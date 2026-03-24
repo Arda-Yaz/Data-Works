@@ -38,7 +38,10 @@ def data_cleaning():
     if st.button("Find mismatches (allowed values based)"):
         mismatches = find_mismatches_by_allowed_values(df, allowed_values_dict)
         st.write("Mismatches based on allowed values:")
-        st.write(mismatches)
+        for col, indices in mismatches.items():
+            if indices:
+                st.write(f"Column: {col}")
+                st.dataframe(df.loc[indices])
     #button to perform automatic cleaning
     if st.button("Perform automatic cleaning"):
         df = automatic_cleaning(df,missing)

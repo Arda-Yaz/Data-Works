@@ -42,11 +42,13 @@ def find_mismatches_by_allowed_values(df, allowed_values_dict):
         if not allowed_values:  # boşsa skip
             continue
 
+        allowed_set = set(allowed_values)
+
         for idx, value in df[col].items():
             if pd.isna(value):
                 continue
 
-            if value not in allowed_values:
+            if str(value) not in allowed_set:
                 col_mismatches.append(idx)
 
         mismatches[col] = col_mismatches
