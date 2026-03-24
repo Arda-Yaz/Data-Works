@@ -11,7 +11,9 @@ def home_page():
 
     if page == "Preview":
         preview()
-
+    if page == "Data Cleaning":
+        from frontend.pages.data_cleaning import data_cleaning
+        data_cleaning()
 
 if __name__ == "__main__":
     home_page()
