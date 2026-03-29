@@ -76,7 +76,7 @@ def preview():
         edited = st.data_editor(
             schema,
             num_rows="dynamic",            # user can add/remove if you want
-            use_container_width=True,
+            width='stretch',
         )
         # `edited` is a DataFrame with whatever the user picked
 
