@@ -84,27 +84,27 @@ def data_cleaning():
 
     # ── Tab 2: Duplicates ────────────────────────────────────────────────
     with tab_dupes:
-        n_dupes, sample = get_duplicate_summary(df)
+        subset_cols = st.multiselect(
+            "Check duplicates across specific columns (leave empty for all)",
+            df.columns.tolist(),
+            key="dup_subset",
+        )
+        keep = st.radio("Keep", ["first", "last", False], horizontal=True, key="dup_keep")
+        
+        n_dupes, sample = get_duplicate_summary(df, subset=subset_cols if subset_cols else None)
         st.write(f"**{n_dupes}** duplicate rows found.")
+        
         if n_dupes > 0:
             with st.expander("Show sample duplicates"):
                 st.dataframe(sample)
 
-            subset_cols = st.multiselect(
-                "Check duplicates across specific columns (leave empty for all)",
-                df.columns.tolist(),
-                key="dup_subset",
-            )
-            keep = st.radio("Keep", ["first", "last", False], horizontal=True, key="dup_keep")
-
-            if st.button("Remove Duplicates", key="apply_dupes"):
-                StateManager.save_snapshot("Remove duplicates")
-                subset = subset_cols if subset_cols else None
-                new_df, removed = remove_duplicates(df, subset=subset, keep=keep)  # type: ignore[arg-type]
-                st.session_state.df = new_df
-                st.success(f"Removed {removed} duplicate rows.")
-                st.rerun()
-
+        if st.button("Remove Duplicates", key="apply_dupes"):
+            StateManager.save_snapshot("Remove duplicates")
+            subset = subset_cols if subset_cols else None
+            new_df, removed = remove_duplicates(df, subset=subset, keep=keep)
+            st.session_state.df = new_df
+            st.success(f"Removed {removed} duplicate rows.")
+            st.rerun()
     # ── Tab 3: Outliers ──────────────────────────────────────────────────
     with tab_outliers:
         outliers = find_outliers(df)

@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+import plotly
 
 from backend.eda import correlation_matrix, group_by_summary, univariate_stats, value_counts_summary
 from backend.state import StateManager
