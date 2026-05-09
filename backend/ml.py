@@ -63,12 +63,11 @@ def train_model(model, X_train, y_train):
 def evaluate_model(model, X_test, y_test, problem_type: str) -> dict:
     y_pred = model.predict(X_test)
     if problem_type == "classification":
-        avg = "weighted" if y_test.nunique() > 2 else "binary"
         return {
             "accuracy": round(accuracy_score(y_test, y_pred), 4),
-            "precision": round(float(precision_score(y_test, y_pred, average=avg, zero_division=0)), 4),
-            "recall": round(float(recall_score(y_test, y_pred, average=avg, zero_division=0)), 4),
-            "f1": round(float(f1_score(y_test, y_pred, average=avg, zero_division=0)), 4),
+            "precision": round(float(precision_score(y_test, y_pred, average="weighted", zero_division=0)), 4),
+            "recall": round(float(recall_score(y_test, y_pred, average="weighted", zero_division=0)), 4),
+            "f1": round(float(f1_score(y_test, y_pred, average="weighted", zero_division=0)), 4),
             "confusion_matrix": confusion_matrix(y_test, y_pred),
             "y_pred": y_pred,
         }

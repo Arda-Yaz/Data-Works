@@ -168,6 +168,9 @@ def data_cleaning():
             )
             if val.strip():
                 allowed_dict[col] = [v.strip() for v in val.split(",")]
+                StateManager.update_column_meta(col, allowed_values=allowed_dict[col])
+            elif current:
+                StateManager.update_column_meta(col, allowed_values=None)
 
         if st.button("Find Mismatches", key="find_mismatch"):
             mismatches = find_mismatches_by_allowed_values(df, allowed_dict)

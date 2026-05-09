@@ -56,6 +56,7 @@ def data_upload():
             "inferred_dtype": m.get("inferred_dtype", str(df[col_name].dtype)),
             "confidence": m.get("confidence", 0.0),
             "role": m.get("role", "feature"),
+            "allowed_values": ", ".join(m.get("allowed_values") or []),
         })
 
     schema_df = pd.DataFrame(schema_rows).set_index("column")
@@ -71,6 +72,9 @@ def data_upload():
                 "Confidence", min_value=0.0, max_value=1.0, format="%.0%%",
             ),
             "role": st.column_config.SelectboxColumn("Role", options=_ROLE_OPTIONS),
+            "allowed_values": st.column_config.TextColumn(
+                "Allowed Values", help="Optional comma-separated values for mismatch checks."
+            ),
         },
         width='stretch',
         key="schema_editor",
@@ -87,6 +91,11 @@ def data_upload():
                     col_name,
                     user_dtype=row["inferred_dtype"],
                     role=row["role"],
+                    allowed_values=[
+                        value.strip()
+                        for value in str(row.get("allowed_values", "")).split(",")
+                        if value.strip()
+                    ] or None,
                 )
             # Cast dtypes
             st.session_state.df = apply_inferred_dtypes(df, st.session_state.column_meta)

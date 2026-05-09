@@ -1,7 +1,6 @@
 import pandas as pd
-import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler, MinMaxScaler
+from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
 
 
 def encode_column(
@@ -59,39 +58,70 @@ def auto_preprocess(
     ]
     df = df.drop(columns=drop_cols)
 
+    X_train, X_test, y_train, y_test = train_test_split(
+        df, y, test_size=test_size, random_state=random_state,
+    )
+
     # Track what we did
-    info: dict = {"dropped": drop_cols, "encoded": {}, "scaled": []}
+    info: dict = {
+        "dropped": drop_cols,
+        "encoded": {},
+        "scaled": [],
+        "fill_values": {},
+        "encoders": {},
+        "scalers": {},
+    }
 
     # Encode categoricals
-    cat_cols = df.select_dtypes(include=["object", "category", "bool"]).columns.tolist()
+    cat_cols = X_train.select_dtypes(include=["object", "category", "bool"]).columns.tolist()
     for col in cat_cols:
-        cardinality = int(df[col].nunique())
+        cardinality = int(X_train[col].nunique())
         method = "onehot" if cardinality < 10 else "label"
-        df = encode_column(df, col, method=method)
         info["encoded"][col] = method
+        if method == "onehot":
+            train_dummies = pd.get_dummies(X_train[col], prefix=col, drop_first=True, dtype=int)
+            test_dummies = pd.get_dummies(X_test[col], prefix=col, drop_first=True, dtype=int)
+            test_dummies = test_dummies.reindex(columns=train_dummies.columns, fill_value=False)
+            X_train = pd.concat([X_train.drop(columns=[col]), train_dummies], axis=1)
+            X_test = pd.concat([X_test.drop(columns=[col]), test_dummies], axis=1)
+            info["encoders"][col] = train_dummies.columns.tolist()
+        else:
+            categories = {
+                value: code
+                for code, value in enumerate(X_train[col].dropna().astype(str).unique())
+            }
+            X_train[col] = X_train[col].astype(str).map(categories)
+            X_test[col] = X_test[col].astype(str).map(categories).fillna(-1)
+            info["encoders"][col] = categories
 
     # Drop any remaining non-numeric columns (safety)
-    df = df.select_dtypes(include="number")
+    X_train = X_train.select_dtypes(include="number")
+    X_test = X_test.reindex(columns=X_train.columns, fill_value=0)
 
-    # Fill remaining NaNs with column median
-    df = df.fillna(df.median())
+    # Fill remaining NaNs with train medians only
+    fill_values = X_train.median()
+    X_train = X_train.fillna(fill_values)
+    X_test = X_test.fillna(fill_values)
+    info["fill_values"] = fill_values.to_dict()
 
     # Scale numeric features
-    scalers = {}
-    for col in df.columns:
-        df, scaler = scale_column(df, col, method="standard")
-        scalers[col] = scaler
-    info["scaled"] = list(df.columns)
+    for col in X_train.columns:
+        scaler = StandardScaler()
+        X_train[col] = scaler.fit_transform(X_train[[col]])
+        X_test[col] = scaler.transform(X_test[[col]])
+        info["scalers"][col] = scaler
+    info["scaled"] = list(X_train.columns)
 
     # Encode target if categorical
     if y.dtype == "object" or y.dtype.name == "category":
         le = LabelEncoder()
-        encoded_y = le.fit_transform(y.astype(str))
-        y = pd.Series(encoded_y, index=y.index, name=target_col)  # type: ignore[arg-type]
+        le.fit(y.astype(str))
+        y_train = pd.Series(
+            le.transform(y_train.astype(str)), index=y_train.index, name=target_col
+        )
+        y_test = pd.Series(
+            le.transform(y_test.astype(str)), index=y_test.index, name=target_col
+        )
         info["target_encoder"] = le
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        df, y, test_size=test_size, random_state=random_state,
-    )
 
     return X_train, X_test, y_train, y_test, info

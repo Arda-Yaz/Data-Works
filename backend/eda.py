@@ -51,6 +51,14 @@ def group_by_summary(
     agg_func: str = "mean",
 ) -> pd.DataFrame:
     """Group by one column and aggregate another."""
+    # Check if column is numeric for numeric aggregation functions
+    numeric_funcs = ["mean", "sum", "median", "min", "max"]
+    if agg_func in numeric_funcs and not pd.api.types.is_numeric_dtype(df[agg_col]):
+        raise ValueError(
+            f"Cannot apply '{agg_func}' to non-numeric column '{agg_col}'. "
+            f"Column dtype is '{df[agg_col].dtype}'. Use 'count' instead."
+        )
+    
     result = df.groupby(group_col)[agg_col].agg(agg_func).reset_index()
     result.columns = [group_col, f"{agg_func}({agg_col})"]
     return result

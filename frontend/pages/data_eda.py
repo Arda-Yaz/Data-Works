@@ -59,14 +59,25 @@ def data_eda():
                 key="gb_agg_col",
             )
         with c3:
-            agg_func = st.selectbox(
-                "Function", ["mean", "sum", "count", "min", "max", "median"],
-                key="gb_func",
-            )
+            # Show appropriate functions based on column type
+            is_numeric = pd.api.types.is_numeric_dtype(df[agg_col]) if agg_col in df.columns else False
+            if is_numeric:
+                agg_func = st.selectbox(
+                    "Function", ["mean", "sum", "count", "min", "max", "median"],
+                    key="gb_func",
+                )
+            else:
+                agg_func = st.selectbox(
+                    "Function", ["count"],
+                    key="gb_func",
+                )
 
         if group_col and agg_col:
-            result = group_by_summary(df, group_col, agg_col, agg_func)
-            st.dataframe(result)
-            agg_label = f"{agg_func}({agg_col})"
-            fig = bar_chart(result, group_col, y=agg_label, agg="sum")
-            st.plotly_chart(fig, width='stretch')
+            try:
+                result = group_by_summary(df, group_col, agg_col, agg_func)
+                st.dataframe(result)
+                agg_label = f"{agg_func}({agg_col})"
+                fig = bar_chart(result, group_col, y=agg_label, agg="sum")
+                st.plotly_chart(fig, width='stretch')
+            except ValueError as e:
+                st.error(f"Error: {str(e)}")

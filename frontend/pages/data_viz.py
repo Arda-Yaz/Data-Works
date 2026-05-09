@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import copy
 
 from backend.state import StateManager
 from backend import visualization as viz
@@ -71,10 +72,17 @@ def data_viz():
 
     if fig is not None:
         st.plotly_chart(fig, width='stretch')
+        if st.button("Save Chart", key="vz_save"):
+            st.session_state.viz_charts.append(copy.deepcopy(fig))
+            st.success("Chart saved.")
+            st.rerun()
 
     # ── Saved charts gallery ─────────────────────────────────────────────
     if st.session_state.viz_charts:
         st.markdown("---")
         st.subheader("Saved Charts")
+        if st.button("Clear Saved Charts", key="vz_clear_saved"):
+            st.session_state.viz_charts = []
+            st.rerun()
         for i, saved_fig in enumerate(st.session_state.viz_charts):
             st.plotly_chart(saved_fig, width='stretch', key=f"saved_{i}")
