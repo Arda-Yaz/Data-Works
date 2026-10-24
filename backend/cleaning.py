@@ -433,17 +433,58 @@ def handle_outliers(
 
 # ── Mismatch helpers (existing, kept) ────────────────────────────────────────
 
+def _rule_normalizer(series: pd.Series):
+    categorical = isinstance(series.dtype, pd.CategoricalDtype)
+    categories = series.cat.categories if categorical else None
+    numeric = _is_real_numeric(series) or (
+        categorical and len(categories) > 0
+        and all(isinstance(value, Real) and not isinstance(value, (bool, np.bool_)) for value in categories)
+    )
+    if numeric:
+        def normalize(value):
+            try:
+                number = Decimal(str(value).strip())
+            except InvalidOperation as exc:
+                raise ValueError("Allowed values for this column must be numbers, without units or other text.") from exc
+            if not number.is_finite():
+                raise ValueError("Numeric allowed values must be finite.")
+            return number
+        return normalize
+    typed = pd.Series(categories) if categorical else series
+    if (
+        pd.api.types.is_bool_dtype(typed.dtype)
+        or pd.api.types.is_datetime64_any_dtype(typed.dtype)
+        or pd.api.types.is_timedelta64_dtype(typed.dtype)
+    ):
+        return lambda value: _parse_constant(typed, value)
+    return str
+
+
+def validate_allowed_values(series: pd.Series, allowed_values) -> set:
+    """Normalize rules against the actual column type without rewriting their text."""
+    normalize = _rule_normalizer(series)
+    try:
+        return {normalize(value) for value in allowed_values}
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError(f"Column {series.name!r}: invalid allowed value. {exc}") from exc
+
+
 def find_mismatches_by_allowed_values(df, allowed_values_dict):
     mismatches = {}
     for col, allowed_values in allowed_values_dict.items():
         col_mismatches = []
-        if not allowed_values:
+        if col not in df.columns or not allowed_values:
             continue
-        allowed_set = set(allowed_values)
+        allowed_set = validate_allowed_values(df[col], allowed_values)
+        normalize = _rule_normalizer(df[col])
         for idx, value in df[col].items():
             if pd.isna(value):
                 continue
-            if str(value) not in allowed_set:
+            try:
+                matches = normalize(value) in allowed_set
+            except (TypeError, ValueError, OverflowError):
+                matches = False
+            if not matches:
                 col_mismatches.append(idx)
         mismatches[col] = col_mismatches
     return mismatches

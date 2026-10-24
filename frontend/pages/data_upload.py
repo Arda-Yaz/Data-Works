@@ -17,6 +17,7 @@ def data_upload():
         uploaded_file = st.file_uploader(
             "Upload a dataset",
             type=["csv", "tsv", "txt", "xlsx", "xls", "json"],
+            key="data_upload_file",
         )
         if uploaded_file is not None:
             try:
@@ -38,12 +39,18 @@ def data_upload():
     st.write(f"**Rows:** {df.shape[0]}  |  **Columns:** {df.shape[1]}")
 
     # Row preview
-    max_rows = max(1, df.shape[0])
-    n = st.sidebar.slider(
+    max_rows = len(df)
+    n = 1 if max_rows <= 1 else st.sidebar.slider(
         "Rows to preview", 1, min(max_rows, 100),
-        5 if max_rows >= 5 else 1,
+        min(max_rows, 5), key="preview_rows",
     )
     st.dataframe(df.head(n))
+    if df.shape[1] == 0:
+        st.info("No columns remain. Undo the last operation or clear the dataset to upload another file.")
+        if st.button("Clear Dataset"):
+            StateManager.clear()
+            st.rerun()
+        return
 
     # ── Editable schema table ────────────────────────────────────────────
     st.subheader("Schema Review")
@@ -71,12 +78,14 @@ def data_upload():
         column_config={
             "original_dtype": st.column_config.TextColumn("Original Type", disabled=True),
             "inferred_dtype": st.column_config.SelectboxColumn(
-                "Requested Type", options=_DTYPE_OPTIONS,
+                "Requested Type", options=list(dict.fromkeys(
+                    _DTYPE_OPTIONS + schema_df["inferred_dtype"].tolist()
+                )), required=True,
             ),
             "confidence": st.column_config.ProgressColumn(
                 "Parser Coverage", min_value=0.0, max_value=1.0, format="%.0%%",
             ),
-            "role": st.column_config.SelectboxColumn("Role", options=_ROLE_OPTIONS),
+            "role": st.column_config.SelectboxColumn("Role", options=_ROLE_OPTIONS, required=True),
             "allowed_values": st.column_config.TextColumn(
                 "Allowed Values", help="Optional comma-separated values for mismatch checks."
             ),
@@ -91,12 +100,13 @@ def data_upload():
     candidate_meta = copy.deepcopy(column_meta)
     for col_name, row in edited.iterrows():
         date_format = row.get("date_format", "")
+        allowed = row.get("allowed_values", "")
         candidate_meta.setdefault(col_name, {}).update(
             user_dtype=row["inferred_dtype"],
             role=row["role"],
             allowed_values=[
                 value.strip()
-                for value in str(row.get("allowed_values", "")).split(",")
+                for value in (str(allowed).split(",") if pd.notna(allowed) else [])
                 if value.strip()
             ] or None,
             date_format=str(date_format).strip() if pd.notna(date_format) and date_format else None,
@@ -129,11 +139,18 @@ def data_upload():
 
     with col1:
         if st.button("Confirm Schema", type="primary", disabled=candidate_df is None):
-            st.session_state.df = candidate_df
-            st.session_state.column_meta = candidate_meta
-            st.session_state.schema_confirmed = True
-            st.success("Schema confirmed and types applied.")
-            st.rerun()
+            try:
+                changed = StateManager.apply_operation(
+                    "Confirm schema", candidate_df,
+                    column_meta=candidate_meta, schema_confirmed=True,
+                )
+            except ValueError as exc:
+                st.error(str(exc))
+            else:
+                if changed:
+                    st.toast("Schema confirmed and types applied. Undo is available in History.")
+                    st.rerun()
+                st.info("The schema is already confirmed with these settings.")
 
     with col2:
         if st.button("Clear Dataset"):
@@ -146,5 +163,5 @@ def data_upload():
 
     with st.expander("Missing Values"):
         missing = df.isna().sum().to_frame("missing")
-        missing["%"] = (100 * missing["missing"] / len(df)).round(2)
+        missing["%"] = (100 * missing["missing"] / max(len(df), 1)).round(2)
         st.dataframe(missing)

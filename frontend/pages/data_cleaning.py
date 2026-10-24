@@ -1,3 +1,5 @@
+import copy
+
 import streamlit as st
 import pandas as pd
 
@@ -34,6 +36,9 @@ def data_cleaning():
             st.rerun()
 
     st.dataframe(df.head(5))
+    if df.shape[1] == 0:
+        st.info("No columns remain. Undo the last operation or upload another dataset.")
+        return
     st.caption("Whole-number columns become decimal columns only when a fill or cap requires it.")
 
     tab_missing, tab_dupes, tab_outliers, tab_mismatch = st.tabs(
@@ -80,16 +85,16 @@ def data_cleaning():
                     new_df = df.copy()
                     for col, strat in strategies.items():
                         new_df = handle_missing(new_df, col, strat, fill_value=fill_values.get(col))
+                    changed = StateManager.apply_operation("Handle missing values", new_df)
                 except Exception as exc:
                     st.error(f"Missing-value changes were not applied. {exc}")
                 else:
-                    StateManager.save_snapshot("Handle missing values")
-                    st.session_state.df = new_df
                     st.toast(
                         f"Applied. Rows: {len(df)} → {len(new_df)}, "
                         f"Columns: {df.shape[1]} → {new_df.shape[1]}"
                     )
-                    st.rerun()
+                    if changed:
+                        st.rerun()
 
     # ── Tab 2: Duplicates ────────────────────────────────────────────────
     with tab_dupes:
@@ -108,12 +113,16 @@ def data_cleaning():
                 st.dataframe(sample)
 
         if st.button("Remove Duplicates", key="apply_dupes"):
-            StateManager.save_snapshot("Remove duplicates")
             subset = subset_cols if subset_cols else None
-            new_df, removed = remove_duplicates(df, subset=subset, keep=keep)
-            st.session_state.df = new_df
-            st.success(f"Removed {removed} duplicate rows.")
-            st.rerun()
+            try:
+                new_df, removed = remove_duplicates(df, subset=subset, keep=keep)
+                changed = StateManager.apply_operation("Remove duplicates", new_df)
+            except Exception as exc:
+                st.error(f"Duplicate rows were not removed. {exc}")
+            else:
+                st.toast(f"Removed {removed} duplicate rows.")
+                if changed:
+                    st.rerun()
     # ── Tab 3: Outliers ──────────────────────────────────────────────────
     with tab_outliers:
         detection_failed = False
@@ -160,59 +169,74 @@ def data_cleaning():
                     for col, (method, action) in actions.items():
                         if action != "ignore":
                             new_df = handle_outliers(new_df, col, method=method, action=action)
+                    changed = StateManager.apply_operation("Handle outliers", new_df)
                 except Exception as exc:
                     st.error(f"Outlier changes were not applied. {exc}")
                 else:
-                    StateManager.save_snapshot("Handle outliers")
-                    st.session_state.df = new_df
                     st.toast(f"Applied. Rows: {len(df)} → {len(new_df)}")
-                    st.rerun()
+                    if changed:
+                        st.rerun()
 
     # ── Tab 4: Mismatches ────────────────────────────────────────────────
     with tab_mismatch:
-        column_meta = st.session_state.get("column_meta", {})
-        allowed_dict = {
-            col: m["allowed_values"]
-            for col, m in column_meta.items()
-            if m.get("allowed_values")
-        }
+        column_meta = st.session_state.column_meta
+        candidate_meta = copy.deepcopy(column_meta)
+        allowed_dict = {}
 
-        st.caption("Set allowed values per column in the Upload page schema, or add them here.")
+        st.caption("Apply Allowed Values saves these rules. Find Mismatches previews your current entries. "
+                   "Rules follow the column's type; dates use ISO format.")
 
         for col in df.columns:
-            current = allowed_dict.get(col)
+            current = column_meta.get(col, {}).get("allowed_values")
             val = st.text_input(
                 f"Allowed values for **{col}** (comma-separated)",
                 value=", ".join(current) if current else "",
                 key=f"av_{col}",
             )
-            if val.strip():
-                allowed_dict[col] = [v.strip() for v in val.split(",")]
-                StateManager.update_column_meta(col, allowed_values=allowed_dict[col])
-            elif current:
-                StateManager.update_column_meta(col, allowed_values=None)
+            values = [value.strip() for value in val.split(",") if value.strip()]
+            candidate_meta[col]["allowed_values"] = values or None
+            if values:
+                allowed_dict[col] = values
+
+        if st.button("Apply Allowed Values", key="apply_allowed_values"):
+            try:
+                changed = StateManager.apply_operation("Update allowed values", df, column_meta=candidate_meta)
+            except ValueError as exc:
+                st.error(str(exc))
+            else:
+                st.toast("Allowed values saved.")
+                if changed:
+                    st.rerun()
 
         if st.button("Find Mismatches", key="find_mismatch"):
-            mismatches = find_mismatches_by_allowed_values(df, allowed_dict)
-            any_found = False
-            for col, idxs in mismatches.items():
-                if idxs:
-                    any_found = True
-                    st.write(f"**{col}**: {len(idxs)} mismatches")
-                    st.dataframe(df.loc[idxs, [col]].head(20))
-            if not any_found:
-                st.success("No mismatches found.")
+            try:
+                mismatches = find_mismatches_by_allowed_values(df, allowed_dict)
+            except ValueError as exc:
+                st.error(f"Could not check allowed values. {exc}")
+            else:
+                any_found = False
+                for col, idxs in mismatches.items():
+                    if idxs:
+                        any_found = True
+                        st.write(f"**{col}**: {len(idxs)} mismatches")
+                        st.dataframe(df.loc[idxs, [col]].head(20))
+                if not any_found:
+                    st.success("No mismatches found.")
 
         if st.button("Remove Mismatch Rows", key="apply_mismatch"):
-            mismatches = find_mismatches_by_allowed_values(df, allowed_dict)
-            all_bad = set()
-            for idxs in mismatches.values():
-                all_bad.update(idxs)
-            if all_bad:
-                StateManager.save_snapshot("Remove mismatch rows")
+            try:
+                mismatches = find_mismatches_by_allowed_values(df, allowed_dict)
+                all_bad = set()
+                for idxs in mismatches.values():
+                    all_bad.update(idxs)
                 new_df = df.drop(index=list(all_bad))
-                st.session_state.df = new_df
-                st.success(f"Removed {len(all_bad)} rows with mismatches.")
-                st.rerun()
+                changed = StateManager.apply_operation(
+                    "Remove mismatch rows" if all_bad else "Update allowed values",
+                    new_df, column_meta=candidate_meta,
+                )
+            except Exception as exc:
+                st.error(f"Mismatch changes were not applied. {exc}")
             else:
-                st.info("Nothing to remove.")
+                st.toast(f"Removed {len(all_bad)} rows with mismatches; current rules saved.")
+                if changed:
+                    st.rerun()

@@ -33,6 +33,10 @@ def home_page():
         st.warning(f"⬆ Upload a dataset first to access **{page}**.")
         return
 
+    if page in _PAGES_NEED_DATA and st.session_state.df.shape[1] == 0:
+        st.warning("No columns remain. Undo the last operation or clear the dataset on the Upload page.")
+        return
+
     _show_page(page)
 
 
