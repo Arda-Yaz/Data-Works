@@ -1,0 +1,1091 @@
+--- a/backend/cleaning.py
++++ b/backend/cleaning.py
+@@ -1,9 +1,32 @@
+-import streamlit as st
++from decimal import Decimal, InvalidOperation
++from fractions import Fraction
++from numbers import Real
++
+ import pandas as pd
+ import numpy as np
+ 
+ 
+ # ── Missing-value helpers ────────────────────────────────────────────────────
++
++def _is_real_numeric(series: pd.Series) -> bool:
++    return (
++        pd.api.types.is_numeric_dtype(series.dtype)
++        and not pd.api.types.is_bool_dtype(series.dtype)
++        and not pd.api.types.is_complex_dtype(series.dtype)
++    )
++
++
++def get_missing_strategies(series: pd.Series) -> list[str]:
++    """Return only missing-value strategies compatible with the column's dtype."""
++    strategies = ["drop_rows"]
++    if _is_real_numeric(series):
++        strategies.extend(["mean", "median"])
++    strategies.extend(["mode", "constant"])
++    if "mean" in strategies:
++        strategies.append("interpolate")
++    strategies.append("drop_column")
++    return strategies
++
+ 
+ def get_missing_summary(df: pd.DataFrame) -> pd.DataFrame:
+     """Return a DataFrame with missing count, percentage, and suggested strategy per column."""
+@@ -17,7 +40,7 @@
+         if pct < 5:
+             suggestions.append("drop_rows")
+         elif pct < 20:
+-            if df[col].dtype in ("int64", "float64", "Int64", "Float64"):
++            if "median" in get_missing_strategies(df[col]):
+                 suggestions.append("median")
+             else:
+                 suggestions.append("mode")
+@@ -27,6 +50,184 @@
+     return missing
+ 
+ 
++def _parse_number(value):
++    if isinstance(value, (bool, np.bool_)):
++        raise ValueError("Enter a number, not a boolean.")
++    try:
++        number = Decimal(str(value).strip())
++    except InvalidOperation as exc:
++        raise ValueError("Enter a finite numeric fill value, for example 0 or 1.5.") from exc
++    if not number.is_finite():
++        raise ValueError("The fill value must be finite.")
++    if number == number.to_integral_value():
++        if -(2**63) <= number <= 2**64 - 1:
++            return int(number)
++        result = float(number)
++        if not np.isfinite(result) or Decimal.from_float(result) != number:
++            raise ValueError("The whole-number fill value cannot be represented exactly.")
++        return result
++    result = float(number)
++    if not np.isfinite(result) or result == 0 or result.is_integer():
++        raise ValueError("The fill value cannot be represented without losing its numeric meaning.")
++    return result
++
++
++def _parse_constant(series: pd.Series, value):
++    if not pd.api.types.is_scalar(value) or pd.isna(value):
++        raise ValueError("Supply a non-missing scalar fill value.")
++    if isinstance(series.dtype, pd.CategoricalDtype):
++        categories = pd.Series(series.cat.categories)
++        if categories.dtype == object and not categories.empty and all(
++            isinstance(item, Real) and not isinstance(item, (bool, np.bool_)) for item in categories
++        ):
++            return _parse_number(value)
++        parsed = _parse_constant(categories, value)
++        if pd.api.types.is_float_dtype(categories.dtype):
++            _, parsed = _numeric_destination(categories, parsed)
++        return parsed
++    if pd.api.types.is_bool_dtype(series.dtype):
++        tokens = {"true": True, "false": False, "yes": True, "no": False,
++                  "t": True, "f": False, "1": True, "0": False}
++        token = str(value).strip().lower()
++        if token not in tokens:
++            raise ValueError("Use true/false, yes/no, t/f, or 1/0 for a boolean fill.")
++        return tokens[token]
++    if _is_real_numeric(series):
++        return _parse_number(value)
++    if pd.api.types.is_datetime64_any_dtype(series.dtype):
++        timestamp = pd.to_datetime(value, format="ISO8601", errors="raise")
++        if pd.isna(timestamp):
++            raise ValueError("Enter a non-missing ISO date or datetime.")
++        timezone = series.dt.tz
++        if timezone is not None:
++            try:
++                return timestamp.tz_localize(timezone) if timestamp.tzinfo is None else timestamp.tz_convert(timezone)
++            except Exception as exc:
++                raise ValueError(
++                    "This local datetime is ambiguous or invalid for the column's timezone. "
++                    "Use an ISO datetime with an explicit UTC offset."
++                ) from exc
++        if timestamp.tzinfo is not None:
++            raise ValueError("This column has no timezone; use a datetime without a timezone offset.")
++        return timestamp
++    if pd.api.types.is_timedelta64_dtype(series.dtype):
++        duration = pd.to_timedelta(value, errors="raise")
++        if pd.isna(duration):
++            raise ValueError("Enter a non-missing duration, for example '2 days'.")
++        return duration
++    if pd.api.types.is_complex_dtype(series.dtype):
++        number = complex(value)
++        if not np.isfinite(number):
++            raise ValueError("The fill value must be finite.")
++        return number
++    return value
++
++
++def _float_series(series: pd.Series) -> pd.Series:
++    if pd.api.types.is_integer_dtype(series.dtype):
++        if any(int(value) != int(float(value)) for value in series.dropna()):
++            raise ValueError(
++                "A fractional result would round existing large integers. "
++                "Use a whole-number constant, mode, or a row/column removal strategy."
++            )
++    dtype = "Float64" if pd.api.types.is_extension_array_dtype(series.dtype) else "float64"
++    return series.astype(dtype)
++
++
++def _numeric_destination(series: pd.Series, value) -> tuple[pd.Series, int | float]:
++    """Choose a safe destination dtype before assigning a numeric result."""
++    if not np.isfinite(float(value)):
++        raise ValueError("The numeric result is not finite; choose a different fill or cleaning strategy.")
++    if pd.api.types.is_integer_dtype(series.dtype):
++        if isinstance(value, Fraction):
++            if value.denominator == 1:
++                value = value.numerator
++            else:
++                value = float(value)
++                if value.is_integer():
++                    raise ValueError("The fractional result would be rounded to an integer.")
++        if not float(value).is_integer():
++            return _float_series(series), value
++        value = int(value)
++        limits = np.iinfo(getattr(series.dtype, "numpy_dtype", series.dtype))
++        if not limits.min <= value <= limits.max:
++            observed = series.dropna()
++            low = min(value, int(observed.min())) if not observed.empty else value
++            high = max(value, int(observed.max())) if not observed.empty else value
++            if -(2**63) <= low and high < 2**63:
++                dtype = "Int64"
++            elif 0 <= low and high < 2**64:
++                dtype = "UInt64"
++            else:
++                raise ValueError("The fill value and existing integers cannot share a safe 64-bit dtype.")
++            return series.astype(dtype), value
++    elif isinstance(value, (int, np.integer)) and int(float(value)) != value:
++        raise ValueError("This whole-number fill value would lose precision in a floating-point column.")
++    if pd.api.types.is_float_dtype(series.dtype):
++        storage = getattr(series.dtype, "numpy_dtype", series.dtype)
++        with np.errstate(over="ignore", under="ignore"):
++            stored_value = np.asarray(value, dtype=storage).item()
++        if stored_value != value:
++            return _float_series(series), value
++    return series.copy(), value
++
++
++def _statistic(series: pd.Series, strategy: str):
++    if not pd.api.types.is_integer_dtype(series.dtype):
++        numeric = _float_series(series)
++        return numeric.mean() if strategy == "mean" else numeric.median()
++    present = series.dropna()
++    if strategy == "mean":
++        value = Fraction(sum(map(int, present)), len(present))
++    else:
++        ordered = present.sort_values()
++        midpoint = len(ordered) // 2
++        value = Fraction(int(ordered.iloc[midpoint])) if len(ordered) % 2 else Fraction(
++            int(ordered.iloc[midpoint - 1]) + int(ordered.iloc[midpoint]), 2,
++        )
++    if value.denominator == 1:
++        return value.numerator
++    result = float(value)
++    if result.is_integer():
++        raise ValueError("The fractional statistic is too large to represent without rounding to an integer.")
++    return result
++
++
++def _interpolate_integers(series: pd.Series) -> pd.Series:
++    # Compute missing positions exactly before deciding whether a float dtype is needed.
++    present = np.flatnonzero(series.notna().to_numpy())
++    replacements = []
++    for left, right in zip(present[:-1], present[1:]):
++        if right == left + 1:
++            continue
++        start, stop = int(series.iloc[left]), int(series.iloc[right])
++        for position in range(left + 1, right):
++            replacements.append((position, Fraction(start) + Fraction(stop - start, int(right - left)) * int(position - left)))
++    replacements.extend((position, Fraction(int(series.iloc[present[-1]]))) for position in range(present[-1] + 1, len(series)))
++    fractional = any(value.denominator != 1 for _, value in replacements)
++    result = _float_series(series) if fractional else series.copy()
++    for position, value in replacements:
++        number = float(value) if fractional else value.numerator
++        if fractional and value.denominator == 1 and int(number) != value.numerator:
++            raise ValueError("Interpolation would round a newly calculated whole number during float conversion.")
++        if value.denominator != 1 and number.is_integer():
++            raise ValueError("Interpolation would round a fractional result to an integer.")
++        result.iloc[position] = number
++    return result
++
++
++def _interpolate_floats(series: pd.Series) -> pd.Series:
++    result = _float_series(series).interpolate()
++    storage = getattr(series.dtype, "numpy_dtype", series.dtype)
++    if np.dtype(storage).itemsize < 8:
++        filled = result.loc[series.isna()].dropna().to_numpy(dtype=float)
++        with np.errstate(over="ignore", under="ignore"):
++            narrowed = filled.astype(storage).astype(float)
++        if np.array_equal(filled, narrowed):
++            return result.astype(series.dtype)
++    return result
++
++
+ def handle_missing(
+     df: pd.DataFrame,
+     col: str,
+@@ -37,24 +238,57 @@
+ 
+     Strategies: drop_rows, mean, median, mode, constant, interpolate, drop_column
+     """
+-    df = df.copy()
++    if col not in df.columns:
++        raise ValueError(f"Column {col!r} is not present in the dataset.")
++    series = df[col]
++    if strategy not in get_missing_strategies(series):
++        raise ValueError(f"Column {col!r}: strategy {strategy!r} is incompatible with dtype {series.dtype}.")
++    result = df.copy()
+     if strategy == "drop_rows":
+-        df = df.dropna(subset=[col])
+-    elif strategy == "mean":
+-        df[col] = df[col].fillna(df[col].mean())
+-    elif strategy == "median":
+-        df[col] = df[col].fillna(df[col].median())
+-    elif strategy == "mode":
+-        mode_val = df[col].mode()
+-        if not mode_val.empty:
+-            df[col] = df[col].fillna(mode_val.iloc[0])
+-    elif strategy == "constant":
+-        df[col] = df[col].fillna(fill_value)
+-    elif strategy == "interpolate":
+-        df[col] = df[col].interpolate()
+-    elif strategy == "drop_column":
+-        df = df.drop(columns=[col])
+-    return df
++        return result.dropna(subset=[col])
++    if strategy == "drop_column":
++        return result.drop(columns=[col])
++    if not series.isna().any():
++        return result
++    try:
++        if strategy != "constant" and series.dropna().empty:
++            raise ValueError("There are no observed values to use. Choose a constant or drop rows/the column.")
++        if strategy in ("mean", "median", "interpolate"):
++            if not np.isfinite(series.dropna().to_numpy(dtype=float)).all():
++                raise ValueError("Replace non-finite values before computing statistics or interpolating.")
++        if strategy == "interpolate":
++            result[col] = (
++                _interpolate_integers(series) if pd.api.types.is_integer_dtype(series.dtype)
++                else _interpolate_floats(series)
++            )
++            return result
++        if strategy in ("mean", "median"):
++            value = _statistic(series, strategy)
++        elif strategy == "mode":
++            value = series.mode().iloc[0]
++        else:
++            value = _parse_constant(series, fill_value)
++        destination = series.copy()
++        if _is_real_numeric(series):
++            destination, value = _numeric_destination(series, value)
++        elif isinstance(series.dtype, pd.CategoricalDtype) and value not in series.cat.categories:
++            categories = series.cat.categories
++            mixed_numeric = pd.api.types.is_integer_dtype(categories.dtype) and isinstance(value, float)
++            if categories.dtype == object or mixed_numeric:
++                # add_categories may infer a float index and round integer labels.
++                categorical = pd.Categorical.from_codes(
++                    series.cat.codes.to_numpy(copy=True),
++                    categories=pd.Index([*categories, value], dtype=object),
++                    ordered=series.cat.ordered,
++                )
++                destination = pd.Series(categorical, index=series.index, name=series.name)
++            else:
++                destination = series.cat.add_categories([value])
++        destination.loc[destination.isna()] = value
++        result[col] = destination
++        return result
++    except (TypeError, ValueError, OverflowError) as exc:
++        raise ValueError(f"Column {col!r}: {exc}") from exc
+ 
+ 
+ # ── Duplicate helpers ────────────────────────────────────────────────────────
+@@ -80,16 +314,77 @@
+ 
+ # ── Outlier helpers ──────────────────────────────────────────────────────────
+ 
++def _integer_quantile(ordered: pd.Series, quantile: Fraction) -> Fraction:
++    position = (len(ordered) - 1) * quantile
++    left = position.numerator // position.denominator
++    value = Fraction(int(ordered.iloc[left]))
++    if position.denominator != 1:
++        value += (int(ordered.iloc[left + 1]) - int(ordered.iloc[left])) * (position - left)
++    return value
++
++
++def _bound_masks(series: pd.Series, lower, upper):
++    if pd.api.types.is_integer_dtype(series.dtype):
++        # Integer comparisons against rounded float bounds also lose precision.
++        lower, upper = Fraction(lower), Fraction(upper)
++        below = -(-lower.numerator // lower.denominator)
++        above = upper.numerator // upper.denominator
++        limits = np.iinfo(getattr(series.dtype, "numpy_dtype", series.dtype))
++        false = pd.Series(False, index=series.index)
++        low_mask = false if below <= limits.min else series.notna() if below > limits.max else series < below
++        high_mask = false if above >= limits.max else series.notna() if above < limits.min else series > above
++        return low_mask.fillna(False), high_mask.fillna(False)
++    return (series < lower).fillna(False), (series > upper).fillna(False)
++
++
++def _outlier_mask(series: pd.Series, method: str):
++    if method not in ("iqr", "zscore"):
++        raise ValueError(f"Column {series.name!r}: unknown outlier method {method!r}.")
++    if not _is_real_numeric(series):
++        raise ValueError(f"Column {series.name!r}: outlier handling requires a real numeric column.")
++    observed = series.dropna()
++    empty_mask = pd.Series(False, index=series.index)
++    if observed.empty:
++        return empty_mask, None, None
++    if not np.isfinite(observed.to_numpy(dtype=float)).all():
++        raise ValueError(f"Column {series.name!r}: replace non-finite values before detecting outliers.")
++    integer = pd.api.types.is_integer_dtype(series.dtype)
++    if method == "iqr":
++        if integer:
++            ordered = observed.sort_values()
++            q1, q3 = _integer_quantile(ordered, Fraction(1, 4)), _integer_quantile(ordered, Fraction(3, 4))
++        else:
++            numeric = _float_series(observed)
++            q1, q3 = numeric.quantile(0.25), numeric.quantile(0.75)
++        spread = q3 - q1
++        multiplier = Fraction(3, 2) if integer else 1.5
++        lower, upper = q1 - multiplier * spread, q3 + multiplier * spread
++    else:
++        if len(observed) < 2:
++            return empty_mask, None, None
++        if integer:
++            mean = Fraction(sum(map(int, observed)), len(observed))
++            origin = int(observed.iloc[0])
++            std = pd.Series([int(value) - origin for value in observed], dtype=float).std()
++            distance = Fraction.from_float(3 * float(std))
++        else:
++            numeric = _float_series(observed)
++            mean, std = numeric.mean(), numeric.std()
++            distance = 3 * std
++        lower, upper = mean - distance, mean + distance
++    if not np.isfinite(float(lower)) or not np.isfinite(float(upper)):
++        raise ValueError(f"Column {series.name!r}: outlier bounds are not finite; rescale the values first.")
++    low_mask, high_mask = _bound_masks(series, lower, upper)
++    return low_mask | high_mask, lower, upper
++
++
+ def find_outliers(df):
+     """Find outliers using the IQR method. Returns dict of col → list of indices."""
+     outliers = {}
+     for col in df.select_dtypes(include="number").columns:
+-        Q1 = df[col].quantile(0.25)
+-        Q3 = df[col].quantile(0.75)
+-        IQR = Q3 - Q1
+-        lower = Q1 - 1.5 * IQR
+-        upper = Q3 + 1.5 * IQR
+-        outliers[col] = df[(df[col] < lower) | (df[col] > upper)].index.tolist()
++        if _is_real_numeric(df[col]):
++            mask, _, _ = _outlier_mask(df[col], "iqr")
++            outliers[col] = df.index[mask].tolist()
+     return outliers
+ 
+ 
+@@ -102,31 +397,38 @@
+     """Handle outliers for a single column.
+ 
+     method: iqr | zscore
+-    action: remove | cap | replace_nan
++    action: remove | cap | replace_nan | ignore
+     """
+-    df = df.copy()
++    if col not in df.columns:
++        raise ValueError(f"Column {col!r} is not present in the dataset.")
++    if action not in ("remove", "cap", "replace_nan", "ignore"):
++        raise ValueError(f"Column {col!r}: unknown outlier action {action!r}.")
+     series = df[col]
+-
+-    if method == "iqr":
+-        Q1 = series.quantile(0.25)
+-        Q3 = series.quantile(0.75)
+-        IQR = Q3 - Q1
+-        lower, upper = Q1 - 1.5 * IQR, Q3 + 1.5 * IQR
+-    else:  # zscore
+-        mean, std = series.mean(), series.std()
+-        lower, upper = mean - 3 * std, mean + 3 * std
+-
+-    mask = (series < lower) | (series > upper)
+-
++    mask, lower, upper = _outlier_mask(series, method)
++    result = df.copy()
++    if action == "ignore" or not mask.any():
++        return result
+     if action == "remove":
+-        df = df[~mask]
+-    elif action == "cap":
+-        df.loc[series < lower, col] = lower
+-        df.loc[series > upper, col] = upper
+-    elif action == "replace_nan":
+-        df.loc[mask, col] = np.nan
+-
+-    return df
++        return result.loc[~mask].copy()
++    try:
++        if action == "cap":
++            capped = series.copy()
++            low_mask, high_mask = _bound_masks(series, lower, upper)
++            for bound, selected in (
++                (lower, low_mask),
++                (upper, high_mask),
++            ):
++                if selected.any():
++                    capped, value = _numeric_destination(capped, bound)
++                    capped.loc[selected] = value
++            result[col] = capped
++        elif action == "replace_nan":
++            destination = series.convert_dtypes() if pd.api.types.is_integer_dtype(series.dtype) else series.copy()
++            destination.loc[mask] = pd.NA
++            result[col] = destination
++        return result
++    except (TypeError, ValueError, OverflowError) as exc:
++        raise ValueError(f"Column {col!r}: {exc}") from exc
+ 
+ 
+ # ── Mismatch helpers (existing, kept) ────────────────────────────────────────
+@@ -150,14 +452,13 @@
+ # ── Legacy automatic cleaning (kept for backward compat) ─────────────────────
+ 
+ def automatic_cleaning(df, missing):
++    result = df.copy()
+     for col in missing.index:
+         if missing.loc[col, "%"] < 5:
+-            df = df.dropna(subset=[col])
++            strategy = "drop_rows"
+         elif missing.loc[col, "%"] < 20:
+-            if df[col].dtype in ["int64", "float64"]:
+-                df[col] = df[col].fillna(df[col].median())
+-            else:
+-                df[col] = df[col].fillna(df[col].mode()[0])
++            strategy = "median" if "median" in get_missing_strategies(result[col]) else "mode"
+         else:
+-            df = df.drop(columns=[col])
+-    return df
+\ No newline at end of file
++            strategy = "drop_column"
++        result = handle_missing(result, col, strategy)
++    return result
+--- a/frontend/pages/data_cleaning.py
++++ b/frontend/pages/data_cleaning.py
+@@ -6,6 +6,7 @@
+     find_outliers,
+     get_duplicate_summary,
+     get_missing_summary,
++    get_missing_strategies,
+     handle_missing,
+     handle_outliers,
+     remove_duplicates,
+@@ -13,9 +14,6 @@
+ from backend.state import StateManager
+ 
+ 
+-_MISSING_STRATEGIES = [
+-    "drop_rows", "mean", "median", "mode", "constant", "interpolate", "drop_column",
+-]
+ _OUTLIER_METHODS = ["iqr", "zscore"]
+ _OUTLIER_ACTIONS = ["remove", "cap", "replace_nan", "ignore"]
+ 
+@@ -36,6 +34,7 @@
+             st.rerun()
+ 
+     st.dataframe(df.head(5))
++    st.caption("Whole-number columns become decimal columns only when a fill or cap requires it.")
+ 
+     tab_missing, tab_dupes, tab_outliers, tab_mismatch = st.tabs(
+         ["Missing Values", "Duplicates", "Outliers", "Mismatches"]
+@@ -54,33 +53,43 @@
+ 
+             for col in missing_summary.index:
+                 suggested = missing_summary.loc[col, "suggested"]
++                compatible = get_missing_strategies(df[col])
++                widget_key = f"ms_{col}"
++                if widget_key in st.session_state and st.session_state[widget_key] not in compatible:
++                    del st.session_state[widget_key]
+                 c1, c2 = st.columns([2, 1])
+                 with c1:
+                     strat = st.selectbox(
+                         f"Strategy for **{col}**",
+-                        _MISSING_STRATEGIES,
+-                        index=_MISSING_STRATEGIES.index(str(suggested)),
+-                        key=f"ms_{col}",
++                        compatible,
++                        index=compatible.index(str(suggested)),
++                        key=widget_key,
+                     )
+                     strategies[col] = strat
+                 with c2:
+                     if strat == "constant":
+                         fill_values[col] = st.text_input(
+-                            f"Fill value for {col}", key=f"fv_{col}"
++                            f"Fill value for {col}", key=f"fv_{col}",
++                            help="Numbers are parsed as numbers; booleans accept true/false. "
++                                 "Dates use ISO format, for example 2024-03-15. "
++                                 "A date without an offset uses the column's timezone, if present.",
+                         )
+ 
+             if st.button("Apply Missing Value Strategies", key="apply_missing"):
+-                StateManager.save_snapshot("Handle missing values")
+-                new_df = df.copy()
+-                for col, strat in strategies.items():
+-                    fv = fill_values.get(col)
+-                    new_df = handle_missing(new_df, col, strat, fill_value=fv)
+-                st.session_state.df = new_df
+-                st.success(
+-                    f"Applied. Rows: {len(df)} → {len(new_df)}, "
+-                    f"Columns: {df.shape[1]} → {new_df.shape[1]}"
+-                )
+-                st.rerun()
++                try:
++                    new_df = df.copy()
++                    for col, strat in strategies.items():
++                        new_df = handle_missing(new_df, col, strat, fill_value=fill_values.get(col))
++                except Exception as exc:
++                    st.error(f"Missing-value changes were not applied. {exc}")
++                else:
++                    StateManager.save_snapshot("Handle missing values")
++                    st.session_state.df = new_df
++                    st.toast(
++                        f"Applied. Rows: {len(df)} → {len(new_df)}, "
++                        f"Columns: {df.shape[1]} → {new_df.shape[1]}"
++                    )
++                    st.rerun()
+ 
+     # ── Tab 2: Duplicates ────────────────────────────────────────────────
+     with tab_dupes:
+@@ -107,10 +116,17 @@
+             st.rerun()
+     # ── Tab 3: Outliers ──────────────────────────────────────────────────
+     with tab_outliers:
+-        outliers = find_outliers(df)
++        detection_failed = False
++        try:
++            outliers = find_outliers(df)
++        except Exception as exc:
++            st.error(f"Could not detect outliers. {exc}")
++            detection_failed = True
++            outliers = {}
+         has_outliers = any(len(v) > 0 for v in outliers.values())
+         if not has_outliers:
+-            st.success("No outliers detected (IQR method).")
++            if not detection_failed:
++                st.success("No outliers detected (IQR method).")
+         else:
+             summary_data = [
+                 {"Column": col, "Outlier Count": len(idxs)}
+@@ -139,14 +155,18 @@
+                 actions[col] = (method, action)
+ 
+             if st.button("Apply Outlier Handling", key="apply_outliers"):
+-                StateManager.save_snapshot("Handle outliers")
+-                new_df = df.copy()
+-                for col, (method, action) in actions.items():
+-                    if action != "ignore":
+-                        new_df = handle_outliers(new_df, col, method=method, action=action)
+-                st.session_state.df = new_df
+-                st.success(f"Applied. Rows: {len(df)} → {len(new_df)}")
+-                st.rerun()
++                try:
++                    new_df = df.copy()
++                    for col, (method, action) in actions.items():
++                        if action != "ignore":
++                            new_df = handle_outliers(new_df, col, method=method, action=action)
++                except Exception as exc:
++                    st.error(f"Outlier changes were not applied. {exc}")
++                else:
++                    StateManager.save_snapshot("Handle outliers")
++                    st.session_state.df = new_df
++                    st.toast(f"Applied. Rows: {len(df)} → {len(new_df)}")
++                    st.rerun()
+ 
+     # ── Tab 4: Mismatches ────────────────────────────────────────────────
+     with tab_mismatch:
+--- /dev/null
++++ b/tests/test_cleaning_correctness.py
+@@ -0,0 +1,363 @@
++import unittest
++
++import numpy as np
++import pandas as pd
++from pandas.testing import assert_frame_equal
++
++from backend.cleaning import get_missing_strategies, handle_missing, handle_outliers
++
++
++class MissingValueTests(unittest.TestCase):
++    def test_strategy_options_match_column_types(self):
++        common = {"drop_rows", "drop_column", "mode", "constant"}
++        numeric_only = {"mean", "median", "interpolate"}
++        for dtype in ("Int64", "Float64", "int64", "float64"):
++            with self.subTest(dtype=dtype):
++                options = set(get_missing_strategies(pd.Series([1, 2], dtype=dtype)))
++                self.assertTrue(common | numeric_only <= options)
++        nonnumeric = [
++            pd.Series(["a", None], dtype="string"),
++            pd.Series([True, None], dtype="boolean"),
++            pd.Series(["a", None], dtype="category"),
++            pd.Series(pd.to_datetime(["2024-01-01", None])),
++        ]
++        for series in nonnumeric:
++            with self.subTest(dtype=series.dtype):
++                options = set(get_missing_strategies(series))
++                self.assertTrue(common <= options)
++                self.assertFalse(numeric_only & options)
++
++    def test_fractional_mean_and_median_promote_nullable_integers(self):
++        df = pd.DataFrame({"x": pd.Series([1, 2, None], dtype="Int64")})
++        before = df.copy(deep=True)
++        for strategy in ("mean", "median"):
++            with self.subTest(strategy=strategy):
++                result = handle_missing(df, "x", strategy)
++                self.assertEqual(str(result["x"].dtype), "Float64")
++                self.assertEqual(result["x"].tolist(), [1.0, 2.0, 1.5])
++                assert_frame_equal(df, before)
++
++    def test_integral_statistics_preserve_nullable_integer_dtype(self):
++        df = pd.DataFrame({"x": pd.Series([1, 3, None], dtype="Int64")})
++        for strategy in ("mean", "median", "mode"):
++            with self.subTest(strategy=strategy):
++                result = handle_missing(df, "x", strategy)
++                self.assertEqual(str(result["x"].dtype), "Int64")
++                self.assertEqual(result.loc[2, "x"], 1 if strategy == "mode" else 2)
++
++    def test_interpolation_promotes_only_when_fractional_values_are_needed(self):
++        for last, expected, dtype in ((3, 2, "Int64"), (4, 2.5, "Float64")):
++            with self.subTest(last=last):
++                df = pd.DataFrame({"x": pd.Series([1, None, last], dtype="Int64")})
++                result = handle_missing(df, "x", "interpolate")
++                self.assertEqual(result.loc[1, "x"], expected)
++                self.assertEqual(str(result["x"].dtype), dtype)
++
++    def test_text_numeric_constants_are_parsed(self):
++        df = pd.DataFrame({"x": pd.Series([1, None], dtype="Int64")})
++        for value, expected, dtype in (("0", 0, "Int64"), ("-2", -2, "Int64"), ("1.5", 1.5, "Float64")):
++            with self.subTest(value=value):
++                result = handle_missing(df, "x", "constant", value)
++                self.assertEqual(result.loc[1, "x"], expected)
++                self.assertEqual(str(result["x"].dtype), dtype)
++
++    def test_float_constant_remains_numeric(self):
++        df = pd.DataFrame({"x": pd.Series([1.0, None], dtype="Float64")})
++        result = handle_missing(df, "x", "constant", "2.75")
++        self.assertEqual(result.loc[1, "x"], 2.75)
++        self.assertEqual(str(result["x"].dtype), "Float64")
++
++    def test_large_integer_constant_is_exact(self):
++        df = pd.DataFrame({"x": pd.Series([9007199254740993, None], dtype="Int64")})
++        result = handle_missing(df, "x", "constant", "9007199254740995")
++        self.assertEqual(result.loc[1, "x"], 9007199254740995)
++        self.assertEqual(str(result["x"].dtype), "Int64")
++
++    def test_unsafe_float_promotion_rejects_instead_of_rounding_existing_integers(self):
++        df = pd.DataFrame({"x": pd.Series([9007199254740993, None], dtype="Int64")})
++        before = df.copy(deep=True)
++        with self.assertRaises(ValueError):
++            handle_missing(df, "x", "constant", "1.5")
++        assert_frame_equal(df, before)
++
++    def test_narrow_float_constants_promote_instead_of_rounding(self):
++        for dtype in ("Float32", "float32"):
++            for value in ("1e-46", "16777217", "1.00000001"):
++                with self.subTest(dtype=dtype, value=value):
++                    df = pd.DataFrame({"x": pd.Series([1, None], dtype=dtype)})
++                    before = df.copy(deep=True)
++                    result = handle_missing(df, "x", "constant", value)
++                    self.assertEqual(float(result.loc[1, "x"]), float(value))
++                    self.assertEqual(str(result["x"].dtype), "Float64" if dtype == "Float32" else "float64")
++                    assert_frame_equal(df, before)
++
++    def test_fractional_interpolation_cannot_round_other_integer_replacements(self):
++        df = pd.DataFrame({"x": pd.Series([2**54, None, 2**54 + 4, 0, None, 1], dtype="Int64")})
++        before = df.copy(deep=True)
++        with self.assertRaisesRegex(ValueError, "x"):
++            handle_missing(df, "x", "interpolate")
++        assert_frame_equal(df, before)
++
++    def test_boolean_constants_are_parsed(self):
++        df = pd.DataFrame({"x": pd.Series([True, None], dtype="boolean")})
++        for value, expected in (("true", True), ("false", False), ("1", True), ("0", False)):
++            with self.subTest(value=value):
++                result = handle_missing(df, "x", "constant", value)
++                self.assertEqual(result.loc[1, "x"], expected)
++                self.assertEqual(str(result["x"].dtype), "boolean")
++
++    def test_datetime_constant_preserves_datetime_dtype(self):
++        df = pd.DataFrame({"x": pd.to_datetime(["2024-01-01", None])})
++        result = handle_missing(df, "x", "constant", "2024-03-15")
++        self.assertEqual(result.loc[1, "x"], pd.Timestamp("2024-03-15"))
++        self.assertEqual(result["x"].dtype, df["x"].dtype)
++
++    def test_naive_datetime_constant_uses_column_timezone(self):
++        df = pd.DataFrame({"x": pd.to_datetime(["2024-01-01", None]).tz_localize("Europe/Istanbul")})
++        result = handle_missing(df, "x", "constant", "2024-03-15T12:30:00")
++        self.assertEqual(result.loc[1, "x"], pd.Timestamp("2024-03-15T12:30:00", tz="Europe/Istanbul"))
++        self.assertEqual(result["x"].dtype, df["x"].dtype)
++
++    def test_aware_datetime_constant_is_rejected_for_naive_column(self):
++        df = pd.DataFrame({"x": pd.to_datetime(["2024-01-01", None])})
++        before = df.copy(deep=True)
++        with self.assertRaisesRegex(ValueError, "x"):
++            handle_missing(df, "x", "constant", "2024-03-15T12:30:00+03:00")
++        assert_frame_equal(df, before)
++
++    def test_string_constant_remains_text(self):
++        df = pd.DataFrame({"x": pd.Series(["existing", None], dtype="string")})
++        result = handle_missing(df, "x", "constant", "0")
++        self.assertEqual(result.loc[1, "x"], "0")
++        self.assertEqual(str(result["x"].dtype), "string")
++
++    def test_new_category_constant_can_be_added(self):
++        df = pd.DataFrame({"x": pd.Series(["existing", None], dtype="category")})
++        before = df.copy(deep=True)
++        result = handle_missing(df, "x", "constant", "unknown")
++        self.assertEqual(result.loc[1, "x"], "unknown")
++        self.assertIsInstance(result["x"].dtype, pd.CategoricalDtype)
++        self.assertIn("unknown", result["x"].cat.categories)
++        assert_frame_equal(df, before)
++
++    def test_numeric_category_constant_uses_category_type(self):
++        df = pd.DataFrame({"x": pd.Categorical([1, None], categories=[1, 2])})
++        result = handle_missing(df, "x", "constant", "2")
++        self.assertEqual(result.loc[1, "x"], 2)
++        self.assertEqual(result["x"].cat.categories.tolist(), [1, 2])
++
++    def test_float_categories_reject_inexact_large_integer_constants(self):
++        df = pd.DataFrame({"x": pd.Categorical([1.0, None], categories=[1.0, 2.0])})
++        before = df.copy(deep=True)
++        with self.assertRaisesRegex(ValueError, "x"):
++            handle_missing(df, "x", "constant", "9007199254740993")
++        assert_frame_equal(df, before)
++
++    def test_signed_category_accepts_uint64_constant_without_rounding(self):
++        df = pd.DataFrame({"x": pd.Categorical([-1, None], categories=[-1, 1])})
++        before = df.copy(deep=True)
++        result = handle_missing(df, "x", "constant", "18446744073709551615")
++        self.assertEqual(result.loc[1, "x"], 18446744073709551615)
++        self.assertEqual(result.loc[0, "x"], -1)
++        self.assertIsInstance(result["x"].dtype, pd.CategoricalDtype)
++        assert_frame_equal(df, before)
++
++    def test_invalid_typed_constants_report_column_and_leave_input_unchanged(self):
++        cases = [
++            (pd.Series([1, None], dtype="Int64"), "not a number"),
++            (pd.Series([True, None], dtype="boolean"), "maybe"),
++            (pd.Series(pd.to_datetime(["2024-01-01", None])), "not a date"),
++        ]
++        for series, value in cases:
++            with self.subTest(dtype=series.dtype, value=value):
++                df = pd.DataFrame({"x": series})
++                before = df.copy(deep=True)
++                with self.assertRaisesRegex(ValueError, "x"):
++                    handle_missing(df, "x", "constant", value)
++                assert_frame_equal(df, before)
++
++    def test_nonfinite_numeric_constants_are_rejected(self):
++        df = pd.DataFrame({"x": pd.Series([1.0, None], dtype="Float64")})
++        for value in ("NaN", "inf", "-inf", "1e999"):
++            with self.subTest(value=value), self.assertRaises(ValueError):
++                handle_missing(df, "x", "constant", value)
++
++    def test_incompatible_strategies_raise_actionable_errors(self):
++        df = pd.DataFrame({"x": pd.Series(["a", None], dtype="string")})
++        for strategy in ("mean", "median", "interpolate", "unknown"):
++            with self.subTest(strategy=strategy), self.assertRaisesRegex(ValueError, "x"):
++                handle_missing(df, "x", strategy)
++
++    def test_all_missing_statistics_raise_actionable_errors(self):
++        df = pd.DataFrame({"x": pd.Series([None, None], dtype="Int64")})
++        for strategy in ("mean", "median", "mode", "interpolate"):
++            with self.subTest(strategy=strategy), self.assertRaisesRegex(ValueError, "x"):
++                handle_missing(df, "x", strategy)
++
++    def test_large_integer_statistics_and_interpolation_remain_exact(self):
++        base = 2**53
++        for strategy in ("mean", "median"):
++            with self.subTest(strategy=strategy):
++                df = pd.DataFrame({"x": pd.Series([base + 1, base + 3, None], dtype="Int64")})
++                result = handle_missing(df, "x", strategy)
++                self.assertEqual(result.loc[2, "x"], base + 2)
++                self.assertEqual(str(result["x"].dtype), "Int64")
++        df = pd.DataFrame({"x": pd.Series([base + 1, None, base + 3], dtype="Int64")})
++        self.assertEqual(handle_missing(df, "x", "interpolate").loc[1, "x"], base + 2)
++
++    def test_narrow_integer_constant_widens_without_overflow(self):
++        df = pd.DataFrame({"x": pd.Series([127, None], dtype="Int8")})
++        result = handle_missing(df, "x", "constant", "128")
++        self.assertEqual(result["x"].tolist(), [127, 128])
++        self.assertTrue(pd.api.types.is_integer_dtype(result["x"]))
++
++    def test_finite_large_scientific_notation_is_valid_for_float_columns(self):
++        df = pd.DataFrame({"x": pd.Series([1.0, None], dtype="Float64")})
++        self.assertEqual(handle_missing(df, "x", "constant", "1e20").loc[1, "x"], 1e20)
++
++    def test_narrow_float_interpolation_does_not_round_new_values(self):
++        next_value = np.nextafter(np.float32(1), np.float32(2))
++        for dtype in ("float32", "Float32"):
++            with self.subTest(dtype=dtype):
++                df = pd.DataFrame({"x": pd.Series([1, np.nan, next_value], dtype=dtype)})
++                result = handle_missing(df, "x", "interpolate")
++                self.assertEqual(float(result.loc[1, "x"]), (1 + float(next_value)) / 2)
++                self.assertEqual(str(result["x"].dtype).lower(), "float64")
++
++    def test_ambiguous_local_dates_request_an_explicit_offset(self):
++        df = pd.DataFrame({"x": pd.to_datetime(["2024-01-01", None]).tz_localize("Europe/Paris")})
++        for value in ("2024-10-27T02:30:00", "2024-03-31T02:30:00"):
++            with self.subTest(value=value), self.assertRaisesRegex(ValueError, "offset"):
++                handle_missing(df, "x", "constant", value)
++        result = handle_missing(df, "x", "constant", "2024-10-27T02:30:00+02:00")
++        self.assertEqual(result.loc[1, "x"].isoformat(), "2024-10-27T02:30:00+02:00")
++
++    def test_fractional_category_fill_keeps_large_integer_labels_exact(self):
++        original = 2**53 + 1
++        df = pd.DataFrame({"x": pd.Categorical.from_codes([0, -1], categories=pd.Index([original], dtype="int64"))})
++        self.assertEqual(int(df.loc[0, "x"]), original)
++        result = handle_missing(df, "x", "constant", "1.5")
++        self.assertEqual(int(result.loc[0, "x"]), original)
++        self.assertEqual(result.loc[1, "x"], 1.5)
++
++    def test_all_missing_columns_still_accept_explicit_constants(self):
++        df = pd.DataFrame({"x": pd.Series([None, None], dtype="Int64")})
++        result = handle_missing(df, "x", "constant", "0")
++        self.assertEqual(result["x"].tolist(), [0, 0])
++        self.assertEqual(str(result["x"].dtype), "Int64")
++
++    def test_drop_operations_preserve_input(self):
++        df = pd.DataFrame({"x": pd.Series([1, None], dtype="Int64"), "y": ["a", "b"]})
++        before = df.copy(deep=True)
++        rows = handle_missing(df, "x", "drop_rows")
++        columns = handle_missing(df, "x", "drop_column")
++        self.assertEqual(rows.index.tolist(), [0])
++        self.assertEqual(columns.columns.tolist(), ["y"])
++        assert_frame_equal(df, before)
++
++
++class OutlierTests(unittest.TestCase):
++    @staticmethod
++    def fractional_cap_frame():
++        return pd.DataFrame({"x": pd.Series([0, 1, 2, 4, 100, None], dtype="Int64")})
++
++    def test_fractional_caps_promote_nullable_integers(self):
++        df = self.fractional_cap_frame()
++        before = df.copy(deep=True)
++        result = handle_outliers(df, "x", "iqr", "cap")
++        self.assertEqual(result.loc[4, "x"], 8.5)
++        self.assertEqual(str(result["x"].dtype), "Float64")
++        self.assertTrue(pd.isna(result.loc[5, "x"]))
++        assert_frame_equal(df, before)
++
++    def test_integral_caps_preserve_nullable_integer_dtype(self):
++        df = pd.DataFrame({"x": pd.Series([0, 1, 2, 3, 100, None], dtype="Int64")})
++        result = handle_outliers(df, "x", "iqr", "cap")
++        self.assertEqual(result.loc[4, "x"], 6)
++        self.assertEqual(str(result["x"].dtype), "Int64")
++
++    def test_large_integer_iqr_caps_use_exact_quartiles(self):
++        base = 2**53
++        df = pd.DataFrame({"x": pd.Series([base, base + 1, base + 2, base + 3, base + 100, None], dtype="Int64")})
++        before = df.copy(deep=True)
++        result = handle_outliers(df, "x", "iqr", "cap")
++        self.assertEqual(int(result.loc[4, "x"]), base + 6)
++        self.assertEqual(str(result["x"].dtype), "Int64")
++        self.assertTrue(pd.isna(result.loc[5, "x"]))
++        assert_frame_equal(df, before)
++
++    def test_fractional_bounds_without_outliers_do_not_promote(self):
++        df = pd.DataFrame({"x": pd.Series([0, 1, 2, 4, None], dtype="Int64")})
++        result = handle_outliers(df, "x", "iqr", "cap")
++        assert_frame_equal(result, df)
++
++    def test_remove_keeps_rows_with_missing_values(self):
++        df = self.fractional_cap_frame()
++        before = df.copy(deep=True)
++        result = handle_outliers(df, "x", "iqr", "remove")
++        self.assertEqual(result.index.tolist(), [0, 1, 2, 3, 5])
++        self.assertTrue(pd.isna(result.loc[5, "x"]))
++        assert_frame_equal(df, before)
++
++    def test_replace_nan_preserves_nullable_integer_dtype(self):
++        df = self.fractional_cap_frame()
++        result = handle_outliers(df, "x", "iqr", "replace_nan")
++        self.assertTrue(pd.isna(result.loc[4, "x"]))
++        self.assertTrue(pd.isna(result.loc[5, "x"]))
++        self.assertEqual(str(result["x"].dtype), "Int64")
++        self.assertEqual(result.index.tolist(), df.index.tolist())
++
++    def test_replace_nan_preserves_large_native_integers(self):
++        base = 2**53
++        df = pd.DataFrame({"x": [base, base + 1, base + 2, base + 3, base + 100]})
++        result = handle_outliers(df, "x", "iqr", "replace_nan")
++        self.assertEqual(int(result.loc[1, "x"]), base + 1)
++        self.assertTrue(pd.isna(result.loc[4, "x"]))
++        self.assertEqual(str(result["x"].dtype), "Int64")
++
++    def test_zscore_handles_nullable_masks_and_retains_missing_rows(self):
++        df = pd.DataFrame({"x": pd.Series([0] * 12 + [100, None], dtype="Int64")})
++        result = handle_outliers(df, "x", "zscore", "remove")
++        self.assertEqual(result.index.tolist(), list(range(12)) + [13])
++        self.assertTrue(pd.isna(result.loc[13, "x"]))
++
++    def test_ignore_returns_unchanged_independent_frame(self):
++        df = self.fractional_cap_frame()
++        result = handle_outliers(df, "x", "iqr", "ignore")
++        assert_frame_equal(result, df)
++        self.assertIsNot(result, df)
++        result.loc[0, "x"] = 99
++        self.assertEqual(df.loc[0, "x"], 0)
++
++    def test_constant_and_all_missing_columns_have_no_outliers(self):
++        for values in ([1, 1, 1, None], [None, None]):
++            for method in ("iqr", "zscore"):
++                for action in ("remove", "cap", "replace_nan"):
++                    with self.subTest(values=values, method=method, action=action):
++                        df = pd.DataFrame({"x": pd.Series(values, dtype="Int64")})
++                        assert_frame_equal(handle_outliers(df, "x", method, action), df)
++
++    def test_invalid_arguments_are_rejected_atomically(self):
++        df = self.fractional_cap_frame()
++        before = df.copy(deep=True)
++        for method, action in (("unsupported", "remove"), ("iqr", "unsupported")):
++            with self.subTest(method=method, action=action), self.assertRaises(ValueError):
++                handle_outliers(df, "x", method, action)
++        assert_frame_equal(df, before)
++
++    def test_nonnumeric_boolean_and_complex_outlier_columns_are_rejected(self):
++        for series in (
++            pd.Series(["a", "b", None], dtype="string"),
++            pd.Series([True, False, None], dtype="boolean"),
++            pd.Series([1 + 2j, 2 + 3j, np.nan]),
++        ):
++            with self.subTest(dtype=series.dtype):
++                df = pd.DataFrame({"x": series})
++                before = df.copy(deep=True)
++                with self.assertRaisesRegex(ValueError, "x"):
++                    handle_outliers(df, "x", "iqr", "cap")
++                assert_frame_equal(df, before)
++
++
++if __name__ == "__main__":
++    unittest.main()
+--- /dev/null
++++ b/tests/test_cleaning_pages.py
+@@ -0,0 +1,116 @@
++import copy
++import unittest
++
++import pandas as pd
++from pandas.testing import assert_frame_equal
++from streamlit.testing.v1 import AppTest
++
++
++CLEANING_SCRIPT = '''
++import pandas as pd
++from backend.state import StateManager
++from frontend.pages.data_cleaning import data_cleaning
++
++StateManager.init_session()
++if not StateManager.has_dataset():
++    df = __FRAME__
++    StateManager.load_dataset(df, {})
++    StateManager.save_snapshot("Initial checkpoint")
++data_cleaning()
++'''
++
++
++class CleaningPageTests(unittest.TestCase):
++    def make_app(self, frame_expression):
++        app = AppTest.from_string(CLEANING_SCRIPT.replace("__FRAME__", frame_expression)).run()
++        self.assertEqual(len(app.exception), 0)
++        self.assertEqual(len(app.error), 0)
++        return app
++
++    def assert_history_unchanged(self, actual, expected):
++        self.assertEqual(len(actual), len(expected))
++        for current, previous in zip(actual, expected):
++            self.assertEqual(current["name"], previous["name"])
++            self.assertEqual(current["column_meta"], previous["column_meta"])
++            assert_frame_equal(current["df"], previous["df"])
++
++    def test_strategy_controls_offer_only_compatible_operations(self):
++        app = self.make_app(
++            'pd.DataFrame({"number": pd.Series([1, 2, None], dtype="Int64"), '
++            '"text": pd.Series(["a", "b", None], dtype="string"), '
++            '"flag": pd.Series([True, False, None], dtype="boolean"), '
++            '"date": pd.to_datetime(["2024-01-01", "2024-02-01", None])})'
++        )
++        numeric = {"mean", "median", "interpolate"}
++        self.assertTrue(numeric <= set(app.selectbox(key="ms_number").options))
++        for column in ("text", "flag", "date"):
++            with self.subTest(column=column):
++                options = set(app.selectbox(key=f"ms_{column}").options)
++                self.assertFalse(numeric & options)
++                self.assertTrue({"mode", "constant", "drop_rows", "drop_column"} <= options)
++
++    def test_nullable_integer_median_fill_succeeds_and_records_history(self):
++        app = self.make_app('pd.DataFrame({"value": pd.Series([1, 2, None], dtype="Int64")})')
++        original = app.session_state["df"].copy(deep=True)
++        app.selectbox(key="ms_value").set_value("median")
++        app.button(key="apply_missing").click().run()
++        self.assertEqual(len(app.exception), 0)
++        self.assertEqual(len(app.error), 0)
++        self.assertEqual(app.session_state["df"]["value"].tolist(), [1.0, 2.0, 1.5])
++        self.assertEqual(str(app.session_state["df"]["value"].dtype), "Float64")
++        self.assertEqual(len(app.session_state["history"]), 2)
++        assert_frame_equal(app.session_state["history"][-1]["df"], original)
++
++    def test_nullable_integer_fractional_cap_succeeds_and_retains_missing_row(self):
++        app = self.make_app('pd.DataFrame({"value": pd.Series([0, 1, 2, 4, 100, None], dtype="Int64")})')
++        original = app.session_state["df"].copy(deep=True)
++        app.selectbox(key="oa_value").set_value("cap")
++        app.button(key="apply_outliers").click().run()
++        self.assertEqual(len(app.exception), 0)
++        self.assertEqual(len(app.error), 0)
++        result = app.session_state["df"]
++        self.assertEqual(result.loc[4, "value"], 8.5)
++        self.assertEqual(str(result["value"].dtype), "Float64")
++        self.assertTrue(pd.isna(result.loc[5, "value"]))
++        self.assertEqual(len(result), 6)
++        self.assertEqual(len(app.session_state["history"]), 2)
++        assert_frame_equal(app.session_state["history"][-1]["df"], original)
++
++    def test_invalid_constant_leaves_entire_missing_value_batch_unchanged(self):
++        app = self.make_app(
++            'pd.DataFrame({"first": pd.Series([1, 2, None], dtype="Int64"), '
++            '"second": pd.Series([3, 4, None], dtype="Int64")})'
++        )
++        original = app.session_state["df"].copy(deep=True)
++        history = copy.deepcopy(app.session_state["history"])
++        app.selectbox(key="ms_first").set_value("constant")
++        app.selectbox(key="ms_second").set_value("constant")
++        app.run()
++        app.text_input(key="fv_first").set_value("0")
++        app.text_input(key="fv_second").set_value("invalid number")
++        app.button(key="apply_missing").click().run()
++        self.assertEqual(len(app.exception), 0)
++        self.assertEqual(len(app.error), 1)
++        self.assertIn("second", app.error[0].value)
++        assert_frame_equal(app.session_state["df"], original)
++        self.assert_history_unchanged(app.session_state["history"], history)
++
++    def test_unsafe_cap_leaves_entire_outlier_batch_unchanged(self):
++        app = self.make_app(
++            'pd.DataFrame({"first": pd.Series([0, 1, 2, 4, 100, None], dtype="Int64"), '
++            '"second": pd.Series([2**53, 2**53 + 1, 2**53 + 2, 2**53 + 4, 2**53 + 100, None], dtype="Int64")})'
++        )
++        original = app.session_state["df"].copy(deep=True)
++        history = copy.deepcopy(app.session_state["history"])
++        app.selectbox(key="oa_first").set_value("cap")
++        app.selectbox(key="oa_second").set_value("cap")
++        app.button(key="apply_outliers").click().run()
++        self.assertEqual(len(app.exception), 0)
++        self.assertEqual(len(app.error), 1)
++        self.assertIn("second", app.error[0].value)
++        assert_frame_equal(app.session_state["df"], original)
++        self.assert_history_unchanged(app.session_state["history"], history)
++
++
++if __name__ == "__main__":
++    unittest.main()

@@ -1,0 +1,46 @@
+﻿# Data-Works
+
+Data-Works is a Streamlit application for uploading tabular datasets, reviewing schema, cleaning data, exploring distributions, building charts, and running quick machine learning experiments.
+
+## Features
+
+- Upload CSV, TSV, TXT, Excel, and JSON files.
+- Infer column data types and roles before analysis.
+- Track cleaning operations with undo support.
+- Handle missing values, duplicates, outliers, and allowed-value mismatches.
+- Explore univariate statistics, correlations, and group-by summaries.
+- Create and save Plotly charts in the current session.
+- Train and compare basic classification and regression models.
+
+## Architecture
+
+- `app.py`: Streamlit entry point and page navigation.
+- `backend/state.py`: shared session state, dataset metadata, history, and undo.
+- `backend/ingestion.py`: file parsing, schema inference, and dtype casting.
+- `backend/cleaning.py`: data cleaning helpers.
+- `backend/eda.py`: exploratory analysis helpers.
+- `backend/visualization.py`: Plotly figure builders.
+- `backend/preprocessing.py`: train/test split and model preprocessing.
+- `backend/ml.py`: model registry, training, metrics, and ML plots.
+- `frontend/pages/`: Streamlit page implementations.
+- `frontend/components/`: reusable UI widgets.
+
+## Setup
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
+
+## Run
+
+```powershell
+streamlit run app.py
+```
+
+## Notes
+
+- Uploaded datasets live only in the Streamlit session state.
+- Machine learning preprocessing fits encoders, imputers, and scalers on the training split, then applies them to the test split.
+- Saved charts are session-local and are cleared when the Streamlit session ends or when the user clears them.

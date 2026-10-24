@@ -1,0 +1,992 @@
+--- a/backend/ingestion.py
++++ b/backend/ingestion.py
+@@ -1,156 +1,189 @@
++"""Lossless ingestion and conservative, atomic schema conversion."""
++
+ import re
++from decimal import Decimal
+ 
++import numpy as np
+ import pandas as pd
+ 
+ 
+-# ── Low-level helpers ────────────────────────────────────────────────────────
+-def _strip_non_numeric(s: pd.Series) -> pd.Series:
+-    return (
+-        s.astype(str)
+-        .str.replace(r"[^0-9.\-]", "", regex=True)
+-        .replace("", pd.NA)
+-    )
++_BOOL_MAP = {
++    "true": True, "false": False, "yes": True, "no": False,
++    "1": True, "0": False, "t": True, "f": False,
++}
++_BOOL_WORDS = set(_BOOL_MAP) - {"1", "0"}
++_NUMBER = re.compile(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?")
++_LEADING_ZERO = re.compile(r"[+-]?0\d+")
++_ID_PATTERN = re.compile(
++    r"^(id|index|key)$|_id$|_key$|^unnamed:\s*\d+$", re.IGNORECASE,
++)
++_INT_LIMITS = np.iinfo(np.int64)
+ 
+ 
+-_BOOL_MAP = {
+-    "true": True, "false": False,
+-    "yes": True, "no": False,
+-    "1": True, "0": False,
+-    "t": True, "f": False,
+-}
++def parse_file(uploaded_file) -> pd.DataFrame:
++    """Preserve textual values until the user reviews the schema.
+ 
+-_ID_PATTERN = re.compile(
+-    r"^(id|index|key)$|_id$|_key$|^unnamed:\s*\d+$", re.IGNORECASE
+-)
+-
+-
+-# ── File parsing ─────────────────────────────────────────────────────────────
+-def parse_file(uploaded_file) -> pd.DataFrame:
+-    name: str = uploaded_file.name.lower()
++    Only empty fields are treated as missing in CSV/TSV/Excel. In particular,
++    'NA' and 'NULL' remain literal strings. Native Excel numeric/date cells and
++    native JSON scalars retain their existing types.
++    """
++    name = uploaded_file.name.lower()
++    options = {"dtype": object, "keep_default_na": False, "na_values": [""]}
+     if name.endswith(".csv"):
+-        return pd.read_csv(uploaded_file)
+-    if name.endswith(".tsv") or name.endswith(".txt"):
+-        return pd.read_csv(uploaded_file, sep="\t")
++        return pd.read_csv(uploaded_file, **options)
++    if name.endswith((".tsv", ".txt")):
++        return pd.read_csv(uploaded_file, sep="\t", **options)
+     if name.endswith((".xlsx", ".xls")):
+-        return pd.read_excel(uploaded_file)
++        return pd.read_excel(uploaded_file, **options)
+     if name.endswith(".json"):
+-        return pd.read_json(uploaded_file)
++        return pd.read_json(uploaded_file, dtype=False, convert_dates=False)
+     raise ValueError(f"Unsupported file type: {uploaded_file.name}")
+ 
+ 
+-# ── Single-column type inference ─────────────────────────────────────────────
++def _numeric_column(col: pd.Series, target: str) -> pd.Series:
++    text = col.astype("string").str.strip()
++    present = text.dropna()
++    if not present.str.fullmatch(_NUMBER).all():
++        raise ValueError("Expected plain numbers; units and compound values need explicit parsing.")
++
++    decimals = [None if pd.isna(value) else Decimal(value) for value in text]
++    if target == "int64":
++        if any(
++            value is not None and (
++                value != value.to_integral_value()
++                or not _INT_LIMITS.min <= value <= _INT_LIMITS.max
++            )
++            for value in decimals
++        ):
++            raise ValueError("Values must be whole numbers within the signed 64-bit range.")
++        values = [pd.NA if value is None else int(value) for value in decimals]
++        result = pd.Series(pd.array(values, dtype="Int64"), index=col.index, name=col.name)
++        return result if result.isna().any() else result.astype("int64")
++
++    if any(
++        value is not None and value == value.to_integral_value() and abs(value) > 2**53
++        for value in decimals
++    ):
++        raise ValueError("Large whole numbers would lose precision as floats; use integers or text.")
++    result = pd.to_numeric(text, errors="raise").astype("Float64")
++    if not np.isfinite(result.dropna().to_numpy(dtype=float)).all():
++        raise ValueError("Numeric values must be finite.")
++    if any(
++        original is not None and original != 0 and converted == 0
++        for original, converted in zip(decimals, result)
++    ):
++        raise ValueError("Values are too small to represent as floats without becoming zero.")
++    return result if result.isna().any() else result.astype("float64")
++
++
+ def infer_dtype(col: pd.Series) -> tuple[str, float]:
+-    """Return (dtype_string, confidence) for a single column."""
+-    non_null = col.dropna()
+-    if non_null.empty:
+-        return str(col.dtype), 0.0
++    """Infer only when every present value has an unambiguous interpretation.
+ 
+-    # Already numeric / datetime — high confidence
++    Confidence measures parser coverage, not semantic certainty. Ambiguous dates,
++    leading-zero codes, units, and mixed numeric/text columns remain text.
++    """
++    present = col.dropna()
++    if present.empty:
++        return "object", 0.0
++    if pd.api.types.is_bool_dtype(col):
++        return "bool", 1.0
+     if pd.api.types.is_numeric_dtype(col):
+         return str(col.dtype), 1.0
+     if pd.api.types.is_datetime64_any_dtype(col):
+         return "datetime64[ns]", 1.0
+ 
+-    # Boolean detection (check before numeric since '1'/'0' overlap)
+-    if col.dtype == "object":
+-        stripped = non_null.astype(str).str.strip().str.lower()
+-        unique_vals = set(stripped.unique())
+-        if unique_vals and unique_vals.issubset(_BOOL_MAP.keys()):
+-            return "bool", 1.0
++    text = present.astype("string").str.strip()
++    if set(text.str.lower().unique()).issubset(_BOOL_WORDS):
++        return "bool", 1.0
++    if text.str.fullmatch(_NUMBER).all() and not text.str.fullmatch(_LEADING_ZERO).any():
++        for target in ("int64", "float64"):
++            try:
++                _numeric_column(col, target)
++                return target, 1.0
++            except (ValueError, TypeError, OverflowError):
++                continue
+ 
+-    # Numeric attempt
+-    if col.dtype == "object":
+-        s = non_null.astype(str).str.strip()
+-        num = pd.to_numeric(_strip_non_numeric(s), errors="coerce")
+-        rate = num.notna().mean()
+-        if rate > 0.8:
+-            # decide int vs float
+-            is_int = (num.dropna() == num.dropna().astype(int)).all()
+-            dtype_str = "int64" if is_int and rate == 1.0 else "float64"
+-            return dtype_str, round(float(rate), 3)
+-
+-    # Datetime attempt
+-    if col.dtype == "object":
+-        s = non_null.astype(str).str.strip()
+-        dt = pd.to_datetime(s, errors="coerce", dayfirst=True)
+-        rate = dt.notna().mean()
+-        if rate > 0.8:
+-            return "datetime64[ns]", round(float(rate), 3)
+-
+-    # Fallback: keep as object
++    # Slash-separated dates require a user-specified format, never day/month guessing.
++    if text.str.fullmatch(r"\d{4}-\d{2}-\d{2}").all():
++        try:
++            pd.to_datetime(text, format="%Y-%m-%d", errors="raise")
++            return "datetime64[ns]", 1.0
++        except (ValueError, TypeError, OverflowError):
++            pass
+     return "object", 1.0
+ 
+ 
+-# ── Column role classification ───────────────────────────────────────────────
+ def classify_role(col: pd.Series, col_name: str) -> str:
+-    # ID-like names with all-unique or sequential values
+-    if _ID_PATTERN.search(col_name):
+-        if col.nunique() == len(col):
+-            return "id"
+-
+-    # Datetime columns
++    if _ID_PATTERN.search(str(col_name)):
++        return "id"
+     if pd.api.types.is_datetime64_any_dtype(col):
+         return "datetime"
+-
+     return "feature"
+ 
+ 
+-# ── Full-dataset metadata inference ──────────────────────────────────────────
+ def infer_column_meta(df: pd.DataFrame) -> dict:
+-    meta: dict[str, dict] = {}
+-    n_rows = len(df)
+-
+-    for col_name in df.columns:
+-        col = df[col_name]
+-        inferred_dtype, confidence = infer_dtype(col)
++    meta = {}
++    for name in df.columns:
++        col = df[name]
++        role = classify_role(col, name)
++        dtype, confidence = infer_dtype(col)
++        if role == "id" and not pd.api.types.is_numeric_dtype(col):
++            dtype = "object"
++        if dtype == "datetime64[ns]" and role != "id":
++            role = "datetime"
+         cardinality = int(col.nunique())
+-        is_categorical = (
+-            inferred_dtype in ("object", "bool")
+-            or (cardinality / max(n_rows, 1) < 0.05)
+-            or (cardinality < 30 and inferred_dtype not in ("datetime64[ns]",))
+-        )
+-        role = classify_role(col, col_name)
+-        if inferred_dtype == "datetime64[ns]":
+-            role = "datetime"
+-
+-        meta[col_name] = {
++        meta[name] = {
+             "original_dtype": str(col.dtype),
+-            "inferred_dtype": inferred_dtype,
++            "inferred_dtype": dtype,
+             "confidence": confidence,
+             "user_dtype": None,
+             "role": role,
+             "cardinality": cardinality,
+-            "is_categorical": is_categorical,
++            "is_categorical": (
++                dtype in ("object", "bool", "category")
++                or cardinality / max(len(df), 1) < 0.05
++                or (cardinality < 30 and dtype != "datetime64[ns]")
++            ),
+             "allowed_values": None,
++            "date_format": None,
+         }
+-
+     return meta
+ 
+ 
+ def apply_inferred_dtypes(df: pd.DataFrame, column_meta: dict) -> pd.DataFrame:
+-    """Cast columns according to inferred (or user-overridden) dtypes."""
+-    df = df.copy()
+-    for col_name, meta in column_meta.items():
+-        if col_name not in df.columns:
++    """Return a converted copy, or raise without changing the input.
++
++    No non-missing value may silently turn into a missing value. Callers must
++    commit both the returned frame and its schema only after this call succeeds.
++    """
++    result = df.copy()
++    for name, meta in column_meta.items():
++        if name not in result.columns:
+             continue
+         target = meta.get("user_dtype") or meta["inferred_dtype"]
+-        if target == str(df[col_name].dtype):
++        col = result[name]
++        if target == str(col.dtype):
+             continue
+         try:
+-            if target == "bool":
+-                stripped = df[col_name].astype(str).str.strip().str.lower()
+-                df[col_name] = stripped.map(_BOOL_MAP)
++            if target in ("int64", "float64"):
++                converted = _numeric_column(col, target)
++            elif target == "bool":
++                text = col.astype("string").str.strip().str.lower()
++                if not text.dropna().isin(_BOOL_MAP).all():
++                    raise ValueError("Expected true/false, yes/no, t/f, or 1/0.")
++                converted = text.map(_BOOL_MAP).astype("boolean")
+             elif target.startswith("datetime"):
+-                df[col_name] = pd.to_datetime(df[col_name], errors="coerce", dayfirst=True)
+-            elif target in ("int64", "float64"):
+-                df[col_name] = pd.to_numeric(
+-                    _strip_non_numeric(df[col_name].astype(str).str.strip()),
+-                    errors="coerce",
++                converted = pd.to_datetime(
++                    col, format=meta.get("date_format") or "%Y-%m-%d", errors="raise",
+                 )
+-                if target == "int64":
+-                    df[col_name] = df[col_name].astype("Int64")
++            elif target in ("object", "string", "category"):
++                converted = col.astype(target)
+             else:
+-                df[col_name] = df[col_name].astype(target, errors="ignore")
+-        except Exception:
+-            pass  # keep original if cast fails
+-    return df
++                raise ValueError(f"Unsupported requested type: {target}")
++            if (col.notna() & converted.isna()).any():
++                raise ValueError("Conversion would introduce missing values.")
++            result[name] = converted
++        except (ValueError, TypeError, OverflowError) as exc:
++            raise ValueError(f"Column {name!r} cannot be converted to {target}: {exc}") from exc
++    return result
++
+--- a/backend/ml.py
++++ b/backend/ml.py
+@@ -3,6 +3,7 @@
+ import plotly.express as px
+ import plotly.figure_factory as ff
+ import plotly.graph_objects as go
++from sklearn.base import clone
+ from sklearn.linear_model import LinearRegression, LogisticRegression
+ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+ from sklearn.svm import SVC, SVR
+@@ -48,9 +49,9 @@
+ 
+ 
+ def get_available_models(problem_type: str) -> dict:
+-    if problem_type == "classification":
+-        return _CLASSIFIERS.copy()
+-    return _REGRESSORS.copy()
++    """Return fresh estimators; registry templates are never fitted."""
++    registry = _CLASSIFIERS if problem_type == "classification" else _REGRESSORS
++    return {name: clone(model) for name, model in registry.items()}
+ 
+ 
+ # ── Training & evaluation ────────────────────────────────────────────────────
+--- a/backend/preprocessing.py
++++ b/backend/preprocessing.py
+@@ -1,6 +1,12 @@
++import numpy as np
+ import pandas as pd
++from sklearn.compose import ColumnTransformer
++from sklearn.impute import SimpleImputer
+ from sklearn.model_selection import train_test_split
+-from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
++from sklearn.pipeline import Pipeline
++from sklearn.preprocessing import (
++    FunctionTransformer, LabelEncoder, MinMaxScaler, OneHotEncoder, StandardScaler,
++)
+ 
+ 
+ def encode_column(
+@@ -34,6 +40,22 @@
+     return df, scaler
+ 
+ 
++def _categorical_strings(frame):
++    # Unify None/pd.NA/NaN for sklearn, including nullable strings and booleans.
++    return frame.astype("string").to_numpy(dtype=object, na_value=np.nan)
++
++
++def _numeric_values(frame):
++    values = frame.to_numpy(dtype=float, na_value=np.nan)
++    if np.isinf(values).any():
++        raise ValueError("Numeric features contain infinity; clean those values first.")
++    return values
++
++
++def _category_feature_name(feature, category):
++    return f"{feature!r}={category!r}"
++
++
+ def auto_preprocess(
+     df: pd.DataFrame,
+     target_col: str,
+@@ -41,87 +63,65 @@
+     test_size: float = 0.2,
+     random_state: int = 42,
+ ) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series, dict]:
+-    """Full preprocessing pipeline.
++    """Split first, then fit one reusable preprocessor using training data only.
+ 
+-    Returns (X_train, X_test, y_train, y_test, info_dict).
++    Rows with missing features are retained. Entirely missing numeric training
++    features use zero; categorical features use the training mode. High-cardinality
++    categoricals group infrequent levels, limiting each to 64 output features.
+     """
+-    df = df.copy()
+-
+-    # Separate target
+-    y = df[target_col]
+-    df = df.drop(columns=[target_col])
+-
+-    # Drop columns with role id / ignore / datetime
+-    drop_cols = [
+-        c for c, m in column_meta.items()
+-        if m.get("role") in ("id", "ignore", "datetime") and c in df.columns
++    if target_col not in df.columns:
++        raise ValueError("Select a target present in the dataset.")
++    usable = df.dropna(subset=[target_col])
++    y = usable[target_col]
++    features = usable.drop(columns=[target_col])
++    dropped = [
++        c for c in features.columns
++        if column_meta.get(c, {}).get("role") in ("id", "ignore", "datetime")
+     ]
+-    df = df.drop(columns=drop_cols)
++    features = features.drop(columns=dropped)
++    if features.shape[1] == 0:
++        raise ValueError("Select at least one usable feature.")
+ 
+     X_train, X_test, y_train, y_test = train_test_split(
+-        df, y, test_size=test_size, random_state=random_state,
++        features, y, test_size=test_size, random_state=random_state,
+     )
++    numeric = X_train.select_dtypes(include="number").columns.tolist()
++    categorical = [c for c in X_train.columns if c not in numeric]
++    transformers = []
++    if numeric:
++        transformers.append(("numeric", Pipeline([
++            ("values", FunctionTransformer(_numeric_values, feature_names_out="one-to-one")),
++            ("impute", SimpleImputer(strategy="median", keep_empty_features=True)),
++            ("scale", StandardScaler()),
++        ]), numeric))
++    if categorical:
++        transformers.append(("categorical", Pipeline([
++            ("strings", FunctionTransformer(_categorical_strings, feature_names_out="one-to-one")),
++            ("impute", SimpleImputer(strategy="most_frequent", keep_empty_features=True)),
++            ("encode", OneHotEncoder(
++                handle_unknown="ignore", sparse_output=False, max_categories=64,
++                feature_name_combiner=_category_feature_name,
++            )),
++        ]), categorical))
+ 
+-    # Track what we did
+-    info: dict = {
+-        "dropped": drop_cols,
+-        "encoded": {},
+-        "scaled": [],
+-        "fill_values": {},
+-        "encoders": {},
+-        "scalers": {},
++    preprocessor = ColumnTransformer(transformers, remainder="drop")
++    train_values = preprocessor.fit_transform(X_train)
++    test_values = preprocessor.transform(X_test)
++    names = preprocessor.get_feature_names_out()
++    prepared_train = pd.DataFrame(train_values, index=X_train.index, columns=names)
++    prepared_test = pd.DataFrame(test_values, index=X_test.index, columns=names)
++    fill_values = {}
++    if numeric:
++        fill_values = dict(zip(
++            numeric, preprocessor.named_transformers_["numeric"].named_steps["impute"].statistics_,
++        ))
++    info = {
++        "dropped": dropped,
++        "dropped_missing_targets": len(df) - len(usable),
++        "encoded": {c: "onehot" for c in categorical},
++        "scaled": numeric,
++        "fill_values": fill_values,
++        "preprocessor": preprocessor,
+     }
++    return prepared_train, prepared_test, y_train, y_test, info
+ 
+-    # Encode categoricals
+-    cat_cols = X_train.select_dtypes(include=["object", "category", "bool"]).columns.tolist()
+-    for col in cat_cols:
+-        cardinality = int(X_train[col].nunique())
+-        method = "onehot" if cardinality < 10 else "label"
+-        info["encoded"][col] = method
+-        if method == "onehot":
+-            train_dummies = pd.get_dummies(X_train[col], prefix=col, drop_first=True, dtype=int)
+-            test_dummies = pd.get_dummies(X_test[col], prefix=col, drop_first=True, dtype=int)
+-            test_dummies = test_dummies.reindex(columns=train_dummies.columns, fill_value=False)
+-            X_train = pd.concat([X_train.drop(columns=[col]), train_dummies], axis=1)
+-            X_test = pd.concat([X_test.drop(columns=[col]), test_dummies], axis=1)
+-            info["encoders"][col] = train_dummies.columns.tolist()
+-        else:
+-            categories = {
+-                value: code
+-                for code, value in enumerate(X_train[col].dropna().astype(str).unique())
+-            }
+-            X_train[col] = X_train[col].astype(str).map(categories)
+-            X_test[col] = X_test[col].astype(str).map(categories).fillna(-1)
+-            info["encoders"][col] = categories
+-
+-    # Drop any remaining non-numeric columns (safety)
+-    X_train = X_train.select_dtypes(include="number")
+-    X_test = X_test.reindex(columns=X_train.columns, fill_value=0)
+-
+-    # Fill remaining NaNs with train medians only
+-    fill_values = X_train.median()
+-    X_train = X_train.fillna(fill_values)
+-    X_test = X_test.fillna(fill_values)
+-    info["fill_values"] = fill_values.to_dict()
+-
+-    # Scale numeric features
+-    for col in X_train.columns:
+-        scaler = StandardScaler()
+-        X_train[col] = scaler.fit_transform(X_train[[col]])
+-        X_test[col] = scaler.transform(X_test[[col]])
+-        info["scalers"][col] = scaler
+-    info["scaled"] = list(X_train.columns)
+-
+-    # Encode target if categorical
+-    if y.dtype == "object" or y.dtype.name == "category":
+-        le = LabelEncoder()
+-        le.fit(y.astype(str))
+-        y_train = pd.Series(
+-            le.transform(y_train.astype(str)), index=y_train.index, name=target_col
+-        )
+-        y_test = pd.Series(
+-            le.transform(y_test.astype(str)), index=y_test.index, name=target_col
+-        )
+-        info["target_encoder"] = le
+-
+-    return X_train, X_test, y_train, y_test, info
+--- a/backend/preview.py
++++ b/backend/preview.py
+@@ -1,34 +1,18 @@
+ import pandas as pd
+ import streamlit as st
+ 
+-def _strip_non_numeric(s: pd.Series) -> pd.Series:
+-    return (s.astype(str)
+-             .str.replace(r'[^0-9.\-]', '', regex=True)
+-             .replace('', pd.NA))
++from backend.ingestion import apply_inferred_dtypes, infer_column_meta, infer_dtype
+ 
+ def guess_dtype(col: pd.Series) -> pd.Series:
+-    """Try to coerce an object column to a more appropriate dtype."""
+-    if col.dtype != 'object':
+-        return col
+-
+-    s = col.str.strip()        # might be NaN so convert first if needed
+-
+-    # numeric?
+-    num = pd.to_numeric(_strip_non_numeric(s), errors='coerce')
+-    if num.notna().mean() > 0.8:
+-        return num
+-
+-    # date / month‑year / etc.
+-    dt = pd.to_datetime(s, errors='coerce', dayfirst=True)
+-    if dt.notna().mean() > 0.8:
+-        return dt
+-
+-    # nothing changed
+-    return col
++    """Use the same conservative conversion rules as the schema page."""
++    target, _ = infer_dtype(col)
++    frame = col.to_frame(name="value")
++    result = apply_inferred_dtypes(frame, {"value": {"inferred_dtype": target}})
++    return result["value"].rename(col.name)
+ 
+ def sanitize(df: pd.DataFrame) -> pd.DataFrame:
+-    """Return a copy with best‑effort conversions applied."""
+-    return df.apply(guess_dtype)
++    """Return a copy converted using the shared schema rules."""
++    return apply_inferred_dtypes(df, infer_column_meta(df))
+ 
+ def dataset_overview(df):
+     st.subheader("Dataset Overview")
+--- a/frontend/pages/data_ml.py
++++ b/frontend/pages/data_ml.py
+@@ -57,12 +57,15 @@
+ 
+     # ── Step 4: Preprocessing preview ────────────────────────────────────
+     with st.expander("Preprocessing preview"):
+-        cat = [c for c in selected_features if df[c].dtype in ("object", "category", "bool")]
++        cat = [c for c in selected_features if not pd.api.types.is_numeric_dtype(df[c])
++               or pd.api.types.is_bool_dtype(df[c])]
+         num = [c for c in selected_features if c not in cat]
+         st.write(f"**Categorical** ({len(cat)}): {cat}")
+         st.write(f"**Numeric** ({len(num)}): {num}")
+-        st.caption("Categoricals: one-hot if <10 unique values, else label encoding. "
+-                   "Numerics: standard scaling. NaNs filled with median.")
++        st.caption("Training data determines categorical encodings, missing-value fills, "
++                   "and numeric scaling. Categories are one-hot encoded with at most 64 "
++                   "outputs per column. Missing feature values are imputed; only rows "
++                   "with missing targets are excluded.")
+ 
+     # ── Step 5: Model selection ──────────────────────────────────────────
+     available = get_available_models(problem_type)
+@@ -83,10 +86,13 @@
+             return
+ 
+         # Subset to selected features + target
+-        subset = df[selected_features + [target]].dropna()
+-        if len(subset) < 20:
+-            st.error("Not enough rows after dropping NaNs. Clean missing values first.")
++        subset = df[selected_features + [target]]
++        usable_rows = int(subset[target].notna().sum())
++        if usable_rows < 20:
++            st.error("At least 20 rows with non-missing target values are required.")
+             return
++        st.caption(f"Using {usable_rows} of {len(subset)} rows; "
++                   f"excluding {len(subset) - usable_rows} with missing targets.")
+ 
+         with st.spinner("Preprocessing & training..."):
+             try:
+--- a/frontend/pages/data_upload.py
++++ b/frontend/pages/data_upload.py
+@@ -1,3 +1,5 @@
++import copy
++
+ import pandas as pd
+ import streamlit as st
+ 
+@@ -45,7 +47,9 @@
+ 
+     # ── Editable schema table ────────────────────────────────────────────
+     st.subheader("Schema Review")
+-    st.caption("Edit inferred types or roles, then click **Confirm Schema**.")
++    st.caption("Review the conversion preview, then click **Confirm Schema**. "
++               "Units, compound values, and ambiguous dates stay as text. "
++               "For dates outside YYYY-MM-DD, specify a format such as %d/%m/%Y.")
+ 
+     schema_rows = []
+     for col_name in df.columns:
+@@ -53,10 +57,11 @@
+         schema_rows.append({
+             "column": col_name,
+             "original_dtype": m.get("original_dtype", str(df[col_name].dtype)),
+-            "inferred_dtype": m.get("inferred_dtype", str(df[col_name].dtype)),
++            "inferred_dtype": m.get("user_dtype") or m.get("inferred_dtype", str(df[col_name].dtype)),
+             "confidence": m.get("confidence", 0.0),
+             "role": m.get("role", "feature"),
+             "allowed_values": ", ".join(m.get("allowed_values") or []),
++            "date_format": m.get("date_format") or "",
+         })
+ 
+     schema_df = pd.DataFrame(schema_rows).set_index("column")
+@@ -66,39 +71,66 @@
+         column_config={
+             "original_dtype": st.column_config.TextColumn("Original Type", disabled=True),
+             "inferred_dtype": st.column_config.SelectboxColumn(
+-                "Inferred Type", options=_DTYPE_OPTIONS,
++                "Requested Type", options=_DTYPE_OPTIONS,
+             ),
+             "confidence": st.column_config.ProgressColumn(
+-                "Confidence", min_value=0.0, max_value=1.0, format="%.0%%",
++                "Parser Coverage", min_value=0.0, max_value=1.0, format="%.0%%",
+             ),
+             "role": st.column_config.SelectboxColumn("Role", options=_ROLE_OPTIONS),
+             "allowed_values": st.column_config.TextColumn(
+                 "Allowed Values", help="Optional comma-separated values for mismatch checks."
++            ),
++            "date_format": st.column_config.TextColumn(
++                "Date Format", help="For example, %d/%m/%Y or %m/%d/%Y. Blank means YYYY-MM-DD."
+             ),
+         },
+         width='stretch',
+         key="schema_editor",
+     )
+ 
++    candidate_meta = copy.deepcopy(column_meta)
++    for col_name, row in edited.iterrows():
++        date_format = row.get("date_format", "")
++        candidate_meta.setdefault(col_name, {}).update(
++            user_dtype=row["inferred_dtype"],
++            role=row["role"],
++            allowed_values=[
++                value.strip()
++                for value in str(row.get("allowed_values", "")).split(",")
++                if value.strip()
++            ] or None,
++            date_format=str(date_format).strip() if pd.notna(date_format) and date_format else None,
++        )
++
++    candidate_df = None
++    try:
++        candidate_df = apply_inferred_dtypes(df, candidate_meta)
++    except ValueError as exc:
++        st.error(str(exc))
++    else:
++        preview = []
++        for name in df.columns:
++            if str(df[name].dtype) != str(candidate_df[name].dtype):
++                preview.append({
++                    "column": name,
++                    "before_type": str(df[name].dtype),
++                    "after_type": str(candidate_df[name].dtype),
++                    "new_missing": int((df[name].notna() & candidate_df[name].isna()).sum()),
++                    "before_examples": repr(df[name].head(3).tolist()),
++                    "after_examples": repr(candidate_df[name].head(3).tolist()),
++                })
++        st.subheader("Conversion Preview")
++        if preview:
++            st.dataframe(pd.DataFrame(preview), width="stretch")
++        else:
++            st.caption("No type conversions requested.")
++
+     col1, col2 = st.columns(2)
+ 
+     with col1:
+-        if st.button("Confirm Schema", type="primary"):
+-            # Apply user edits back to column_meta
+-            for col_name in edited.index:
+-                row = edited.loc[col_name]
+-                StateManager.update_column_meta(
+-                    col_name,
+-                    user_dtype=row["inferred_dtype"],
+-                    role=row["role"],
+-                    allowed_values=[
+-                        value.strip()
+-                        for value in str(row.get("allowed_values", "")).split(",")
+-                        if value.strip()
+-                    ] or None,
+-                )
+-            # Cast dtypes
+-            st.session_state.df = apply_inferred_dtypes(df, st.session_state.column_meta)
++        if st.button("Confirm Schema", type="primary", disabled=candidate_df is None):
++            st.session_state.df = candidate_df
++            st.session_state.column_meta = candidate_meta
+             st.session_state.schema_confirmed = True
+             st.success("Schema confirmed and types applied.")
+             st.rerun()
+--- /dev/null
++++ b/tests/test_review_pages.py
+@@ -0,0 +1,72 @@
++import unittest
++
++from streamlit.testing.v1 import AppTest
++
++
++UPLOAD_SCRIPT = '''
++import pandas as pd
++from backend.ingestion import infer_column_meta
++from backend.state import StateManager
++from frontend.pages.data_upload import data_upload
++
++StateManager.init_session()
++if not StateManager.has_dataset():
++    df = pd.DataFrame({"value": ["1", "2", "3"], "code": ["A001", "A002", "A003"]})
++    StateManager.load_dataset(df, infer_column_meta(df))
++data_upload()
++'''
++
++
++class PageTests(unittest.TestCase):
++    def test_schema_preview_and_confirmation_commit_the_same_values(self):
++        app = AppTest.from_string(UPLOAD_SCRIPT).run()
++        self.assertEqual(len(app.exception), 0)
++        self.assertEqual(app.session_state["df"]["value"].tolist(), ["1", "2", "3"])
++        confirm = next(button for button in app.button if button.label == "Confirm Schema")
++        confirm.click().run()
++        self.assertEqual(len(app.exception), 0)
++        self.assertTrue(app.session_state["schema_confirmed"])
++        self.assertEqual(app.session_state["df"]["value"].tolist(), [1, 2, 3])
++        self.assertEqual(app.session_state["df"]["code"].tolist(), ["A001", "A002", "A003"])
++
++    def test_invalid_schema_is_reported_and_cannot_be_committed(self):
++        script = UPLOAD_SCRIPT.replace(
++            'StateManager.load_dataset(df, infer_column_meta(df))',
++            'meta = infer_column_meta(df)\n'
++            '    meta["code"]["user_dtype"] = "int64"\n'
++            '    StateManager.load_dataset(df, meta)',
++        )
++        app = AppTest.from_string(script).run()
++        self.assertEqual(len(app.exception), 0)
++        self.assertEqual(len(app.error), 1)
++        self.assertIn("code", app.error[0].value)
++        confirm = next(button for button in app.button if button.label == "Confirm Schema")
++        self.assertTrue(confirm.disabled)
++        self.assertFalse(app.session_state["schema_confirmed"])
++        self.assertEqual(app.session_state["df"]["value"].tolist(), ["1", "2", "3"])
++
++    def test_training_page_keeps_rows_with_missing_features(self):
++        app = AppTest.from_string('''
++import numpy as np
++import pandas as pd
++from backend.ingestion import infer_column_meta
++from backend.state import StateManager
++from frontend.pages.data_ml import data_ml
++
++StateManager.init_session()
++if not StateManager.has_dataset():
++    df = pd.DataFrame({"target": np.arange(40, dtype=float), "value": [1.0, None] * 20})
++    StateManager.load_dataset(df, infer_column_meta(df))
++data_ml()
++''').run()
++        self.assertEqual(len(app.exception), 0)
++        app.multiselect(key="ml_models").set_value(["Linear Regression"])
++        app.button(key="ml_train").click().run(timeout=30)
++        self.assertEqual(len(app.exception), 0)
++        self.assertEqual(len(app.error), 0)
++        self.assertTrue(any("Using 40 of 40 rows" in caption.value for caption in app.caption))
++        self.assertTrue(any(table.value.index.tolist() == ["Linear Regression"] for table in app.dataframe))
++
++
++if __name__ == "__main__":
++    unittest.main()
+--- /dev/null
++++ b/tests/test_review_regressions.py
+@@ -0,0 +1,214 @@
++import unittest
++from io import BytesIO, StringIO
++from pathlib import Path
++
++import numpy as np
++import pandas as pd
++from pandas.testing import assert_frame_equal
++from sklearn.linear_model import LinearRegression
++from sklearn.model_selection import train_test_split
++
++from backend.ingestion import apply_inferred_dtypes, infer_column_meta, infer_dtype, parse_file
++from backend.ml import get_available_models, train_model
++from backend.preprocessing import auto_preprocess
++
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++def upload(text, name="example.csv"):
++    stream = StringIO(text)
++    stream.name = name
++    return stream
++
++
++def schema(dtype, **kwargs):
++    return {"x": {"inferred_dtype": dtype, **kwargs}}
++
++
++class IngestionTests(unittest.TestCase):
++    def test_csv_preserves_identifiers_and_literal_na(self):
++        df = parse_file(upload("customer_id,region\n0001,NA\n0002,EU\n"))
++        self.assertEqual(df["customer_id"].tolist(), ["0001", "0002"])
++        self.assertEqual(df["region"].tolist(), ["NA", "EU"])
++        after = apply_inferred_dtypes(df, infer_column_meta(df))
++        assert_frame_equal(df, after)
++
++    def test_tsv_preserves_text_and_blank_cells(self):
++        df = parse_file(upload("code\tregion\n001\tNULL\n002\t\n", "example.tsv"))
++        self.assertEqual(df["code"].tolist(), ["001", "002"])
++        self.assertEqual(df.loc[0, "region"], "NULL")
++        self.assertTrue(pd.isna(df.loc[1, "region"]))
++
++    def test_excel_preserves_text_cells(self):
++        stream = BytesIO()
++        pd.DataFrame({"id": ["0001", "0002"], "region": ["NA", "EU"]}).to_excel(stream, index=False)
++        stream.name = "example.xlsx"
++        stream.seek(0)
++        df = parse_file(stream)
++        self.assertEqual(df["id"].tolist(), ["0001", "0002"])
++        self.assertEqual(df["region"].tolist(), ["NA", "EU"])
++
++    def test_json_preserves_quoted_numbers_and_dates(self):
++        df = parse_file(upload('[{"id":"0001","date":"2024-01-02","region":"NA"}]', "example.json"))
++        self.assertEqual(df.loc[0, "id"], "0001")
++        self.assertEqual(df.loc[0, "date"], "2024-01-02")
++
++    def test_compound_values_and_ambiguous_dates_remain_text(self):
++        for values in (["5 out of 10"], ["A001"], ["01/02/2024"], ["33.8 Lac", "1.2 Cr"], ["001", "002"]):
++            with self.subTest(values=values):
++                self.assertEqual(infer_dtype(pd.Series(values, dtype=object))[0], "object")
++
++    def test_scientific_notation_retains_numeric_meaning(self):
++        df = pd.DataFrame({"x": ["1e3", "-2e-1", None]})
++        result = apply_inferred_dtypes(df, infer_column_meta(df))
++        self.assertEqual(result.loc[0, "x"], 1000)
++        self.assertEqual(result.loc[1, "x"], -0.2)
++        self.assertTrue(pd.isna(result.loc[2, "x"]))
++
++    def test_partial_numeric_column_is_not_automatically_coerced(self):
++        values = pd.Series(["1"] * 9 + ["unknown"], dtype=object)
++        self.assertEqual(infer_dtype(values)[0], "object")
++
++    def test_string_dtype_is_supported(self):
++        self.assertEqual(infer_dtype(pd.Series(["1", "2", None], dtype="string"))[0], "int64")
++
++    def test_integer_conversion_preserves_large_integers_and_missing_values(self):
++        df = pd.DataFrame({"x": ["9007199254740993", None]})
++        result = apply_inferred_dtypes(df, schema("int64"))
++        self.assertEqual(result.loc[0, "x"], 9007199254740993)
++        self.assertTrue(pd.isna(result.loc[1, "x"]))
++
++    def test_invalid_conversion_is_atomic_and_reports_column(self):
++        df = pd.DataFrame({"valid": ["1", "2"], "x": ["1.5", "2"]})
++        before = df.copy(deep=True)
++        meta = {"valid": {"inferred_dtype": "int64"}, **schema("int64")}
++        with self.assertRaisesRegex(ValueError, "x"):
++            apply_inferred_dtypes(df, meta)
++        assert_frame_equal(df, before)
++
++    def test_invalid_boolean_does_not_become_missing(self):
++        with self.assertRaisesRegex(ValueError, "x"):
++            apply_inferred_dtypes(pd.DataFrame({"x": ["true", "maybe"]}), schema("bool"))
++
++    def test_nonfinite_or_inexact_large_numeric_conversion_is_rejected(self):
++        for values in (["1e999"], ["1e-999"], ["9007199254740993", "1.5"]):
++            with self.subTest(values=values), self.assertRaises(ValueError):
++                apply_inferred_dtypes(pd.DataFrame({"x": values}), schema("float64"))
++
++    def test_dates_need_an_unambiguous_format(self):
++        iso = pd.DataFrame({"x": ["2024-01-02", None]})
++        result = apply_inferred_dtypes(iso, infer_column_meta(iso))
++        self.assertEqual(result.loc[0, "x"], pd.Timestamp("2024-01-02"))
++        ambiguous = pd.DataFrame({"x": ["01/02/2024"]})
++        with self.assertRaises(ValueError):
++            apply_inferred_dtypes(ambiguous, schema("datetime64[ns]"))
++        result = apply_inferred_dtypes(ambiguous, schema("datetime64[ns]", date_format="%d/%m/%Y"))
++        self.assertEqual(result.loc[0, "x"], pd.Timestamp("2024-02-01"))
++
++    def test_id_named_column_is_not_reinterpreted(self):
++        df = pd.DataFrame({"customer_id": ["1", "2", "1"]})
++        after = apply_inferred_dtypes(df, infer_column_meta(df))
++        assert_frame_equal(df, after)
++
++    def test_bundled_data_preserves_text_and_missingness(self):
++        with (ROOT / "surat_uncleaned.csv").open("rb") as stream:
++            df = parse_file(stream)
++        after = apply_inferred_dtypes(df, infer_column_meta(df))
++        for col in ("property_name", "floor", "price", "square_feet"):
++            pd.testing.assert_series_equal(df[col], after[col])
++        pd.testing.assert_series_equal(df.isna().sum(), after.isna().sum())
++
++
++class PreprocessingTests(unittest.TestCase):
++    def test_same_category_has_same_representation_in_both_splits(self):
++        df = pd.DataFrame({"category": ["a", "b", "c"] * 20, "target": np.arange(60)})
++        train_idx, test_idx = train_test_split(df.index, test_size=0.2, random_state=42)
++        # Make the held-out split lack the training baseline category.
++        df.loc[test_idx, "category"] = ["b", "c"] * 6
++        train, test, _, _, _ = auto_preprocess(df, "target", {})
++        train_b = train.loc[df.loc[train.index, "category"].eq("b")].iloc[0]
++        test_b = test.loc[df.loc[test.index, "category"].eq("b")].iloc[0]
++        np.testing.assert_allclose(train_b, test_b)
++
++    def test_features_are_imputed_using_training_values_only(self):
++        df = pd.DataFrame({"number": pd.Series(np.arange(60), dtype="Int64"), "target": np.arange(60)})
++        train_idx, test_idx = train_test_split(df.index, test_size=0.2, random_state=42)
++        df.loc[train_idx[0], "number"] = pd.NA
++        df.loc[test_idx, "number"] = 1000000
++        df.loc[test_idx[0], "number"] = pd.NA
++        train, test, y_train, y_test, info = auto_preprocess(df, "target", {})
++        self.assertEqual(len(train) + len(test), len(df))
++        self.assertEqual(len(y_train) + len(y_test), len(df))
++        self.assertTrue(np.isfinite(train.to_numpy()).all())
++        self.assertTrue(np.isfinite(test.to_numpy()).all())
++        # A future missing value must use exactly the training-fitted transform.
++        transformed = info["preprocessor"].transform(df.loc[[test_idx[0]]].drop(columns="target"))
++        np.testing.assert_allclose(transformed, test.loc[[test_idx[0]]])
++        expected = df.loc[train_idx, "number"].median()
++        np.testing.assert_allclose(info["fill_values"]["number"], expected)
++
++    def test_nullable_categorical_and_entirely_missing_numeric_features(self):
++        df = pd.DataFrame({
++            "text": pd.Series(["a", None, "b"] * 20, dtype="string"),
++            "flag": pd.Series([True, None, False] * 20, dtype="boolean"),
++            "empty": pd.Series([None] * 60, dtype="Int64"),
++            "target": np.arange(60),
++        })
++        train, test, y_train, y_test, _ = auto_preprocess(df, "target", {})
++        self.assertTrue(np.isfinite(train.to_numpy()).all())
++        self.assertTrue(np.isfinite(test.to_numpy()).all())
++        LinearRegression().fit(train, y_train).predict(test)
++
++    def test_only_missing_targets_are_dropped(self):
++        df = pd.DataFrame({"x": [1.0, None] * 30, "target": [0.0, 1.0] * 30})
++        df.loc[0, "target"] = np.nan
++        train, test, _, _, info = auto_preprocess(df, "target", {})
++        self.assertEqual(len(train) + len(test), 59)
++        self.assertEqual(info["dropped_missing_targets"], 1)
++
++    def test_unseen_categories_do_not_refit_the_encoder(self):
++        df = pd.DataFrame({"category": ["a", "b"] * 30, "target": np.arange(60)})
++        _, _, _, _, info = auto_preprocess(df, "target", {})
++        encoder = info["preprocessor"].named_transformers_["categorical"].named_steps["encode"]
++        before = [c.copy() for c in encoder.categories_]
++        result = info["preprocessor"].transform(pd.DataFrame({"category": ["new"]}))
++        self.assertTrue(np.isfinite(result).all())
++        for old, current in zip(before, encoder.categories_):
++            np.testing.assert_array_equal(old, current)
++
++    def test_high_cardinality_is_bounded(self):
++        df = pd.DataFrame({"category": [f"value_{i}" for i in range(300)], "target": np.arange(300)})
++        train, _, _, _, _ = auto_preprocess(df, "target", {})
++        self.assertLessEqual(train.shape[1], 64)
++
++    def test_empty_training_category_handles_future_values(self):
++        df = pd.DataFrame({"category": pd.Series([None] * 60, dtype="string"), "target": np.arange(60)})
++        train, test, _, _, info = auto_preprocess(df, "target", {})
++        self.assertTrue(np.isfinite(train.to_numpy()).all())
++        self.assertTrue(np.isfinite(test.to_numpy()).all())
++        transformed = info["preprocessor"].transform(pd.DataFrame({"category": ["new"]}))
++        self.assertTrue(np.isfinite(transformed).all())
++
++
++class ModelIsolationTests(unittest.TestCase):
++    def test_each_registry_request_returns_fresh_estimators(self):
++        for task in ("classification", "regression"):
++            first = get_available_models(task)
++            second = get_available_models(task)
++            for name in first:
++                self.assertIsNot(first[name], second[name])
++                self.assertEqual(first[name].get_params(), second[name].get_params())
++
++    def test_training_one_run_cannot_change_another_run(self):
++        first = get_available_models("regression")["Linear Regression"]
++        second = get_available_models("regression")["Linear Regression"]
++        x = pd.DataFrame({"x": np.arange(10, dtype=float)})
++        train_model(first, x, np.arange(10, dtype=float))
++        predictions = first.predict(x).copy()
++        train_model(second, x, -np.arange(10, dtype=float))
++        np.testing.assert_allclose(first.predict(x), predictions)
++
++
++if __name__ == "__main__":
++    unittest.main()
