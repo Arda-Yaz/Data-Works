@@ -55,7 +55,7 @@ from frontend.pages.data_ml import data_ml
 
 StateManager.init_session()
 if not StateManager.has_dataset():
-    df = pd.DataFrame({"target": np.arange(40, dtype=float), "value": [1.0, None] * 20})
+    df = pd.DataFrame({"target": np.arange(40, dtype=float), "value": [1.0, None, 2.0, None] * 10})
     StateManager.load_dataset(df, infer_column_meta(df))
 data_ml()
 ''').run()

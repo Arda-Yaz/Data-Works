@@ -36,6 +36,7 @@ def _defaults() -> dict:
     return {
         "original_df": None, "df": None, "column_meta": {}, "history": [],
         "target_column": None, "schema_confirmed": False, "viz_charts": [],
+        "statistical_operations": [],
     }
 
 
@@ -121,6 +122,12 @@ class StateManager:
         for key in pending:
             st.session_state.pop(key, None)
         st.session_state["_dataset_widgets_pending_reset"] = []
+        if "statistical_operations" not in st.session_state:
+            # Older sessions did not record cleaning parameters; be conservative.
+            st.session_state["statistical_operations"] = list(dict.fromkeys(
+                item["name"] for item in st.session_state.get("history", [])
+                if item.get("name") in ("Handle missing values", "Handle outliers")
+            ))
         for key, value in _defaults().items():
             if key not in st.session_state:
                 st.session_state[key] = value
@@ -146,6 +153,7 @@ class StateManager:
         st.session_state.history = []
         st.session_state.schema_confirmed = False
         st.session_state.target_column = None
+        st.session_state.statistical_operations = []
 
     @staticmethod
     def _snapshot(operation_name: str) -> dict:
@@ -157,6 +165,7 @@ class StateManager:
             "column_meta": copy.deepcopy(st.session_state.column_meta),
             "schema_confirmed": st.session_state.schema_confirmed,
             "target_column": st.session_state.target_column,
+            "statistical_operations": list(st.session_state.statistical_operations),
         }
 
     @staticmethod
@@ -166,6 +175,7 @@ class StateManager:
         *,
         column_meta: dict | None = None,
         schema_confirmed: bool | None = None,
+        learns_from_data: bool = False,
     ) -> bool:
         """Atomically apply a prepared operation; return False for a true no-op.
 
@@ -176,6 +186,8 @@ class StateManager:
             raise ValueError("Load a dataset before applying an operation.")
         if schema_confirmed is not None and not isinstance(schema_confirmed, bool):
             raise ValueError("Schema confirmation must be a boolean.")
+        if not isinstance(learns_from_data, bool):
+            raise ValueError("The statistical-cleaning flag must be a boolean.")
         metadata = st.session_state.column_meta if column_meta is None else column_meta
         candidate, metadata = _prepare_dataset(
             df, metadata, previous_df=st.session_state.df,
@@ -194,12 +206,16 @@ class StateManager:
             return False
         snapshot = StateManager._snapshot(operation_name)
         history = [*st.session_state.history, snapshot][-MAX_HISTORY:]
+        statistical = list(st.session_state.statistical_operations)
+        if learns_from_data and operation_name not in statistical:
+            statistical.append(operation_name)
         StateManager._invalidate_dependent_state()
         st.session_state.df = candidate
         st.session_state.column_meta = metadata
         st.session_state.schema_confirmed = confirmed
         st.session_state.target_column = target
         st.session_state.history = history
+        st.session_state.statistical_operations = statistical
         return True
 
     @staticmethod
@@ -225,6 +241,9 @@ class StateManager:
         st.session_state.schema_confirmed = confirmed
         st.session_state.target_column = target
         st.session_state.history = history[:-1]
+        st.session_state.statistical_operations = list(snapshot.get(
+            "statistical_operations", st.session_state.statistical_operations,
+        ))
         return True
 
     @staticmethod
@@ -247,6 +266,15 @@ class StateManager:
             c for c, meta in st.session_state.column_meta.items()
             if c in st.session_state.df.columns and meta.get("role") == role
         ]
+
+    @staticmethod
+    def set_target(col) -> None:
+        if col is not None and (
+            not StateManager.has_dataset() or col not in st.session_state.df.columns
+            or st.session_state.column_meta[col].get("role") in ("id", "datetime", "ignore")
+        ):
+            raise ValueError("Choose a target column with the feature role.")
+        st.session_state.target_column = col
 
     @staticmethod
     def get_numeric_columns() -> list[str]:

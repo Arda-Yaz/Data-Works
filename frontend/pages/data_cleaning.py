@@ -85,7 +85,13 @@ def data_cleaning():
                     new_df = df.copy()
                     for col, strat in strategies.items():
                         new_df = handle_missing(new_df, col, strat, fill_value=fill_values.get(col))
-                    changed = StateManager.apply_operation("Handle missing values", new_df)
+                    changed = StateManager.apply_operation(
+                        "Handle missing values", new_df,
+                        learns_from_data=any(
+                            strategy in ("mean", "median", "mode", "interpolate")
+                            for strategy in strategies.values()
+                        ),
+                    )
                 except Exception as exc:
                     st.error(f"Missing-value changes were not applied. {exc}")
                 else:
@@ -169,7 +175,10 @@ def data_cleaning():
                     for col, (method, action) in actions.items():
                         if action != "ignore":
                             new_df = handle_outliers(new_df, col, method=method, action=action)
-                    changed = StateManager.apply_operation("Handle outliers", new_df)
+                    changed = StateManager.apply_operation(
+                        "Handle outliers", new_df,
+                        learns_from_data=any(action != "ignore" for _, action in actions.values()),
+                    )
                 except Exception as exc:
                     st.error(f"Outlier changes were not applied. {exc}")
                 else:
