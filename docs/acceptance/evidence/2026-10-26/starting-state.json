@@ -1,0 +1,448 @@
+{
+  "captured_at_utc": "2026-10-26T13:22:34.768573+00:00",
+  "client_date": "2026-10-26",
+  "client_timezone": "Europe/Istanbul",
+  "head": "4b8ab1c04b355c331d850fcf6ed627ae767ba3ba",
+  "branch": "main",
+  "python_executable": "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+  "python_version": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "git_status_porcelain_v1_z": " M .gitignore\u0000A  .streamlit/config.toml\u0000D  .vscode/settings.json\u0000 M README.md\u0000 M app.py\u0000M  backend/cleaning.py\u0000A  backend/cleaning_preview.py\u0000M  backend/eda.py\u0000 M backend/ingestion.py\u0000 M backend/ml.py\u0000 M backend/preprocessing.py\u0000MM backend/state.py\u0000MM backend/visualization.py\u0000 D blank.py\u0000M  frontend/components/widgets.py\u0000MM frontend/pages/data_cleaning.py\u0000MM frontend/pages/data_eda.py\u0000 M frontend/pages/data_ml.py\u0000 M frontend/pages/data_upload.py\u0000 M frontend/pages/data_viz.py\u0000 M requirements.txt\u0000D  review/cleaning-correctness.patch\u0000D  review/dataset-schema-history.patch\u0000D  review/definitive-refactor.patch\u0000D  review/definitive-refactor.zip\u0000D  review/ml-execution-evaluation.patch\u0000M  tests/test_cleaning_pages.py\u0000A  tests/test_cleaning_plans.py\u0000A  tests/test_cleaning_policy_pages.py\u0000A  tests/test_cleaning_preview.py\u0000A  tests/test_eda_correctness.py\u0000AM tests/test_eda_pages.py\u0000M  tests/test_state_consistency_pages.py\u0000?? .github/\u0000?? DEPLOYMENT.md\u0000?? backend/access.py\u0000?? backend/diagnostics.py\u0000?? backend/experiments.py\u0000?? backend/exports.py\u0000?? backend/operations.py\u0000?? backend/project_io.py\u0000?? backend/resources.py\u0000?? backend/text_transform.py\u0000?? frontend/components/row_inspector.py\u0000?? frontend/pages/data_project.py\u0000?? scripts/\u0000?? tests/test_data_exports.py\u0000?? tests/test_experiment_pages.py\u0000?? tests/test_experiment_persistence.py\u0000?? tests/test_ingestion_options.py\u0000?? tests/test_ingestion_transform_pages.py\u0000?? tests/test_operation_recipes.py\u0000?? tests/test_performance_views.py\u0000?? tests/test_project_io.py\u0000?? tests/test_project_pages.py\u0000?? tests/test_project_state.py\u0000?? tests/test_row_inspector.py\u0000?? tests/test_runtime_readiness.py\u0000?? tests/test_session_resources.py\u0000?? tests/test_text_transform.py\u0000?? tests/test_workload_limits.py\u0000",
+  "index_entries": [
+    "100644 4898c26601df13f06ef63ddb01ec3f6c2a66394d 0\t.gitignore",
+    "100644 3ff20cf1f0d8bce668746ac34afd0078c0e11dc7 0\t.streamlit/config.toml",
+    "100644 2135d834e69c5943e08ae5f94ba7a2c8e497b6fb 0\tREADME.md",
+    "100644 cf85f18b4a941090a94db0c4fb19d7f731eecad8 0\tapp.py",
+    "100644 2bf4f5c48b9a9197118deb2104fb10ebff576efb 0\tbackend/cleaning.py",
+    "100644 13a3d14cd21a67e86f8d7145cf7d58c9fb2c4a9b 0\tbackend/cleaning_preview.py",
+    "100644 4e531bcf6451ab7daf82812defa43e60762addd9 0\tbackend/eda.py",
+    "100644 3d3fd45afef1bb45f464aaa699a7218f9127e6d0 0\tbackend/ingestion.py",
+    "100644 ef00184ac269406111f7d01b2c4600ecbe0b5a85 0\tbackend/ml.py",
+    "100644 f79cdae597f2225f5bb08ab127be9acaca1147f9 0\tbackend/preprocessing.py",
+    "100644 ee506cd85c1d17df36c16fb521e403213c764151 0\tbackend/preview.py",
+    "100644 7cb02a916fbca7a21fc3f657953587b682556655 0\tbackend/state.py",
+    "100644 4d9feed49ddef33afeebf76aaeb71dc439af7ded 0\tbackend/visualization.py",
+    "100644 824818434cb9fd723f7b988f58b5db21d0cd713a 0\tblank.py",
+    "100644 6909188e334a2fa7d5c282be87407dc78c2a24cf 0\tfrontend/components/widgets.py",
+    "100644 cc166e7f83b38777dc2e0983c7f6e8d380994e3a 0\tfrontend/pages/data_cleaning.py",
+    "100644 6d46c0578474a14ccc5eb66bf0b5952076086d5a 0\tfrontend/pages/data_eda.py",
+    "100644 456a12af53d19654dc13907e4f404a849c74f195 0\tfrontend/pages/data_ml.py",
+    "100644 fb52885325436e2baa7cc0bc328313a861b0055a 0\tfrontend/pages/data_preview.py",
+    "100644 e564a343d9556f99713d0557ba75812bea6149bc 0\tfrontend/pages/data_upload.py",
+    "100644 5e7086bf9d7f5243066dfc5ba97411be5cd35861 0\tfrontend/pages/data_viz.py",
+    "100644 1c7b41347a2e392698151c22a821e6efc9c91b11 0\trequirements.txt",
+    "100644 a1f41497c27121ef9fde04e7359de486fec0f073 0\tsurat_uncleaned.csv",
+    "100644 9fb3ed4e13719c42902005e2e214725dbe6f1c1e 0\ttests/test_cleaning_correctness.py",
+    "100644 697eecf1a48ffe71f6b6e12b906c2c5a2454f825 0\ttests/test_cleaning_pages.py",
+    "100644 eb36b83ccadbe27704cce612d3e4894b297d7335 0\ttests/test_cleaning_plans.py",
+    "100644 7647b5cb1c92f7ddf3979c504e3ffe07d6ac4011 0\ttests/test_cleaning_policy_pages.py",
+    "100644 7178ec6d3d084fbb08c5d4cbcbc3db236c68513d 0\ttests/test_cleaning_preview.py",
+    "100644 217fa29a2de0fcaf6305cba797bc53eace9002b5 0\ttests/test_eda_correctness.py",
+    "100644 5472e7515adca973f26ff5dd64bf81ea55fc19c6 0\ttests/test_eda_pages.py",
+    "100644 5c3b703ab7cd7a7bc90aacaca395bbaca1271991 0\ttests/test_ml_evaluation.py",
+    "100644 66a0a8a740d21f8e69a77f9364acfd710797dd20 0\ttests/test_ml_execution_pages.py",
+    "100644 847ef80ff6de544b028496f36a3faa70de35caa7 0\ttests/test_ml_provenance.py",
+    "100644 1f03e46c2bd24a6aefa5f844ca6db9d954abbf83 0\ttests/test_ml_splitting.py",
+    "100644 a9f9ae01f9ed3d0553f0f9754ba429ed3e2b3d8f 0\ttests/test_review_pages.py",
+    "100644 8e0ab2c62460899ada98468144bbb086e14b7a1f 0\ttests/test_review_regressions.py",
+    "100644 b3312d574e72aa7c3be26c2d837117693b6606d3 0\ttests/test_state_consistency.py",
+    "100644 47987cdec1bffa1bb6dec63379662c0209ff4ecc 0\ttests/test_state_consistency_pages.py"
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "exists": true,
+      "bytes": 939,
+      "sha256": "a0454c6455f4024d164103d808ac0623ef1359ea57bb9779acf533834e84bcec"
+    },
+    {
+      "path": ".gitignore",
+      "exists": true,
+      "bytes": 302,
+      "sha256": "a64dc4de0cab2e9d14c6d1decee53b55009271c91cb8ffa925c7ae818937b92b"
+    },
+    {
+      "path": ".streamlit/config.toml",
+      "exists": true,
+      "bytes": 184,
+      "sha256": "f3789a5574a3f6a114d85ff7338ffbfc83348e05250d0a0a1ea1e4f0af67b939"
+    },
+    {
+      "path": "DEPLOYMENT.md",
+      "exists": true,
+      "bytes": 4710,
+      "sha256": "ca8cda8332efc4a241d1ee18ac321d829c14a1b14279782348bac318f741f009"
+    },
+    {
+      "path": "README.md",
+      "exists": true,
+      "bytes": 7392,
+      "sha256": "d40287c5f40b923a4efa395b5205e0d6d27ad26ee3e1f964055b757221301930"
+    },
+    {
+      "path": "app.py",
+      "exists": true,
+      "bytes": 2463,
+      "sha256": "a1d8390077a4dc86908f5486a7d3c5d81b62476008d99d6b1128ba62cf621ea2"
+    },
+    {
+      "path": "backend/access.py",
+      "exists": true,
+      "bytes": 4388,
+      "sha256": "8f9255ac1bf4287761b2442700235cf887c9b83ccef2aabe3cc86ea5796dc762"
+    },
+    {
+      "path": "backend/cleaning.py",
+      "exists": true,
+      "bytes": 28101,
+      "sha256": "f3683b6ad3da59e7a8be2a4ec03e8cf1dda5f4f35149f4ad5ffef54fd23eabac"
+    },
+    {
+      "path": "backend/cleaning_preview.py",
+      "exists": true,
+      "bytes": 5457,
+      "sha256": "2503ba1a3124f4ee22a4de5ec44b3cbb26a6a695c853cb554513d1e880a2de9d"
+    },
+    {
+      "path": "backend/diagnostics.py",
+      "exists": true,
+      "bytes": 2526,
+      "sha256": "48baa1d6c398fea31d86a6f30e6f465361d81127c52fdd582d9535417ca9963d"
+    },
+    {
+      "path": "backend/eda.py",
+      "exists": true,
+      "bytes": 5757,
+      "sha256": "b09da6a6a4d757bdd77caa6c509d5d28182383588c39f44af0be20235617dabf"
+    },
+    {
+      "path": "backend/experiments.py",
+      "exists": true,
+      "bytes": 16277,
+      "sha256": "c2ae6fbabe0a4c041555968d9bcec8140396dc3b2edb9367a4a5bd4430f9af3c"
+    },
+    {
+      "path": "backend/exports.py",
+      "exists": true,
+      "bytes": 2374,
+      "sha256": "4e5ad194343af57dd65fe354fa0f0f475bfa578730b045e381c2909bebfe2065"
+    },
+    {
+      "path": "backend/ingestion.py",
+      "exists": true,
+      "bytes": 17151,
+      "sha256": "01c8070f7664856cd39d8ac8ca2e9b3e925eb8a0c771ef6af1c2ad3f5bbae1a2"
+    },
+    {
+      "path": "backend/ml.py",
+      "exists": true,
+      "bytes": 12716,
+      "sha256": "ce0b873061bfdc79c4bb6c19b6eca99706539588eb2952c890fdf59108e89778"
+    },
+    {
+      "path": "backend/operations.py",
+      "exists": true,
+      "bytes": 16596,
+      "sha256": "c10c3985f35135c995e6651054a40c1631a9e30f698c8e2da44019d959ca321c"
+    },
+    {
+      "path": "backend/preprocessing.py",
+      "exists": true,
+      "bytes": 17230,
+      "sha256": "740163218ccedc2e604cbff5d0bc66474d7ad4d7d7d35d1a4902f858b1440c92"
+    },
+    {
+      "path": "backend/preview.py",
+      "exists": true,
+      "bytes": 1188,
+      "sha256": "8347ceb821b9c310ff00b9f0eac39c5b3708ba34ae98ab469666aabb177ee6ae"
+    },
+    {
+      "path": "backend/project_io.py",
+      "exists": true,
+      "bytes": 27450,
+      "sha256": "069546cf47047334ffb5eba70af3da22713d1b823a03ce13b6cd04492ffeaa5b"
+    },
+    {
+      "path": "backend/resources.py",
+      "exists": true,
+      "bytes": 3541,
+      "sha256": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a"
+    },
+    {
+      "path": "backend/state.py",
+      "exists": true,
+      "bytes": 32239,
+      "sha256": "1dd60ef5bcb25dbc627656cc9423341c416e07ad9d49f9d195ffe32332a7aecb"
+    },
+    {
+      "path": "backend/text_transform.py",
+      "exists": true,
+      "bytes": 6107,
+      "sha256": "078100410a7e21da6d96432236c9dd0e2fec2808b29b42535b0bddab265a69a2"
+    },
+    {
+      "path": "backend/visualization.py",
+      "exists": true,
+      "bytes": 5939,
+      "sha256": "1d7f6e439c947608f81ee475fb82d0e7fb721a6d528befe82ce3f0c89ec168e4"
+    },
+    {
+      "path": "blank.py",
+      "exists": false
+    },
+    {
+      "path": "frontend/components/row_inspector.py",
+      "exists": true,
+      "bytes": 3363,
+      "sha256": "34e078b8ff7e5077a0bce2ac0c11d0fe47098afc1958af67f77cc54be050de0f"
+    },
+    {
+      "path": "frontend/components/widgets.py",
+      "exists": true,
+      "bytes": 1989,
+      "sha256": "af79f3afcdd36e9902bdafe7df2f75c0ea360e859317c567aa3d07f0c4045d34"
+    },
+    {
+      "path": "frontend/pages/data_cleaning.py",
+      "exists": true,
+      "bytes": 18726,
+      "sha256": "ede84625fc04591a08ff9dab5e3c451b59a0bae0a5b4b3d6e2b7386b5be2aa1c"
+    },
+    {
+      "path": "frontend/pages/data_eda.py",
+      "exists": true,
+      "bytes": 8292,
+      "sha256": "0d686c1c31600b42c97cd712e08e58c2a0029177e217a19a97cb2a96d927634e"
+    },
+    {
+      "path": "frontend/pages/data_ml.py",
+      "exists": true,
+      "bytes": 17380,
+      "sha256": "d248ed93b5d933c1655ebbafa66e2bcded55190643101a17dd9e469c213bfdd2"
+    },
+    {
+      "path": "frontend/pages/data_preview.py",
+      "exists": true,
+      "bytes": 89,
+      "sha256": "86cacfa225dfe39a5f9c319b1875e9c76c95a504f604ccbff7b939455621ee6c"
+    },
+    {
+      "path": "frontend/pages/data_project.py",
+      "exists": true,
+      "bytes": 7366,
+      "sha256": "fb9c809ae00621353c3f808947b1a337a036e64b7c7dc138a4550925aa43f37f"
+    },
+    {
+      "path": "frontend/pages/data_upload.py",
+      "exists": true,
+      "bytes": 11581,
+      "sha256": "2251b9c7c6bf17dbe7a441d5c8edd665a9d3961caae6f21f94f51e4b796e08fc"
+    },
+    {
+      "path": "frontend/pages/data_viz.py",
+      "exists": true,
+      "bytes": 4762,
+      "sha256": "5afe43aaff9f6d36c08bc983df879f494723e98554a53f02009ad612fafd29b3"
+    },
+    {
+      "path": "requirements.txt",
+      "exists": true,
+      "bytes": 187,
+      "sha256": "ba32be5b7f9111767fa5840dad823f59ef2024e8e167552002af57add707c3ce"
+    },
+    {
+      "path": "scripts/run_tests.py",
+      "exists": true,
+      "bytes": 894,
+      "sha256": "f867e61deed97b9ca921883e8eb5b6b9424eb5475c6d42cb4721abdc8de5d789"
+    },
+    {
+      "path": "surat_uncleaned.csv",
+      "exists": true,
+      "bytes": 1324055,
+      "sha256": "cb08655a74ed5035ce94c196330dee8b1e5463237c797e2c4ad65720511e0369"
+    },
+    {
+      "path": "tests/test_cleaning_correctness.py",
+      "exists": true,
+      "bytes": 18855,
+      "sha256": "40c6dfda8a5454e01a5c92d6bc0b21ffd259488011f3672fcf58715e097830b8"
+    },
+    {
+      "path": "tests/test_cleaning_pages.py",
+      "exists": true,
+      "bytes": 6033,
+      "sha256": "4c1d47b31325c9e45f547c92f84795980edf39462af971840c2408cec3ceca66"
+    },
+    {
+      "path": "tests/test_cleaning_plans.py",
+      "exists": true,
+      "bytes": 9388,
+      "sha256": "1cb4db0c6eb5f5c5ee2392b7688ddc0a0bf8025433da21e0003e6b80a4dcb6b4"
+    },
+    {
+      "path": "tests/test_cleaning_policy_pages.py",
+      "exists": true,
+      "bytes": 10303,
+      "sha256": "eb68d40c857692ef74ec81aa4324a079e2fc7f3016ed11b01e4843a1f5db57fc"
+    },
+    {
+      "path": "tests/test_cleaning_preview.py",
+      "exists": true,
+      "bytes": 8103,
+      "sha256": "2f3db4970948e8180bcff7ac677ee6385b34ae0ec3bfd049e449a60c3ac256d7"
+    },
+    {
+      "path": "tests/test_data_exports.py",
+      "exists": true,
+      "bytes": 2654,
+      "sha256": "79da01b01f00f9eb1b84276d817ca908b6fa0126a661392fd0216c4898d634bf"
+    },
+    {
+      "path": "tests/test_eda_correctness.py",
+      "exists": true,
+      "bytes": 7974,
+      "sha256": "833649594f5d900b2cea0af36096977bf97db788e05252063d717a40a90266f6"
+    },
+    {
+      "path": "tests/test_eda_pages.py",
+      "exists": true,
+      "bytes": 2924,
+      "sha256": "e59d352ede3a2ac3b33af728355bd650fb978db84b927de8f5232b8a95d90373"
+    },
+    {
+      "path": "tests/test_experiment_pages.py",
+      "exists": true,
+      "bytes": 5768,
+      "sha256": "80df32bbd69a1d099e1296a4e729e59751e15f82cfa33de3ab031c3034940547"
+    },
+    {
+      "path": "tests/test_experiment_persistence.py",
+      "exists": true,
+      "bytes": 5617,
+      "sha256": "f641634232036300bf009540486a6a500fcbe641bab96036351dc9d458e9ff3d"
+    },
+    {
+      "path": "tests/test_ingestion_options.py",
+      "exists": true,
+      "bytes": 9148,
+      "sha256": "25b33e2029cd4bdd0283170624e9240626ffda41bd708098b0aca9a869588368"
+    },
+    {
+      "path": "tests/test_ingestion_transform_pages.py",
+      "exists": true,
+      "bytes": 8590,
+      "sha256": "0ad552e260f40ecec5fd70d5dd8f2e647dc373596f59b0782a63bbc55975e1bf"
+    },
+    {
+      "path": "tests/test_ml_evaluation.py",
+      "exists": true,
+      "bytes": 9367,
+      "sha256": "8aae6ea409543cb2ed07c420cf49e77e859774bb729269d33c272b9d7d6c0cfb"
+    },
+    {
+      "path": "tests/test_ml_execution_pages.py",
+      "exists": true,
+      "bytes": 8524,
+      "sha256": "82d28ea025a8ea96d5a4ce45bed889772db324e979cdb3b97d7d36ee85cf0c3d"
+    },
+    {
+      "path": "tests/test_ml_provenance.py",
+      "exists": true,
+      "bytes": 3743,
+      "sha256": "5e7a1c4747129ccea19ded0c8bec69b7e61b4bb6efd2b07d15132d22f2eff7c9"
+    },
+    {
+      "path": "tests/test_ml_splitting.py",
+      "exists": true,
+      "bytes": 13666,
+      "sha256": "a122683265e555163843f57886b73639024849807914d25a862ce6204e884781"
+    },
+    {
+      "path": "tests/test_operation_recipes.py",
+      "exists": true,
+      "bytes": 14516,
+      "sha256": "f48d50cbb5fc2d16aa4bdef5c3fdc6259f518da6dab288358eef3c50a710f70e"
+    },
+    {
+      "path": "tests/test_performance_views.py",
+      "exists": true,
+      "bytes": 7537,
+      "sha256": "760c65e1971e5b11a9a4cf3fc22ae6eb1c3299382f8b7a00d98b74c576589989"
+    },
+    {
+      "path": "tests/test_project_io.py",
+      "exists": true,
+      "bytes": 8895,
+      "sha256": "c0f5b06a772885e59d9b52993690138e6b2d267b4289c17b6262e45422484b5c"
+    },
+    {
+      "path": "tests/test_project_pages.py",
+      "exists": true,
+      "bytes": 5660,
+      "sha256": "5130df56eaa756bb54e66708f8e23db979d9f194a397177b3468f3199237f65e"
+    },
+    {
+      "path": "tests/test_project_state.py",
+      "exists": true,
+      "bytes": 10550,
+      "sha256": "4f76b826e0685ea30ab111835c0ad758920d14ffcacac3849edba82864a0883a"
+    },
+    {
+      "path": "tests/test_review_pages.py",
+      "exists": true,
+      "bytes": 3031,
+      "sha256": "3757dcf4e8882a20c13b411b5773a6554d0214725c0eb8ee18e09ae4cca1a46d"
+    },
+    {
+      "path": "tests/test_review_regressions.py",
+      "exists": true,
+      "bytes": 10709,
+      "sha256": "c6e80b83d5fede43e407a8bd887366121a4bbecb1554aaa26c8fbfe317799bcf"
+    },
+    {
+      "path": "tests/test_row_inspector.py",
+      "exists": true,
+      "bytes": 3244,
+      "sha256": "c2667c226ddad2071b6bba716ab58e82eab8da21551e066a743a20b9740767ac"
+    },
+    {
+      "path": "tests/test_runtime_readiness.py",
+      "exists": true,
+      "bytes": 7177,
+      "sha256": "b0cd1c2a40daee509fcefd069be177d6d73435d3e31bc6caa551297074ac3585"
+    },
+    {
+      "path": "tests/test_session_resources.py",
+      "exists": true,
+      "bytes": 9520,
+      "sha256": "bbb29d461edeb47be8718e3756657b23916184742f47ef639e2f2e3ceca09a43"
+    },
+    {
+      "path": "tests/test_state_consistency.py",
+      "exists": true,
+      "bytes": 16876,
+      "sha256": "9abdf7835bd20753d6a9b99041119d6c029d1bc8f2b4bdc01aaa0c300ad8af9c"
+    },
+    {
+      "path": "tests/test_state_consistency_pages.py",
+      "exists": true,
+      "bytes": 10392,
+      "sha256": "82a868cfd1cb5b7118336cd13f23f4cab16d32450af9b204d7d21cddd743923c"
+    },
+    {
+      "path": "tests/test_text_transform.py",
+      "exists": true,
+      "bytes": 9177,
+      "sha256": "774a1e023a76edf84755314944dc515f43e3c0bfe3910274c657b43028cd5adf"
+    },
+    {
+      "path": "tests/test_workload_limits.py",
+      "exists": true,
+      "bytes": 6132,
+      "sha256": "8fa43fd7ac33c50e5d51bb755e3909df4477ebc3044ca130bca372417616d74e"
+    }
+  ],
+  "scope": "Git tracked and nonignored untracked paths before Phase 1 authoring; excluded environments, ignored files, and Git internals are not captured. Hash inventory, not a content backup."
+}

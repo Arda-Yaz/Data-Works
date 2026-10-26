@@ -1,0 +1,34 @@
+ .gitignore                            |   17 +
+ .streamlit/config.toml                |   12 +
+ .vscode/settings.json                 |   11 -
+ README.md                             |   61 +-
+ app.py                                |   17 +-
+ backend/cleaning.py                   |  182 +++-
+ backend/cleaning_preview.py           |  120 +++
+ backend/eda.py                        |  164 +++-
+ backend/ingestion.py                  |  233 ++++-
+ backend/ml.py                         |   10 +-
+ backend/preprocessing.py              |    8 +
+ backend/state.py                      |  351 ++++++-
+ backend/visualization.py              |  145 ++-
+ blank.py                              |    2 -
+ frontend/components/widgets.py        |   20 +-
+ frontend/pages/data_cleaning.py       |  494 ++++++----
+ frontend/pages/data_eda.py            |  200 ++--
+ frontend/pages/data_ml.py             |  195 +++-
+ frontend/pages/data_upload.py         |   96 +-
+ frontend/pages/data_viz.py            |  116 ++-
+ requirements.txt                      |    5 +
+ review/cleaning-correctness.patch     | 1091 ---------------------
+ review/dataset-schema-history.patch   | 1231 -----------------------
+ review/definitive-refactor.patch      |  992 -------------------
+ review/definitive-refactor.zip        |  Bin 15914 -> 0 bytes
+ review/ml-execution-evaluation.patch  | 1740 ---------------------------------
+ tests/test_cleaning_pages.py          |   12 +-
+ tests/test_cleaning_plans.py          |  188 ++++
+ tests/test_cleaning_policy_pages.py   |  196 ++++
+ tests/test_cleaning_preview.py        |  147 +++
+ tests/test_eda_correctness.py         |  157 +++
+ tests/test_eda_pages.py               |   65 ++
+ tests/test_state_consistency_pages.py |   12 +-
+ 33 files changed, 2696 insertions(+), 5594 deletions(-)

@@ -1,0 +1,2 @@
+order_id,line_id,order_date,sku,quantity,fulfillment_status,warehouse
+000311,01,2026-10-11,sku-211,1,shipped,east

@@ -1,4 +1,7 @@
 .venv/
+venv/
+env/
+ENV/
 __pycache__/
 *.py[cod]
 *$py.class
@@ -6,5 +9,19 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .streamlit/secrets.toml
+.streamlit/secrets.*.toml
+.env
+.env.*
+!.env.example
+*.log
+.test-tmp/
+.coverage
+.coverage.*
+/htmlcov/
+/coverage.xml
+/coverage.json
+/lcov.info
+/review/
+/.vscode/
 .DS_Store
 Thumbs.db

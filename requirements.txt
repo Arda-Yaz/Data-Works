@@ -3,5 +3,10 @@ pandas==2.3.3
 numpy==2.4.2
 plotly==6.6.0
 scikit-learn==1.8.0
+scipy==1.18.1
+joblib==1.6.0
+threadpoolctl==3.7.0
+Authlib==1.9.1
 openpyxl==3.1.5
+xlrd==2.0.2
 watchdog==6.0.0

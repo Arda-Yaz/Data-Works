@@ -1,0 +1,59 @@
+{
+  "fixture_version": 1,
+  "client_date": "2026-10-26",
+  "provenance": "Original synthetic fixtures; manually declared expectations, independently audited without production imports. No customer data or measured user benefit.",
+  "change_policy": "Review and version expectation/input changes; never derive expected outputs from application execution.",
+  "hash_scope": "Raw file bytes; this manifest excludes itself.",
+  "files": [
+    {
+      "path": "expected.json",
+      "bytes": 4905,
+      "sha256": "1898263149a7a4a9a55c8f84fb6fd188b565c33e274cc0fbde27c9dc0ce7cbfd"
+    },
+    {
+      "path": "month_a.csv",
+      "bytes": 528,
+      "sha256": "b2eeaaa79555292a37d0fa933d6e70b3570025ec72ffd8ec0c844fca04197471"
+    },
+    {
+      "path": "month_b.csv",
+      "bytes": 373,
+      "sha256": "3d8a37176b3c65fe7c0195d689ae1e3ae04d4748cffcea2b512b76856a72a09e"
+    },
+    {
+      "path": "month_c_conflicting_duplicates.csv",
+      "bytes": 138,
+      "sha256": "89c8012631e8b1def05b7968b16843314893976dd6dd2fe7151296dd98ac04a3"
+    },
+    {
+      "path": "month_c_extra_column.csv",
+      "bytes": 114,
+      "sha256": "cb40b7a440d79acfd2f438ec82e6c1f297c4a98d572d6f4275a330ab67195a3a"
+    },
+    {
+      "path": "month_c_invalid_rows.csv",
+      "bytes": 410,
+      "sha256": "a03a6b88f12836b1a0905eafd2adb80a206b39333d3ba5ff3329c0a6c4fd003b"
+    },
+    {
+      "path": "month_c_missing_quantity.csv",
+      "bytes": 88,
+      "sha256": "8a4490feed3e26368d1b9fbe5db5d0995203c917748c9d6e735d0815089ac641"
+    },
+    {
+      "path": "month_c_unseen_status.csv",
+      "bytes": 103,
+      "sha256": "5512e2fa85212e082c45869cab5e0c91d84321fde127bdbc5f43974dd4fbb0bb"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2090,
+      "sha256": "0ee0ce7be66940498ad48b433e897924d69aa56d5c4d8d0cc28bda9adfead6f2"
+    },
+    {
+      "path": "statistical_characterization.json",
+      "bytes": 1069,
+      "sha256": "4b81b767848e062b207f4b95fbef7242e4dd4dccdc16dc3fdcd5da2b937a3755"
+    }
+  ]
+}

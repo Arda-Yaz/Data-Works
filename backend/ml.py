@@ -22,6 +22,8 @@ from sklearn.metrics import (
 )
 from sklearn.utils.multiclass import type_of_target
 
+from backend import resources
+
 
 # ── Problem type detection ───────────────────────────────────────────────────
 
@@ -97,6 +99,7 @@ def _validate_feature_rows(features, target, name: str) -> None:
         raise ValueError(f"{name} features must be a non-empty two-dimensional table.")
     if shape[0] != len(target):
         raise ValueError(f"{name} features and targets must contain the same number of rows.")
+    return shape
 
 
 def _regression_target(values: pd.Series, name: str) -> np.ndarray:
@@ -113,7 +116,10 @@ def _regression_target(values: pd.Series, name: str) -> np.ndarray:
 
 def train_model(model, X_train, y_train):
     target = _target_series(y_train, "Training target")
-    _validate_feature_rows(X_train, target, "Training")
+    shape = _validate_feature_rows(X_train, target, "Training")
+    resources.validate_ml_shape(*shape)
+    if isinstance(model, (SVC, SVR)) and len(target) > resources.MAX_KERNEL_ROWS:
+        raise ValueError(f"Kernel SVM models are limited to {resources.MAX_KERNEL_ROWS:,} training rows; select another model or fewer rows.")
     if is_classifier(model):
         if type_of_target(target) not in ("binary", "multiclass"):
             raise ValueError("Classification requires discrete class labels; choose regression for continuous values.")
@@ -131,6 +137,8 @@ def evaluate_model(model, X_test, y_test, problem_type: str) -> dict:
     _validate_problem_type(problem_type)
     actual = _target_series(y_test, "Test target")
     _validate_feature_rows(X_test, actual, "Test")
+    if isinstance(model, (KNeighborsClassifier, KNeighborsRegressor)) and len(actual) * model.n_samples_fit_ > resources.MAX_KNN_PAIRS:
+        raise ValueError("KNN evaluation exceeds the pairwise-work budget; select another model or fewer rows.")
     if problem_type == "classification" and type_of_target(actual) not in ("binary", "multiclass"):
         raise ValueError("Classification evaluation requires discrete class labels.")
     actual_values = _regression_target(actual, "Test target") if problem_type == "regression" else None

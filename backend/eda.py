@@ -1,64 +1,148 @@
-import pandas as pd
+import warnings
+
 import numpy as np
+import pandas as pd
 
 
-def univariate_stats(df: pd.DataFrame, col: str) -> dict:
-    """Return descriptive statistics for a single column."""
-    series = df[col].dropna()
-    if pd.api.types.is_numeric_dtype(series):
-        return {
+_NUMERIC_STATS = ("mean", "median", "std", "min", "max", "q25", "q75", "skew", "kurtosis")
+_GROUP_FUNCTIONS = ("mean", "sum", "count", "min", "max", "median")
+
+
+def _column(df: pd.DataFrame, name) -> pd.Series:
+    if name not in df.columns:
+        raise ValueError(f"Column {name!r} is not present in the dataset.")
+    column = df[name]
+    if not isinstance(column, pd.Series):
+        raise ValueError("Column names must be unique for analysis.")
+    return column
+
+
+def _real_numeric(series: pd.Series) -> bool:
+    return (
+        pd.api.types.is_numeric_dtype(series.dtype)
+        and not pd.api.types.is_bool_dtype(series.dtype)
+        and not pd.api.types.is_complex_dtype(series.dtype)
+    )
+
+
+def _output_name(preferred: str, occupied) -> str:
+    name = preferred
+    number = 2
+    while name in occupied:
+        name = f"{preferred} [{number}]"
+        number += 1
+    return name
+
+
+def _number_or_none(value):
+    if pd.isna(value):
+        return None
+    if isinstance(value, (int, np.integer)):
+        return int(value)
+    number = float(value)
+    return round(number, 4) if np.isfinite(number) else None
+
+
+def _observed_counts(series: pd.Series) -> pd.Series:
+    counts = series.value_counts()
+    return counts[counts > 0]
+
+
+def _category_labels(values):
+    labels = [str(value) for value in values]
+    duplicates = {label for label in labels if labels.count(label) > 1}
+    return [
+        f"{type(value).__name__}:{value!r}" if label in duplicates else label
+        for value, label in zip(values, labels)
+    ]
+
+
+def univariate_stats(df: pd.DataFrame, col) -> dict:
+    """Describe observed values; undefined numeric statistics are JSON nulls.
+
+    Numeric summaries use finite observations only. count still counts all
+    non-missing observations; finite_count/non_finite make exclusions explicit.
+    """
+    series = _column(df, col).dropna()
+    if _real_numeric(series):
+        finite = np.isfinite(series.to_numpy(dtype=float))
+        observed = series.iloc[np.flatnonzero(finite)]
+        result = {
             "type": "numeric",
-            "count": int(series.count()),
-            "mean": round(float(series.mean()), 4),
-            "median": round(float(series.median()), 4),
-            "std": round(float(series.std()), 4),
-            "min": round(float(series.min()), 4),
-            "max": round(float(series.max()), 4),
-            "q25": round(float(series.quantile(0.25)), 4),
-            "q75": round(float(series.quantile(0.75)), 4),
-            "skew": round(float(series.skew(skipna=True)), 4),  # type: ignore[arg-type]
-            "kurtosis": round(float(series.kurtosis(skipna=True)), 4),  # type: ignore[arg-type]
+            "count": len(series),
+            "finite_count": len(observed),
+            "non_finite": int((~finite).sum()),
+            **{name: None for name in _NUMERIC_STATS},
         }
-    # Categorical / object
-    vc = series.value_counts()
+        if observed.empty:
+            return result
+        # Extreme but finite inputs can overflow higher moments. Those summaries
+        # are unavailable rather than being exposed as invalid JSON infinities.
+        with np.errstate(all="ignore"), warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            values = {
+                "mean": observed.mean(),
+                "median": observed.median(),
+                "std": observed.std() if len(observed) > 1 else None,
+                "min": observed.min(),
+                "max": observed.max(),
+                "q25": observed.quantile(0.25),
+                "q75": observed.quantile(0.75),
+                "skew": observed.skew() if len(observed) > 2 else None,
+                "kurtosis": observed.kurtosis() if len(observed) > 3 else None,
+            }
+        result.update({name: _number_or_none(value) for name, value in values.items()})
+        return result
+
+    counts = _observed_counts(series)
+    top = counts.head(5)
     return {
         "type": "categorical",
         "count": int(series.count()),
         "unique": int(series.nunique()),
-        "mode": str(vc.index[0]) if not vc.empty else None,
-        "top_5": vc.head(5).to_dict(),
+        "mode": str(counts.index[0]) if not counts.empty else None,
+        "top_5": dict(zip(_category_labels(top.index), map(int, top))),
     }
 
 
 def correlation_matrix(df: pd.DataFrame, method: str = "pearson") -> pd.DataFrame:
-    """Return the correlation matrix for numeric columns."""
-    numeric = df.select_dtypes(include="number")
-    if numeric.shape[1] < 2:
+    """Correlate varying real numeric columns using finite pairs."""
+    if method not in ("pearson", "spearman", "kendall"):
+        raise ValueError("Choose pearson, spearman, or kendall correlation.")
+    names = [name for name in df.columns if _real_numeric(_column(df, name))]
+    numeric = df[names].replace([np.inf, -np.inf], np.nan)
+    names = [name for name in names if numeric[name].nunique(dropna=True) > 1]
+    if len(names) < 2:
         return pd.DataFrame()
-    return numeric.corr(method=method).round(4)  # type: ignore[arg-type]
+    return numeric[names].corr(method=method).round(4)
 
 
-def value_counts_summary(df: pd.DataFrame, col: str, top_n: int = 20) -> pd.DataFrame:
-    vc = df[col].value_counts().head(top_n).reset_index()
-    vc.columns = [col, "count"]
-    return vc
+def value_counts_summary(df: pd.DataFrame, col, top_n: int = 20) -> pd.DataFrame:
+    """Return observed categorical counts with non-colliding column labels."""
+    if isinstance(top_n, bool) or not isinstance(top_n, int) or top_n <= 0:
+        raise ValueError("top_n must be a positive integer.")
+    counts = _observed_counts(_column(df, col)).head(top_n)
+    label = _output_name("count", [col])
+    return counts.rename(label).rename_axis(col).reset_index()
 
 
 def group_by_summary(
     df: pd.DataFrame,
-    group_col: str,
-    agg_col: str,
+    group_col,
+    agg_col,
     agg_func: str = "mean",
 ) -> pd.DataFrame:
-    """Group by one column and aggregate another."""
-    # Check if column is numeric for numeric aggregation functions
-    numeric_funcs = ["mean", "sum", "median", "min", "max"]
-    if agg_func in numeric_funcs and not pd.api.types.is_numeric_dtype(df[agg_col]):
+    """Aggregate observed groups and name the output before resetting the index."""
+    _column(df, group_col)
+    values = _column(df, agg_col)
+    if agg_func not in _GROUP_FUNCTIONS:
+        raise ValueError(f"Unsupported aggregation {agg_func!r}; choose one of {_GROUP_FUNCTIONS}.")
+    if agg_func != "count" and not _real_numeric(values):
         raise ValueError(
-            f"Cannot apply '{agg_func}' to non-numeric column '{agg_col}'. "
-            f"Column dtype is '{df[agg_col].dtype}'. Use 'count' instead."
+            f"Cannot apply {agg_func!r} to non-numeric column {agg_col!r}. "
+            f"Column dtype is {values.dtype!r}; use count instead."
         )
-    
-    result = df.groupby(group_col)[agg_col].agg(agg_func).reset_index()
-    result.columns = [group_col, f"{agg_func}({agg_col})"]
-    return result
+    label = _output_name(f"{agg_func}({agg_col})", [group_col])
+    grouped = df.groupby(group_col, observed=True)[agg_col]
+    result = grouped.sum(min_count=1) if agg_func == "sum" else grouped.agg(agg_func)
+    return result.rename(label).reset_index()

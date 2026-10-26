@@ -1,8 +1,12 @@
 import streamlit as st
 
 from backend.state import StateManager
+from backend.access import require_access
+from backend.diagnostics import configure_logging, log_failure
 
 st.set_page_config(page_title="DataWorks", layout="wide")
+configure_logging()
+require_access()
 
 # Initialise shared session state once
 StateManager.init_session()
@@ -13,7 +17,7 @@ _PAGES_NEED_DATA = {"Data Cleaning", "EDA", "Visualization", "Machine Learning"}
 def home_page():
     st.sidebar.title("DataWorks")
 
-    all_pages = ["Upload", "Data Cleaning", "EDA", "Visualization", "Machine Learning"]
+    all_pages = ["Upload", "Data Cleaning", "EDA", "Visualization", "Machine Learning", "Project & Exports"]
     page = st.sidebar.selectbox("Navigate", all_pages)
 
     # Undo button + operation history in sidebar
@@ -33,7 +37,7 @@ def home_page():
         st.warning(f"⬆ Upload a dataset first to access **{page}**.")
         return
 
-    if page in _PAGES_NEED_DATA and st.session_state.df.shape[1] == 0:
+    if page in _PAGES_NEED_DATA and page != "Machine Learning" and st.session_state.df.shape[1] == 0:
         st.warning("No columns remain. Undo the last operation or clear the dataset on the Upload page.")
         return
 
@@ -56,7 +60,14 @@ def _show_page(page: str):
     elif page == "Machine Learning":
         from frontend.pages.data_ml import data_ml
         data_ml()
+    elif page == "Project & Exports":
+        from frontend.pages.data_project import data_project
+        data_project()
 
 
 if __name__ == "__main__":
-    home_page()
+    try:
+        home_page()
+    except Exception as exc:
+        log_failure("page_failed", exc)
+        st.error("This page could not finish. Try a smaller operation or return to Upload; the server diagnostic log records the error type.")

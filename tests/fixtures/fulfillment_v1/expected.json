@@ -1,0 +1,65 @@
+{
+  "fixture_version": 1,
+  "status": "independent expectations; application acceptance execution pending",
+  "source_record_number": "1-based parsed data-record ordinal, excluding the header; an expectation reference, not the final row-identity representation",
+  "output_columns": ["order_id", "line_id", "order_date", "sku", "quantity", "fulfillment_status"],
+  "logical_schema": {"order_id": "string", "line_id": "string", "order_date": "calendar date exported as YYYY-MM-DD", "sku": "string", "quantity": "positive signed-64 integer", "fulfillment_status": "fulfilled | pending | cancelled"},
+  "completed_runs": {
+    "month_a.csv": {
+      "accepted": [
+        {"source_record": 1, "values": ["000101", "01", "2026-08-01", "SKU-001", 2, "fulfilled"]},
+        {"source_record": 2, "values": ["000101", "02", "2026-08-01", "SKU-002", 1, "pending"]},
+        {"source_record": 3, "values": ["000102", "01", "2026-08-02", "SKU-003", 1, "fulfilled"]},
+        {"source_record": 8, "values": ["000106", "01", "2026-08-06", "SKU-007", 1, "cancelled"]}
+      ],
+      "rejected": [
+        {"source_record": 4, "reasons": ["exact_duplicate"], "duplicate_of_source_record": 3},
+        {"source_record": 5, "reasons": ["nonpositive_quantity"]},
+        {"source_record": 6, "reasons": ["nonpositive_quantity"]},
+        {"source_record": 7, "reasons": ["invalid_order_date"]},
+        {"source_record": 9, "reasons": ["missing_order_id"]},
+        {"source_record": 10, "reasons": ["missing_sku"]},
+        {"source_record": 11, "reasons": ["missing_quantity"]},
+        {"source_record": 12, "reasons": ["missing_line_id"]}
+      ],
+      "report": {"source_rows": 12, "accepted_rows": 4, "rejected_rows": 8, "rejection_reason_assignments": 8, "accepted_distinct_orders": 3, "accepted_quantity": 5, "accepted_line_counts_by_status": {"fulfilled": 2, "pending": 1, "cancelled": 1}, "accepted_quantity_by_status": {"fulfilled": 3, "pending": 1, "cancelled": 1}}
+    },
+    "month_b.csv": {
+      "accepted": [
+        {"source_record": 1, "values": ["000201", "01", "2026-09-01", "SKU-101", 3, "fulfilled"]},
+        {"source_record": 2, "values": ["000201", "02", "2026-09-01", "SKU-102", 1, "pending"]},
+        {"source_record": 3, "values": ["000202", "01", "2026-09-02", "SKU-103", 2, "cancelled"]},
+        {"source_record": 5, "values": ["000203", "01", "2026-09-03", "SKU-104", 4, "fulfilled"]},
+        {"source_record": 8, "values": ["000206", "01", "2026-09-06", "SKU-106", 1, "pending"]}
+      ],
+      "rejected": [
+        {"source_record": 4, "reasons": ["exact_duplicate"], "duplicate_of_source_record": 1},
+        {"source_record": 6, "reasons": ["nonpositive_quantity"]},
+        {"source_record": 7, "reasons": ["missing_sku"]}
+      ],
+      "report": {"source_rows": 8, "accepted_rows": 5, "rejected_rows": 3, "rejection_reason_assignments": 3, "accepted_distinct_orders": 4, "accepted_quantity": 11, "accepted_line_counts_by_status": {"fulfilled": 2, "pending": 2, "cancelled": 1}, "accepted_quantity_by_status": {"fulfilled": 7, "pending": 2, "cancelled": 2}}
+    },
+    "month_c_invalid_rows.csv": {
+      "accepted": [
+        {"source_record": 1, "values": ["000301", "01", "2026-10-01", "SKU-201", 2, "fulfilled"]},
+        {"source_record": 8, "values": ["000308", "01", "2026-10-08", "SKU-208", 1, "cancelled"]}
+      ],
+      "rejected": [
+        {"source_record": 2, "reasons": ["missing_order_id", "missing_sku", "nonpositive_quantity"]},
+        {"source_record": 3, "reasons": ["invalid_order_date"]},
+        {"source_record": 4, "reasons": ["invalid_quantity"]},
+        {"source_record": 5, "reasons": ["missing_quantity"]},
+        {"source_record": 6, "reasons": ["missing_line_id"]},
+        {"source_record": 7, "reasons": ["invalid_quantity"]},
+        {"source_record": 9, "reasons": ["missing_fulfillment_status"]}
+      ],
+      "report": {"source_rows": 9, "accepted_rows": 2, "rejected_rows": 7, "rejection_reason_assignments": 9, "accepted_distinct_orders": 2, "accepted_quantity": 3, "accepted_line_counts_by_status": {"fulfilled": 1, "pending": 0, "cancelled": 1}, "accepted_quantity_by_status": {"fulfilled": 2, "pending": 0, "cancelled": 1}}
+    }
+  },
+  "noncommitting_attempts": {
+    "month_c_missing_quantity.csv": {"outcome": "blocked", "issue": "missing_required_column", "columns": ["quantity"], "source_rows": 1},
+    "month_c_extra_column.csv": {"outcome": "blocked", "issue": "unexpected_column", "columns": ["warehouse"], "source_rows": 1},
+    "month_c_conflicting_duplicates.csv": {"outcome": "decision_required", "issue": "conflicting_duplicate", "key": ["000401", "01"], "source_records": [1, 2], "differing_columns": ["quantity"], "source_rows": 2},
+    "month_c_unseen_status.csv": {"outcome": "decision_required", "issue": "unseen_fulfillment_status", "source_records": [1], "normalized_value": "backordered", "source_rows": 1}
+  }
+}

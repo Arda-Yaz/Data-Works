@@ -18,7 +18,7 @@ def _is_real_numeric(series: pd.Series) -> bool:
 
 def get_missing_strategies(series: pd.Series) -> list[str]:
     """Return only missing-value strategies compatible with the column's dtype."""
-    strategies = ["drop_rows"]
+    strategies = ["keep", "drop_rows"]
     if _is_real_numeric(series):
         strategies.extend(["mean", "median"])
     strategies.extend(["mode", "constant"])
@@ -28,25 +28,26 @@ def get_missing_strategies(series: pd.Series) -> list[str]:
     return strategies
 
 
-def get_missing_summary(df: pd.DataFrame) -> pd.DataFrame:
-    """Return a DataFrame with missing count, percentage, and suggested strategy per column."""
+def get_missing_summary(df: pd.DataFrame, column_meta: dict | None = None) -> pd.DataFrame:
+    """Describe missingness without choosing destructive actions from percentages."""
     missing = df.isna().sum().to_frame("count")
-    missing["%"] = (100 * missing["count"] / len(df)).round(2)
+    missing["%"] = (100 * missing["count"] / max(len(df), 1)).round(2)
     missing = missing[missing["count"] > 0]
-
-    suggestions = []
+    metadata = column_meta or {}
+    guidance = []
     for col in missing.index:
-        pct: float = missing.loc[col, "%"]  # type: ignore[assignment]
-        if pct < 5:
-            suggestions.append("drop_rows")
-        elif pct < 20:
-            if "median" in get_missing_strategies(df[col]):
-                suggestions.append("median")
-            else:
-                suggestions.append("mode")
+        meta = metadata.get(col, {})
+        if df[col].dropna().empty:
+            message = "No observed values: keep, supply an explicit constant, or explicitly drop rows/the column."
+        elif meta.get("role") in ("id", "ignore", "datetime"):
+            message = "Review this column's role before filling or dropping; missingness alone does not justify removal."
+        elif meta.get("is_categorical") or isinstance(df[col].dtype, pd.CategoricalDtype):
+            message = "Review category meaning and why values are missing before choosing a fill or removal."
         else:
-            suggestions.append("drop_column")
-    missing["suggested"] = suggestions
+            message = "Keep until you review this column's importance and why its values are missing."
+        guidance.append(message)
+    missing["suggested"] = "keep"
+    missing["guidance"] = guidance
     return missing
 
 
@@ -236,7 +237,7 @@ def handle_missing(
 ) -> pd.DataFrame:
     """Apply a missing-value strategy to a single column.
 
-    Strategies: drop_rows, mean, median, mode, constant, interpolate, drop_column
+    Strategies: keep, drop_rows, mean, median, mode, constant, interpolate, drop_column
     """
     if col not in df.columns:
         raise ValueError(f"Column {col!r} is not present in the dataset.")
@@ -244,6 +245,8 @@ def handle_missing(
     if strategy not in get_missing_strategies(series):
         raise ValueError(f"Column {col!r}: strategy {strategy!r} is incompatible with dtype {series.dtype}.")
     result = df.copy()
+    if strategy == "keep":
+        return result
     if strategy == "drop_rows":
         return result.dropna(subset=[col])
     if strategy == "drop_column":
@@ -378,12 +381,57 @@ def _outlier_mask(series: pd.Series, method: str):
     return low_mask | high_mask, lower, upper
 
 
-def find_outliers(df):
-    """Find outliers using the IQR method. Returns dict of col → list of indices."""
+def get_outlier_columns(
+    df: pd.DataFrame, column_meta: dict | None = None, include_protected: bool = False,
+) -> list:
+    """List real numeric columns, protecting IDs and numeric categories by default."""
+    if not isinstance(include_protected, bool):
+        raise ValueError("The protected-column option must be a boolean.")
+    metadata = column_meta or {}
+    return [
+        col for col in df.columns
+        if _is_real_numeric(df[col]) and (
+            include_protected or (
+                metadata.get(col, {}).get("role", "feature") == "feature"
+                and not metadata.get(col, {}).get("is_categorical", False)
+            )
+        )
+    ]
+
+
+def _display_bound(value):
+    if value is None:
+        return None
+    if isinstance(value, Fraction):
+        if value.denominator == 1:
+            return str(value.numerator)
+        numeric = float(value)
+        return str(numeric) if Fraction.from_float(numeric) == value else str(value)
+    return str(value)
+
+
+def outlier_summary(df: pd.DataFrame, methods: dict) -> pd.DataFrame:
+    """Report selected methods' counts and exact display bounds, without mutation."""
+    _validate_plan(df, methods)
+    rows = []
+    for col in df.columns:
+        if col in methods:
+            mask, lower, upper = _outlier_mask(df[col], methods[col])
+            rows.append({
+                "column": col, "method": methods[col], "outlier_count": int(mask.sum()),
+                "lower_bound": _display_bound(lower), "upper_bound": _display_bound(upper),
+            })
+    return pd.DataFrame(rows, columns=["column", "method", "outlier_count", "lower_bound", "upper_bound"])
+
+
+def find_outliers(df, method="iqr"):
+    """Find real numeric outliers, returning column → original index labels."""
+    if method not in ("iqr", "zscore"):
+        raise ValueError(f"Unknown outlier method: {method!r}.")
     outliers = {}
     for col in df.select_dtypes(include="number").columns:
         if _is_real_numeric(df[col]):
-            mask, _, _ = _outlier_mask(df[col], "iqr")
+            mask, _, _ = _outlier_mask(df[col], method)
             outliers[col] = df.index[mask].tolist()
     return outliers
 
@@ -490,16 +538,88 @@ def find_mismatches_by_allowed_values(df, allowed_values_dict):
     return mismatches
 
 
-# ── Legacy automatic cleaning (kept for backward compat) ─────────────────────
+def _validate_plan(df: pd.DataFrame, plan: dict) -> None:
+    if not isinstance(df, pd.DataFrame) or not df.columns.is_unique:
+        raise ValueError("Cleaning requires a DataFrame with unique column names.")
+    if not isinstance(plan, dict):
+        raise ValueError("A cleaning plan must map column names to operations.")
+    missing = [col for col in plan if col not in df.columns]
+    if missing:
+        raise ValueError(f"Cleaning plan references absent columns: {missing}.")
+
+
+def _restore_row_labels(candidate: pd.DataFrame, original: pd.DataFrame, keep: np.ndarray) -> pd.DataFrame:
+    positions = np.flatnonzero(keep)
+    result = candidate.iloc[positions].copy()
+    result.index = original.index.take(positions)
+    return result
+
+
+def build_missing_candidate(
+    df: pd.DataFrame, strategies: dict, fill_values: dict | None = None,
+) -> pd.DataFrame:
+    """Prepare one missing-value batch using unchanged base data for every fill.
+
+    Selected row removals combine by position. Original row labels may repeat and
+    never determine which other rows survive. Nothing mutates the caller's frame.
+    """
+    _validate_plan(df, strategies)
+    if fill_values is not None and not isinstance(fill_values, dict):
+        raise ValueError("Fill values must map column names to scalar values.")
+    values = fill_values or {}
+    base = df.reset_index(drop=True)
+    candidate = base.copy()
+    keep = np.ones(len(base), dtype=bool)
+    for col in df.columns:
+        strategy = strategies.get(col, "keep")
+        if not isinstance(strategy, str) or strategy not in get_missing_strategies(base[col]):
+            raise ValueError(f"Column {col!r}: invalid missing-value strategy {strategy!r}.")
+        if strategy == "drop_rows":
+            keep &= base[col].notna().to_numpy(dtype=bool)
+        elif strategy == "drop_column":
+            candidate = candidate.drop(columns=[col])
+        elif strategy != "keep":
+            transformed = handle_missing(base[[col]], col, strategy, fill_value=values.get(col))
+            candidate[col] = transformed[col]
+    return _restore_row_labels(candidate, df, keep)
+
+
+def build_outlier_candidate(df: pd.DataFrame, actions: dict) -> pd.DataFrame:
+    """Prepare a batch with all outlier bounds fitted to the same base frame."""
+    _validate_plan(df, actions)
+    base = df.reset_index(drop=True)
+    candidate = base.copy()
+    keep = np.ones(len(base), dtype=bool)
+    for col in df.columns:
+        if col not in actions:
+            continue
+        choice = actions[col]
+        if (
+            not isinstance(choice, (tuple, list)) or len(choice) != 2
+            or choice[0] not in ("iqr", "zscore")
+            or choice[1] not in ("ignore", "remove", "cap", "replace_nan")
+        ):
+            raise ValueError(f"Column {col!r}: choose a supported outlier method and action.")
+        method, action = choice
+        if not _is_real_numeric(base[col]):
+            raise ValueError(f"Column {col!r}: outlier handling requires a real numeric column.")
+        if action == "ignore":
+            continue
+        if action == "remove":
+            mask, _, _ = _outlier_mask(base[col], method)
+            keep &= ~mask.to_numpy(dtype=bool)
+        else:
+            transformed = handle_outliers(base[[col]], col, method=method, action=action)
+            candidate[col] = transformed[col]
+    return _restore_row_labels(candidate, df, keep)
+
+
+# ── Legacy automatic cleaning (explicit plans only) ──────────────────────────
 
 def automatic_cleaning(df, missing):
-    result = df.copy()
-    for col in missing.index:
-        if missing.loc[col, "%"] < 5:
-            strategy = "drop_rows"
-        elif missing.loc[col, "%"] < 20:
-            strategy = "median" if "median" in get_missing_strategies(result[col]) else "mode"
-        else:
-            strategy = "drop_column"
-        result = handle_missing(result, col, strategy)
-    return result
+    """Apply explicit strategies from a summary; percentages alone change nothing."""
+    strategies = {
+        col: missing.loc[col, "suggested"] if "suggested" in missing.columns else "keep"
+        for col in missing.index
+    }
+    return build_missing_candidate(df, strategies)

@@ -1,0 +1,10 @@
+order_id,line_id,order_date,sku,quantity,fulfillment_status
+000301,01,2026/10/01, sku-201 ,2,Shipped
+,01,2026-10-02,   ,-1,pending
+000303,01,10/03/2026,sku-203,1,pending
+000304,01,2026-10-04,sku-204,1.5,shipped
+000305,01,2026-10-05,sku-205,,pending
+000306,,2026-10-06,sku-206,2,canceled
+000307,01,2026-10-07,sku-207,not-a-number,shipped
+000308,01,2026-10-08,sku-208,1,Cancelled
+000309,01,2026-10-09,sku-209,1,

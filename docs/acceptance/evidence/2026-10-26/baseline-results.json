@@ -1,0 +1,66 @@
+{
+  "checks": [
+    {
+      "name": "dependency-check",
+      "command": [
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pip",
+        "check"
+      ],
+      "started_at_utc": "2026-10-26T13:23:03.009050+00:00",
+      "elapsed_seconds": 0.042,
+      "exit_code": 1,
+      "timed_out": false,
+      "log": "dependency-check.txt"
+    },
+    {
+      "name": "syntax-check",
+      "command": [
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+        "-m",
+        "compileall",
+        "-q",
+        "app.py",
+        "backend",
+        "frontend",
+        "scripts",
+        "tests"
+      ],
+      "started_at_utc": "2026-10-26T13:23:03.052104+00:00",
+      "elapsed_seconds": 0.15,
+      "exit_code": 0,
+      "timed_out": false,
+      "log": "syntax-check.txt"
+    },
+    {
+      "name": "regression-suite",
+      "command": [
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+        "scripts/run_tests.py"
+      ],
+      "started_at_utc": "2026-10-26T13:23:03.201625+00:00",
+      "elapsed_seconds": 8.245,
+      "exit_code": 0,
+      "timed_out": false,
+      "log": "regression-suite.txt",
+      "tests_run": 395,
+      "outcome_lines": [
+        "OK"
+      ]
+    }
+  ],
+  "dependency_check_resolution": {
+    "command": [
+      "C:\\Users\\Gaming\\AppData\\Local\\Python\\bin\\pip.exe",
+      "--python",
+      "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+      "check"
+    ],
+    "exit_code": 0,
+    "log": "dependency-check-alternate.txt",
+    "output": "No broken requirements found.",
+    "evidence_kind": "recorded command result; initial failure retained",
+    "environment_modified": false
+  }
+}

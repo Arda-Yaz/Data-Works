@@ -1,0 +1,172 @@
+{
+  "checked_at_utc": "2026-10-26T14:01:07.371218+00:00",
+  "status": "passed",
+  "phase": "1: specification, synthetic fixtures, and existing baseline only",
+  "starting_paths_verified": 66,
+  "pre_existing_file_changes": [],
+  "git_index_unchanged": true,
+  "head_unchanged": true,
+  "unexpected_new_paths": [],
+  "new_nonignored_paths": [
+    "docs/acceptance/evidence/2026-10-26/README.md",
+    "docs/acceptance/evidence/2026-10-26/baseline-results.json",
+    "docs/acceptance/evidence/2026-10-26/dependency-check-alternate.txt",
+    "docs/acceptance/evidence/2026-10-26/dependency-check.txt",
+    "docs/acceptance/evidence/2026-10-26/diff-stat-before.txt",
+    "docs/acceptance/evidence/2026-10-26/environment.json",
+    "docs/acceptance/evidence/2026-10-26/final-integrity.json",
+    "docs/acceptance/evidence/2026-10-26/fixture-audit.json",
+    "docs/acceptance/evidence/2026-10-26/fixture-audit.py",
+    "docs/acceptance/evidence/2026-10-26/git-status-before.txt",
+    "docs/acceptance/evidence/2026-10-26/regression-suite.txt",
+    "docs/acceptance/evidence/2026-10-26/starting-state.json",
+    "docs/acceptance/evidence/2026-10-26/syntax-check.txt",
+    "docs/acceptance/gap-map.md",
+    "docs/acceptance/phase-1.md",
+    "tests/fixtures/fulfillment_v1/README.md",
+    "tests/fixtures/fulfillment_v1/expected.json",
+    "tests/fixtures/fulfillment_v1/manifest.json",
+    "tests/fixtures/fulfillment_v1/month_a.csv",
+    "tests/fixtures/fulfillment_v1/month_b.csv",
+    "tests/fixtures/fulfillment_v1/month_c_conflicting_duplicates.csv",
+    "tests/fixtures/fulfillment_v1/month_c_extra_column.csv",
+    "tests/fixtures/fulfillment_v1/month_c_invalid_rows.csv",
+    "tests/fixtures/fulfillment_v1/month_c_missing_quantity.csv",
+    "tests/fixtures/fulfillment_v1/month_c_unseen_status.csv",
+    "tests/fixtures/fulfillment_v1/statistical_characterization.json"
+  ],
+  "relative_links_checked": 62,
+  "broken_relative_links": [],
+  "artifact_hash_scope": "Phase 1 documentation/evidence/fixtures excluding this report itself and ignored Python caches",
+  "artifacts": [
+    {
+      "path": "docs/acceptance/evidence/2026-10-26/baseline-results.json",
+      "bytes": 1819,
+      "sha256": "5c9fbf92c262e84ea7e779f65684adef9a8aefdb094a3eb3b7221555af5f3b9f"
+    },
+    {
+      "path": "docs/acceptance/evidence/2026-10-26/dependency-check-alternate.txt",
+      "bytes": 554,
+      "sha256": "c61d90aea01e259c073e0d5b599efa4ebf4278f4778161a474adc74d16306229"
+    },
+    {
+      "path": "docs/acceptance/evidence/2026-10-26/dependency-check.txt",
+      "bytes": 84,
+      "sha256": "86526e441bf2eee705f94591d33e2b5d2add57250ee3cc93416c00280cdab7fc"
+    },
+    {
+      "path": "docs/acceptance/evidence/2026-10-26/diff-stat-before.txt",
+      "bytes": 1803,
+      "sha256": "00697d6a364d150216386c7b46e1d0d4b745a0bdfca19c82c257bb3d81d2e30d"
+    },
+    {
+      "path": "docs/acceptance/evidence/2026-10-26/environment.json",
+      "bytes": 1883,
+      "sha256": "6f4976d8b189a4a4c88be01e9bd650689bdf7ebcc5869459a216d09cecda8543"
+    },
+    {
+      "path": "docs/acceptance/evidence/2026-10-26/fixture-audit.json",
+      "bytes": 1937,
+      "sha256": "294d39c7b759a9f23cbe838200b67edc151abb11c34c535facd361ec8e54d1b9"
+    },
+    {
+      "path": "docs/acceptance/evidence/2026-10-26/fixture-audit.py",
+      "bytes": 7875,
+      "sha256": "47d784eb52f92a73dd035a8c6bf257a59ee7431180f22d25dd8510898f9e3c7f"
+    },
+    {
+      "path": "docs/acceptance/evidence/2026-10-26/git-status-before.txt",
+      "bytes": 1767,
+      "sha256": "81ab68549cb4d8c34397a3c000e7dd90b42cc9a701b62a73fde3b5261243d732"
+    },
+    {
+      "path": "docs/acceptance/evidence/2026-10-26/README.md",
+      "bytes": 4936,
+      "sha256": "f01c88f588afba8dac4554c35f97bfe629de96123ef9471a620d15e9a5c34870"
+    },
+    {
+      "path": "docs/acceptance/evidence/2026-10-26/regression-suite.txt",
+      "bytes": 13621,
+      "sha256": "2e8d8393ee339f2b9b07dad3917432b08bca56254f9a90c8c669d30b50e4e847"
+    },
+    {
+      "path": "docs/acceptance/evidence/2026-10-26/starting-state.json",
+      "bytes": 18268,
+      "sha256": "2581aec0612ca7aca19be4c2735d976badc99b14c6baf8b935975c589f9e1430"
+    },
+    {
+      "path": "docs/acceptance/evidence/2026-10-26/syntax-check.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/acceptance/gap-map.md",
+      "bytes": 20626,
+      "sha256": "c8a6a458c16fd27c92a53cadf9103d0684446b3bd6a5a8474922bfd0dbe73a33"
+    },
+    {
+      "path": "docs/acceptance/phase-1.md",
+      "bytes": 11924,
+      "sha256": "e1d4e148bcc96cb5279a5bf77c9e4ab910b7ddc98ec4d096d2695d36040c347a"
+    },
+    {
+      "path": "tests/fixtures/fulfillment_v1/expected.json",
+      "bytes": 4905,
+      "sha256": "1898263149a7a4a9a55c8f84fb6fd188b565c33e274cc0fbde27c9dc0ce7cbfd"
+    },
+    {
+      "path": "tests/fixtures/fulfillment_v1/manifest.json",
+      "bytes": 2053,
+      "sha256": "7be4f350f52e6a51b99efaed6293c64b216ac94f80699925b7d78a3800731ea8"
+    },
+    {
+      "path": "tests/fixtures/fulfillment_v1/month_a.csv",
+      "bytes": 528,
+      "sha256": "b2eeaaa79555292a37d0fa933d6e70b3570025ec72ffd8ec0c844fca04197471"
+    },
+    {
+      "path": "tests/fixtures/fulfillment_v1/month_b.csv",
+      "bytes": 373,
+      "sha256": "3d8a37176b3c65fe7c0195d689ae1e3ae04d4748cffcea2b512b76856a72a09e"
+    },
+    {
+      "path": "tests/fixtures/fulfillment_v1/month_c_conflicting_duplicates.csv",
+      "bytes": 138,
+      "sha256": "89c8012631e8b1def05b7968b16843314893976dd6dd2fe7151296dd98ac04a3"
+    },
+    {
+      "path": "tests/fixtures/fulfillment_v1/month_c_extra_column.csv",
+      "bytes": 114,
+      "sha256": "cb40b7a440d79acfd2f438ec82e6c1f297c4a98d572d6f4275a330ab67195a3a"
+    },
+    {
+      "path": "tests/fixtures/fulfillment_v1/month_c_invalid_rows.csv",
+      "bytes": 410,
+      "sha256": "a03a6b88f12836b1a0905eafd2adb80a206b39333d3ba5ff3329c0a6c4fd003b"
+    },
+    {
+      "path": "tests/fixtures/fulfillment_v1/month_c_missing_quantity.csv",
+      "bytes": 88,
+      "sha256": "8a4490feed3e26368d1b9fbe5db5d0995203c917748c9d6e735d0815089ac641"
+    },
+    {
+      "path": "tests/fixtures/fulfillment_v1/month_c_unseen_status.csv",
+      "bytes": 103,
+      "sha256": "5512e2fa85212e082c45869cab5e0c91d84321fde127bdbc5f43974dd4fbb0bb"
+    },
+    {
+      "path": "tests/fixtures/fulfillment_v1/README.md",
+      "bytes": 2090,
+      "sha256": "0ee0ce7be66940498ad48b433e897924d69aa56d5c4d8d0cc28bda9adfead6f2"
+    },
+    {
+      "path": "tests/fixtures/fulfillment_v1/statistical_characterization.json",
+      "bytes": 1069,
+      "sha256": "4b81b767848e062b207f4b95fbef7242e4dd4dccdc16dc3fdcd5da2b937a3755"
+    }
+  ],
+  "new_application_acceptance": "not implemented or executed; requirements only",
+  "real_operator_validation": "pending",
+  "release_approval": "withheld",
+  "next_phase": "paused pending user approval"
+}

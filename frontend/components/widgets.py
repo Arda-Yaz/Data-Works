@@ -2,20 +2,26 @@ import pandas as pd
 import streamlit as st
 
 
-def before_after_viewer(before_df: pd.DataFrame, after_df: pd.DataFrame) -> None:
+def before_after_viewer(
+    before_df: pd.DataFrame, after_df: pd.DataFrame, *, summary: dict | None = None,
+) -> None:
     """Side-by-side comparison of two DataFrames with diff stats."""
+    summary = summary or {
+        "rows_before": len(before_df), "rows_after": len(after_df),
+        "columns_before": before_df.shape[1], "columns_after": after_df.shape[1],
+    }
     c1, c2 = st.columns(2)
     with c1:
         st.markdown("**Before**")
-        st.write(f"Rows: {len(before_df)}, Columns: {before_df.shape[1]}")
-        st.dataframe(before_df.head(10))
+        st.write(f"Rows: {summary['rows_before']}, Columns: {summary['columns_before']}")
+        st.dataframe(before_df.head(20))
     with c2:
         st.markdown("**After**")
-        st.write(f"Rows: {len(after_df)}, Columns: {after_df.shape[1]}")
-        st.dataframe(after_df.head(10))
+        st.write(f"Rows: {summary['rows_after']}, Columns: {summary['columns_after']}")
+        st.dataframe(after_df.head(20))
 
-    row_diff = len(after_df) - len(before_df)
-    col_diff = after_df.shape[1] - before_df.shape[1]
+    row_diff = summary["rows_after"] - summary["rows_before"]
+    col_diff = summary["columns_after"] - summary["columns_before"]
     parts = []
     if row_diff:
         parts.append(f"Rows: {row_diff:+d}")

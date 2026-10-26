@@ -1,13 +1,51 @@
 import copy
+import json
 
 import pandas as pd
 import streamlit as st
 
-from backend.ingestion import apply_inferred_dtypes, infer_column_meta, parse_file
+from backend.ingestion import (
+    apply_inferred_dtypes, infer_column_meta, list_excel_sheets, parse_file,
+    validate_numeric_format,
+)
 from backend.state import StateManager
+from backend.diagnostics import log_event, log_failure
+from frontend.components.row_inspector import row_inspector
 
 _ROLE_OPTIONS = ["feature", "id", "datetime", "ignore"]
 _DTYPE_OPTIONS = ["object", "int64", "float64", "bool", "datetime64[ns]", "category"]
+
+
+def _upload_options(uploaded_file):
+    options = {}
+    name = uploaded_file.name.lower()
+    with st.expander("File-reading options", expanded=True):
+        if name.endswith((".csv", ".tsv", ".txt")):
+            default = "Comma" if name.endswith(".csv") else "Tab"
+            separators = {"Comma": ",", "Tab": "\t", "Semicolon": ";", "Pipe": "|", "Custom": None}
+            choice = st.selectbox("Delimiter", list(separators), index=list(separators).index(default), key="ingest_delimiter")
+            options["delimiter"] = separators[choice]
+            if choice == "Custom":
+                options["delimiter"] = st.text_input("Single delimiter character", max_chars=1, key="ingest_custom_delimiter")
+        if name.endswith((".csv", ".tsv", ".txt", ".json", ".jsonl", ".ndjson")):
+            options["encoding"] = st.text_input("Text encoding", value="utf-8-sig", help="For example: utf-8-sig, cp1252, latin-1, or utf-16.", key="ingest_encoding")
+        if name.endswith((".xlsx", ".xls")):
+            sheets = list_excel_sheets(uploaded_file)
+            options["sheet_name"] = st.selectbox("Excel sheet", sheets, key="ingest_sheet")
+        if name.endswith((".json", ".jsonl", ".ndjson")):
+            options["json_lines"] = st.checkbox("One JSON record per line (JSON Lines)", value=name.endswith((".jsonl", ".ndjson")), key="ingest_json_lines")
+            path = st.text_input("JSON object path", value="[]", help='An array of object keys, for example ["data", "records"]. Leave [] for the root.', key="ingest_json_path")
+            try:
+                options["json_path"] = json.loads(path)
+            except json.JSONDecodeError as exc:
+                raise ValueError('Use a JSON array of object keys, such as ["data", "records"].') from exc
+            if not isinstance(options["json_path"], list) or any(not isinstance(key, str) for key in options["json_path"]):
+                raise ValueError("The JSON object path must be an array of text keys.")
+        decimal = st.selectbox("Decimal separator", [".", ","], key="ingest_decimal")
+        thousands = st.selectbox("Thousands separator", [None, ",", ".", " "], format_func=lambda value: "None" if value is None else "Space" if value == " " else value, key="ingest_thousands")
+        validate_numeric_format(decimal, thousands)
+        st.caption("Text values stay unchanged on upload. Number separators are used in the schema conversion preview; identifiers and mixed values stay as text.")
+    return options, decimal, thousands
 
 
 def data_upload():
@@ -16,18 +54,27 @@ def data_upload():
     if not StateManager.has_dataset():
         uploaded_file = st.file_uploader(
             "Upload a dataset",
-            type=["csv", "tsv", "txt", "xlsx", "xls", "json"],
+            type=["csv", "tsv", "txt", "xlsx", "xls", "json", "jsonl", "ndjson"],
             key="data_upload_file",
         )
         if uploaded_file is not None:
             try:
-                raw_df = parse_file(uploaded_file)
-                column_meta = infer_column_meta(raw_df)
-                StateManager.load_dataset(raw_df, column_meta)
-                st.rerun()
+                options, decimal, thousands = _upload_options(uploaded_file)
             except Exception as e:
-                st.error(f"Failed to parse file: {e}")
+                log_failure("upload_options_failed", e)
+                st.error(f"Check the file-reading options: {e}")
                 return
+            if st.button("Load Dataset", type="primary", key="ingest_load"):
+                try:
+                    raw_df = parse_file(uploaded_file, **options)
+                    column_meta = infer_column_meta(raw_df, decimal=decimal, thousands=thousands)
+                    StateManager.load_dataset(raw_df, column_meta)
+                    log_event("dataset_loaded", rows=len(raw_df), columns=len(raw_df.columns))
+                    st.rerun()
+                except Exception as e:
+                    log_failure("dataset_load_failed", e)
+                    st.error(f"Failed to parse file: {e}")
+            return
         else:
             st.info("Upload a file to get started.")
             return
@@ -45,6 +92,7 @@ def data_upload():
         min(max_rows, 5), key="preview_rows",
     )
     st.dataframe(df.head(n))
+    row_inspector(df)
     if df.shape[1] == 0:
         st.info("No columns remain. Undo the last operation or clear the dataset to upload another file.")
         if st.button("Clear Dataset"):
@@ -69,6 +117,8 @@ def data_upload():
             "role": m.get("role", "feature"),
             "allowed_values": ", ".join(m.get("allowed_values") or []),
             "date_format": m.get("date_format") or "",
+            "numeric_decimal": m.get("numeric_decimal", "."),
+            "numeric_thousands": m.get("numeric_thousands") or "",
         })
 
     schema_df = pd.DataFrame(schema_rows).set_index("column")
@@ -92,6 +142,8 @@ def data_upload():
             "date_format": st.column_config.TextColumn(
                 "Date Format", help="For example, %d/%m/%Y or %m/%d/%Y. Blank means YYYY-MM-DD."
             ),
+            "numeric_decimal": st.column_config.SelectboxColumn("Decimal", options=[".", ","], required=True),
+            "numeric_thousands": st.column_config.SelectboxColumn("Thousands", options=["", ",", ".", " "]),
         },
         width='stretch',
         key="schema_editor",
@@ -110,12 +162,15 @@ def data_upload():
                 if value.strip()
             ] or None,
             date_format=str(date_format).strip() if pd.notna(date_format) and date_format else None,
+            numeric_decimal=row.get("numeric_decimal", "."),
+            numeric_thousands=row.get("numeric_thousands") or None,
         )
 
     candidate_df = None
     try:
         candidate_df = apply_inferred_dtypes(df, candidate_meta)
     except ValueError as exc:
+        log_failure("schema_preview_failed", exc)
         st.error(str(exc))
     else:
         preview = []
@@ -143,6 +198,9 @@ def data_upload():
                 changed = StateManager.apply_operation(
                     "Confirm schema", candidate_df,
                     column_meta=candidate_meta, schema_confirmed=True,
+                    operation={"kind": "schema", "parameters": {
+                        "column_meta": candidate_meta, "schema_confirmed": True, "apply_types": True,
+                    }},
                 )
             except ValueError as exc:
                 st.error(str(exc))
@@ -158,10 +216,20 @@ def data_upload():
             st.rerun()
 
     # ── Expanders ────────────────────────────────────────────────────────
-    with st.expander("Summary Statistics"):
-        st.dataframe(df.describe(include="all").T)
+    cache = st.session_state.get("_upload_summary_cache", {})
+    if cache.get("revision") != st.session_state.dataset_revision:
+        cache = {"revision": st.session_state.dataset_revision}
+        st.session_state["_upload_summary_cache"] = cache
+    with st.expander("Summary Statistics", key="ingest_summary_stats", on_change="rerun") as summary_panel:
+        if summary_panel.open:
+            if "summary" not in cache:
+                cache["summary"] = df.describe(include="all").T
+            st.dataframe(cache["summary"])
 
-    with st.expander("Missing Values"):
-        missing = df.isna().sum().to_frame("missing")
-        missing["%"] = (100 * missing["missing"] / max(len(df), 1)).round(2)
-        st.dataframe(missing)
+    with st.expander("Missing Values", key="ingest_missing_stats", on_change="rerun") as missing_panel:
+        if missing_panel.open:
+            if "missing" not in cache:
+                missing = df.isna().sum().to_frame("missing")
+                missing["%"] = (100 * missing["missing"] / max(len(df), 1)).round(2)
+                cache["missing"] = missing
+            st.dataframe(cache["missing"])

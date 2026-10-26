@@ -1,0 +1,62 @@
+## main...origin/main
+ M .gitignore
+A  .streamlit/config.toml
+D  .vscode/settings.json
+ M README.md
+ M app.py
+M  backend/cleaning.py
+A  backend/cleaning_preview.py
+M  backend/eda.py
+ M backend/ingestion.py
+ M backend/ml.py
+ M backend/preprocessing.py
+MM backend/state.py
+MM backend/visualization.py
+ D blank.py
+M  frontend/components/widgets.py
+MM frontend/pages/data_cleaning.py
+MM frontend/pages/data_eda.py
+ M frontend/pages/data_ml.py
+ M frontend/pages/data_upload.py
+ M frontend/pages/data_viz.py
+ M requirements.txt
+D  review/cleaning-correctness.patch
+D  review/dataset-schema-history.patch
+D  review/definitive-refactor.patch
+D  review/definitive-refactor.zip
+D  review/ml-execution-evaluation.patch
+M  tests/test_cleaning_pages.py
+A  tests/test_cleaning_plans.py
+A  tests/test_cleaning_policy_pages.py
+A  tests/test_cleaning_preview.py
+A  tests/test_eda_correctness.py
+AM tests/test_eda_pages.py
+M  tests/test_state_consistency_pages.py
+?? .github/
+?? DEPLOYMENT.md
+?? backend/access.py
+?? backend/diagnostics.py
+?? backend/experiments.py
+?? backend/exports.py
+?? backend/operations.py
+?? backend/project_io.py
+?? backend/resources.py
+?? backend/text_transform.py
+?? frontend/components/row_inspector.py
+?? frontend/pages/data_project.py
+?? scripts/
+?? tests/test_data_exports.py
+?? tests/test_experiment_pages.py
+?? tests/test_experiment_persistence.py
+?? tests/test_ingestion_options.py
+?? tests/test_ingestion_transform_pages.py
+?? tests/test_operation_recipes.py
+?? tests/test_performance_views.py
+?? tests/test_project_io.py
+?? tests/test_project_pages.py
+?? tests/test_project_state.py
+?? tests/test_row_inspector.py
+?? tests/test_runtime_readiness.py
+?? tests/test_session_resources.py
+?? tests/test_text_transform.py
+?? tests/test_workload_limits.py

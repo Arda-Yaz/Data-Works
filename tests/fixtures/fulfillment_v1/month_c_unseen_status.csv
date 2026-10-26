@@ -1,0 +1,2 @@
+order_id,line_id,order_date,sku,quantity,fulfillment_status
+000501,01,2026-10-01,sku-401,1,backordered

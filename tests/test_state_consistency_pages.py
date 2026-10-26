@@ -68,6 +68,7 @@ class StateConsistencyPageTests(unittest.TestCase):
             page="data_cleaning",
         )
         app.selectbox(key="ms_value").set_value("drop_column")
+        app.button(key="preview_missing").click().run()
         app.button(key="apply_missing").click().run()
         self.assert_no_exceptions(app)
         self.assertEqual(list(app.session_state["df"].columns), ["label"])
@@ -109,14 +110,17 @@ class StateConsistencyPageTests(unittest.TestCase):
             page="data_cleaning",
         )
         app.selectbox(key="ms_value").set_value("median")
+        app.button(key="preview_missing").click().run()
         app.button(key="apply_missing").click().run()
         self.assert_no_exceptions(app)
         self.assertEqual(str(app.session_state["df"]["value"].dtype), "Float64")
         app.button(key="find_mismatch").click().run()
         self.assert_no_exceptions(app)
         self.assertEqual(len(app.error), 0)
-        self.assertEqual(app.dataframe[-1].value.index.tolist(), [2])
-        self.assertEqual(app.dataframe[-1].value["value"].tolist(), [1.5])
+        preview = app.session_state["cleaning_previews"]["mismatch"]["report"]
+        self.assertEqual(preview["before_sample"].index.tolist(), [2])
+        self.assertEqual(preview["before_sample"]["value"].tolist(), [1.5])
+        self.assertEqual(preview["summary"]["rows_removed"], 1)
 
     def test_invalid_numeric_rule_is_actionable_and_atomic_across_buttons(self):
         for action in ("find_mismatch", "apply_allowed_values", "apply_mismatch"):
@@ -130,10 +134,12 @@ class StateConsistencyPageTests(unittest.TestCase):
                 metadata = copy.deepcopy(app.session_state["column_meta"])
                 app.text_input(key="av_value").set_value("5 out of 10").run()
                 app.session_state["viz_charts"] = ["saved chart"]
-                app.button(key=action).click().run()
+                app.button(key="find_mismatch" if action == "apply_mismatch" else action).click().run()
                 self.assert_no_exceptions(app)
                 self.assertEqual(len(app.error), 1)
                 self.assertIn("value", app.error[0].value)
+                if action == "apply_mismatch":
+                    self.assertTrue(app.button(key="apply_mismatch").disabled)
                 assert_frame_equal(app.session_state["df"], original)
                 self.assertEqual(app.session_state["column_meta"], metadata)
                 self.assertEqual(app.session_state["history"], [])

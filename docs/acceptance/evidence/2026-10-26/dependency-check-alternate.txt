@@ -1,0 +1,13 @@
+Observed command:
+C:\Users\Gaming\AppData\Local\Python\bin\pip.exe --python C:\Users\Gaming\Documents\Data-Works\.venv\Scripts\python.exe check
+
+Exit code: 0
+Output:
+No broken requirements found.
+
+Installer identity observed with pip.exe --version:
+pip 26.2.1 from C:\Users\Gaming\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pip (python 3.14)
+
+The --python argument targets the DataWorks Python 3.12 virtual environment.
+This is a recorded transcription of the command result, not an installation.
+No packages or requirements were changed.

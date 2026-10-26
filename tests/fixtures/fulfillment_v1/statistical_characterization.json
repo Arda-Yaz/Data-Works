@@ -1,0 +1,26 @@
+{
+  "scope": "Regression and future reusable-plan policy characterization for existing generic cleaning features; these operations are excluded from the fulfillment plan.",
+  "expectations_authored_by": "Arithmetic, independently of production cleaning functions",
+  "median": {
+    "month_a": [10, 20, null, 30, 40],
+    "month_b": [100, 200, null, 300, 400],
+    "fitted_a": 25,
+    "fitted_b": 250,
+    "refit_b": [100, 200, 250, 300, 400],
+    "frozen_a_applied_to_b": [100, 200, 25, 300, 400],
+    "derivation": "A median = (20+30)/2; B median = (200+300)/2; missing values are excluded from fitting."
+  },
+  "iqr_cap": {
+    "month_a": [1, 2, 3, 4, 100],
+    "month_b": [10, 20, 30, 40, 1000],
+    "quantile_method": "linear",
+    "multiplier": 1.5,
+    "quartiles_a": [2, 4],
+    "quartiles_b": [20, 40],
+    "bounds_a": [-1, 7],
+    "bounds_b": [-10, 70],
+    "refit_b": [10, 20, 30, 40, 70],
+    "frozen_a_applied_to_b": [7, 7, 7, 7, 7],
+    "derivation": "Five sorted observations place Q1/Q3 at positions 2/4. Bounds = Q1-1.5*(Q3-Q1), Q3+1.5*(Q3-Q1)."
+  }
+}

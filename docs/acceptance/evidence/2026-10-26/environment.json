@@ -1,0 +1,84 @@
+{
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "executable": "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+  "requirements": [
+    {
+      "name": "streamlit",
+      "required": "1.55.0",
+      "installed": "1.55.0",
+      "matches_pin": true
+    },
+    {
+      "name": "pandas",
+      "required": "2.3.3",
+      "installed": "2.3.3",
+      "matches_pin": true
+    },
+    {
+      "name": "numpy",
+      "required": "2.4.2",
+      "installed": "2.4.2",
+      "matches_pin": true
+    },
+    {
+      "name": "plotly",
+      "required": "6.6.0",
+      "installed": "6.6.0",
+      "matches_pin": true
+    },
+    {
+      "name": "scikit-learn",
+      "required": "1.8.0",
+      "installed": "1.8.0",
+      "matches_pin": true
+    },
+    {
+      "name": "scipy",
+      "required": "1.18.1",
+      "installed": "1.18.1",
+      "matches_pin": true
+    },
+    {
+      "name": "joblib",
+      "required": "1.6.0",
+      "installed": "1.6.0",
+      "matches_pin": true
+    },
+    {
+      "name": "threadpoolctl",
+      "required": "3.7.0",
+      "installed": "3.7.0",
+      "matches_pin": true
+    },
+    {
+      "name": "Authlib",
+      "required": "1.9.1",
+      "installed": "1.9.1",
+      "matches_pin": true
+    },
+    {
+      "name": "openpyxl",
+      "required": "3.1.5",
+      "installed": "3.1.5",
+      "matches_pin": true
+    },
+    {
+      "name": "xlrd",
+      "required": "2.0.2",
+      "installed": "2.0.2",
+      "matches_pin": true
+    },
+    {
+      "name": "watchdog",
+      "required": "6.0.0",
+      "installed": "6.0.0",
+      "matches_pin": true
+    }
+  ],
+  "test_environment_overrides": {
+    "DATAWORKS_REQUIRE_AUTH": "false",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  }
+}

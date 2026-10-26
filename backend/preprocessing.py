@@ -3,6 +3,8 @@ from numbers import Real
 
 import numpy as np
 import pandas as pd
+
+from backend import resources
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import GroupShuffleSplit, train_test_split
@@ -245,6 +247,8 @@ def auto_preprocess(
         raise ValueError("Provide a DataFrame with unique column names.")
     if target_col not in df.columns:
         raise ValueError("Select a target present in the dataset.")
+    resources.validate_dataset(df)
+    resources.validate_ml_shape(len(df), 1)
     usable = df.dropna(subset=[target_col])
     y = usable[target_col]
     _validate_target(y, problem_type)
@@ -279,6 +283,10 @@ def auto_preprocess(
             raise ValueError(f"Feature {name!r} contains complex values; real numeric or categorical features are required.")
     numeric = X_train.select_dtypes(include="number").columns.tolist()
     categorical = [c for c in X_train.columns if c not in numeric]
+    # OneHotEncoder uses at most 64 outputs per categorical feature. Check the
+    # dense allocation before fit_transform, rather than after allocating it.
+    encoded_width = len(numeric) + sum(min(64, max(1, X_train[name].nunique())) for name in categorical)
+    resources.validate_ml_shape(len(features), encoded_width)
     transformers = []
     if numeric:
         transformers.append(("numeric", Pipeline([

@@ -2,12 +2,18 @@ import pandas as pd
 import streamlit as st
 
 from backend.ingestion import apply_inferred_dtypes
+from backend.experiments import (
+    MAX_EXPERIMENTS, create_experiment, experiment_comparison, export_experiment_csv,
+    export_experiment_json, export_model_artifact, importance_figure,
+)
 from backend.ml import (
     detect_problem_type, evaluate_model, get_available_models,
     plot_confusion_matrix, plot_feature_importance, plot_residuals, train_model,
 )
 from backend.preprocessing import auto_preprocess
 from backend.state import StateManager
+from backend.resources import ml_job
+from backend.diagnostics import log_event, log_failure
 
 
 _SPLIT_LABELS = {
@@ -24,8 +30,7 @@ def _reset_invalid_selection(key, options):
         del st.session_state[key]
 
 
-def data_ml():
-    st.title("Machine Learning")
+def _training_controls():
     if not StateManager.has_dataset():
         st.warning("Upload a dataset first.")
         return
@@ -190,62 +195,164 @@ def data_ml():
         f"Using {usable_rows} of {len(subset)} rows; "
         f"excluding {len(subset) - usable_rows} with missing targets."
     )
-    with st.spinner("Preprocessing & training..."):
-        try:
-            X_train, X_test, y_train, y_test, info = auto_preprocess(
-                subset, target, metadata, test_size=test_size, problem_type=problem_type,
-                split_strategy=strategy, group_col=group_col, time_col=time_col,
-            )
-        except Exception as exc:
-            st.error(f"Preprocessing failed: {exc}")
-            return
-        st.caption(f"Training rows: {info['train_rows']} | Test rows: {info['test_rows']}")
-        for message in info["warnings"]:
-            st.warning(message)
-        results = {}
-        for name in selected_models:
+    try:
+        with st.spinner("Preprocessing & training..."), ml_job():
             try:
-                fitted = train_model(available[name], X_train, y_train)
-                metrics = evaluate_model(fitted, X_test, y_test, problem_type)
-                metrics["_model"] = fitted
-                results[name] = metrics
+                X_train, X_test, y_train, y_test, info = auto_preprocess(
+                    subset, target, metadata, test_size=test_size, problem_type=problem_type,
+                    split_strategy=strategy, group_col=group_col, time_col=time_col,
+                )
             except Exception as exc:
-                st.error(f"Training **{name}** failed: {exc}")
+                log_failure("ml_preprocessing_failed", exc)
+                st.error(f"Preprocessing failed: {exc}")
+                return
+            st.caption(f"Training rows: {info['train_rows']} | Test rows: {info['test_rows']}")
+            for message in info["warnings"]:
+                st.warning(message)
+            results, errors = {}, {}
+            for name in selected_models:
+                try:
+                    fitted = train_model(available[name], X_train, y_train)
+                    metrics = evaluate_model(fitted, X_test, y_test, problem_type)
+                    metrics["_model"] = fitted
+                    results[name] = metrics
+                    log_event("ml_model_completed", training_rows=len(X_train), test_rows=len(X_test), features=X_train.shape[1])
+                except Exception as exc:
+                    log_failure("ml_model_failed", exc)
+                    errors[name] = str(exc)
+                    st.error(f"Training **{name}** failed: {exc}")
+    except ValueError as exc:
+        log_failure("ml_run_unavailable", exc)
+        st.error(str(exc))
+        return
 
     if not results:
         return
-    st.subheader("Results")
-    compare_cols = (
-        ["accuracy", "macro_f1", "precision", "recall", "f1"]
-        if problem_type == "classification" else ["MAE", "MSE", "RMSE", "R²"]
-    )
-    comparison = pd.DataFrame([
-        {"Model": name, **{column: metrics.get(column) for column in compare_cols}}
-        for name, metrics in results.items()
-    ]).set_index("Model")
-    comparison = comparison.rename(columns={
-        "precision": "weighted_precision", "recall": "weighted_recall", "f1": "weighted_f1",
-    })
-    st.dataframe(comparison)
+    config = {
+        "source": source, "target": target, "features": list(selected_features),
+        "problem_type": problem_type, "split_strategy": strategy, "test_size": test_size,
+        "group_col": group_col, "time_col": time_col, "random_state": 42,
+        "selected_models": list(selected_models),
+    }
+    try:
+        experiment = create_experiment(
+            dataset_id=st.session_state.dataset_id, data_version=st.session_state.data_version,
+            config=config, results=results, errors=errors, y_test=y_test,
+            feature_names=X_train.columns.tolist(),
+            feature_columns=info.get("feature_columns") or getattr(info["preprocessor"], "source_columns_", selected_features),
+            info=info, schema=metadata,
+        )
+        identifier = StateManager.add_experiment(experiment)
+    except Exception as exc:
+        log_failure("ml_report_retention_failed", exc)
+        st.error(f"This run could not be retained. {exc}")
+        return
+    st.session_state["ml_experiment_id"] = identifier
 
-    for name, metrics in results.items():
+
+def _render_experiments():
+    experiments = st.session_state.experiments
+    if not experiments:
+        st.selectbox(
+            "Completed experiment", [], index=None, disabled=True,
+            placeholder="Train a model to save an experiment.", key="ml_experiment_id",
+        )
+        return
+    st.subheader("Saved Experiments")
+    st.caption(f"The latest {MAX_EXPERIMENTS} completed runs are retained for this dataset. Download reports to keep more runs.")
+    ordered = list(reversed(experiments))
+    identifiers = [experiment["id"] for experiment in ordered]
+    by_id = {experiment["id"]: experiment for experiment in ordered}
+    _reset_invalid_selection("ml_experiment_id", identifiers)
+
+    def label(identifier):
+        record = by_id[identifier]
+        return f"{record['created_at']} | {record['config']['target']} | {record['config']['problem_type']}"
+
+    selected = st.selectbox("Completed experiment", identifiers, format_func=label, key="ml_experiment_id")
+    experiment = by_id[selected]
+    config = experiment["config"]
+    st.caption(
+        f"Stored run {experiment['id'][:8]} · Created UTC: {experiment['created_at']} · "
+        f"Target: {config['target']} · Source: {_SOURCE_LABELS.get(config['source'], config['source'])} · "
+        f"Split: {_SPLIT_LABELS.get(config['split_strategy'], config['split_strategy'])} · "
+        f"Test fraction: {config['test_size']} · Features: {config['features']}"
+    )
+    if experiment["data_version"] != st.session_state.data_version:
+        st.warning("This run belongs to an earlier dataset state. Its scores describe that stored run; retrain to evaluate current data.")
+    else:
+        st.caption("This run uses the current dataset state. Its stored settings may differ from the controls above.")
+    for name, message in experiment.get("errors", {}).items():
+        st.warning(f"This run did not complete {name}: {message}")
+    for message in experiment.get("preprocessing_info", {}).get("warnings", []):
+        st.caption(message)
+
+    first, second, third = st.columns(3)
+    with first:
+        st.download_button(
+            "Download experiment report (JSON)", lambda: export_experiment_json(experiment),
+            file_name=f"dataworks-experiment-{experiment['id'][:8]}.json", mime="application/json",
+            key="ml_report_json", on_click="ignore",
+        )
+    with second:
+        st.download_button(
+            "Download model comparison (CSV)", lambda: export_experiment_csv(experiment),
+            file_name=f"dataworks-comparison-{experiment['id'][:8]}.csv", mime="text/csv",
+            key="ml_report_csv", on_click="ignore",
+        )
+    with third:
+        if st.button("Delete this experiment", key="ml_delete_experiment"):
+            StateManager.remove_experiment(selected)
+            st.rerun()
+
+    st.subheader("Results")
+    st.dataframe(experiment_comparison(experiment))
+    runtime = experiment.get("preprocessor") is not None and bool(experiment.get("models"))
+    if runtime:
+        st.caption(
+            "Python model downloads include fitted preprocessing and need a compatible DataWorks installation. "
+            "Joblib files can execute code when loaded; load only trusted exports. This app does not import model binaries."
+        )
+    else:
+        st.info("This reopened report contains no live fitted models. Retrain to download a Python model artifact.")
+
+    for position, (name, metrics) in enumerate(experiment["results"].items()):
         with st.expander(f"Details: {name}"):
             if metrics.get("r2_unavailable_reason"):
                 st.info(metrics["r2_unavailable_reason"])
-            if problem_type == "classification":
+            if config["problem_type"] == "classification":
                 st.dataframe(pd.DataFrame(metrics["per_class"]).set_index("class"))
             try:
                 figure = (
                     plot_confusion_matrix(metrics["confusion_matrix"], metrics["class_labels"])
-                    if problem_type == "classification"
-                    else plot_residuals(y_test, metrics["y_pred"])
+                    if config["problem_type"] == "classification"
+                    else plot_residuals(experiment["y_test"], metrics["y_pred"])
                 )
-                st.plotly_chart(figure, width="stretch")
+                st.plotly_chart(figure, width="stretch", key=f"ml_evaluation_{experiment['id']}_{position}")
             except Exception as exc:
-                st.warning(f"Could not render the evaluation plot for {name}: {exc}")
+                st.warning(f"Could not render the stored evaluation plot for {name}: {exc}")
             try:
-                importance = plot_feature_importance(metrics["_model"], X_train.columns.tolist())
-                if importance is not None:
-                    st.plotly_chart(importance, width="stretch")
+                figure = importance_figure(experiment, name)
+                if figure is not None:
+                    st.plotly_chart(figure, width="stretch", key=f"ml_importance_{experiment['id']}_{position}")
+                elif name in experiment.get("plot_errors", {}):
+                    st.warning(f"Could not render feature importance for {name}: {experiment['plot_errors'][name]}")
             except Exception as exc:
-                st.warning(f"Could not render feature importance for {name}: {exc}")
+                st.warning(f"Could not render stored feature importance for {name}: {exc}")
+            if runtime and name in experiment.get("models", {}):
+                st.download_button(
+                    "Download Python model (.joblib)",
+                    lambda record=experiment, model=name: export_model_artifact(record, model),
+                    file_name=f"dataworks-model-{experiment['id'][:8]}-{position}.joblib",
+                    mime="application/octet-stream", key=f"ml_model_export_{experiment['id']}_{position}",
+                    on_click="ignore",
+                )
+
+
+def data_ml():
+    st.title("Machine Learning")
+    if not StateManager.has_dataset():
+        st.warning("Upload a dataset first.")
+        return
+    _training_controls()
+    _render_experiments()

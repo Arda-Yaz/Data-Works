@@ -1,0 +1,73 @@
+{
+  "status": "passed",
+  "scope": "synthetic oracle audit only; application acceptance not executed",
+  "completed_fixture_audits": [
+    {
+      "input": "month_a.csv",
+      "report": {
+        "source_rows": 12,
+        "accepted_rows": 4,
+        "rejected_rows": 8,
+        "rejection_reason_assignments": 8,
+        "accepted_distinct_orders": 3,
+        "accepted_quantity": 5,
+        "accepted_line_counts_by_status": {
+          "fulfilled": 2,
+          "pending": 1,
+          "cancelled": 1
+        },
+        "accepted_quantity_by_status": {
+          "fulfilled": 3,
+          "pending": 1,
+          "cancelled": 1
+        }
+      }
+    },
+    {
+      "input": "month_b.csv",
+      "report": {
+        "source_rows": 8,
+        "accepted_rows": 5,
+        "rejected_rows": 3,
+        "rejection_reason_assignments": 3,
+        "accepted_distinct_orders": 4,
+        "accepted_quantity": 11,
+        "accepted_line_counts_by_status": {
+          "fulfilled": 2,
+          "pending": 2,
+          "cancelled": 1
+        },
+        "accepted_quantity_by_status": {
+          "fulfilled": 7,
+          "pending": 2,
+          "cancelled": 2
+        }
+      }
+    },
+    {
+      "input": "month_c_invalid_rows.csv",
+      "report": {
+        "source_rows": 9,
+        "accepted_rows": 2,
+        "rejected_rows": 7,
+        "rejection_reason_assignments": 9,
+        "accepted_distinct_orders": 2,
+        "accepted_quantity": 3,
+        "accepted_line_counts_by_status": {
+          "fulfilled": 1,
+          "pending": 0,
+          "cancelled": 1
+        },
+        "accepted_quantity_by_status": {
+          "fulfilled": 2,
+          "pending": 0,
+          "cancelled": 1
+        }
+      }
+    }
+  ],
+  "noncommitting_fixture_audits": 4,
+  "statistical_examples": "passed",
+  "manifest_files_verified": 10,
+  "production_modules_imported": false
+}

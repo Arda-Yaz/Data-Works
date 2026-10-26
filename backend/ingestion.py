@@ -1,10 +1,15 @@
 """Lossless ingestion and conservative, atomic schema conversion."""
 
+import csv
+import io
+import json
 import re
 from decimal import Decimal
 
 import numpy as np
 import pandas as pd
+
+from backend import resources
 
 
 _BOOL_MAP = {
@@ -20,31 +25,211 @@ _ID_PATTERN = re.compile(
 _INT_LIMITS = np.iinfo(np.int64)
 
 
-def parse_file(uploaded_file) -> pd.DataFrame:
+def _read_source(uploaded_file):
+    """Read independently of an upload's cursor without taking ownership of it."""
+    if hasattr(uploaded_file, "getvalue"):
+        source = uploaded_file.getvalue()
+        size = len(source.encode("utf-8")) if isinstance(source, str) else len(source)
+        if size > resources.MAX_UPLOAD_BYTES:
+            raise ValueError("The upload exceeds the 50 MiB file limit.")
+        return source
+    position = uploaded_file.tell()
+    try:
+        uploaded_file.seek(0)
+        source = uploaded_file.read(resources.MAX_UPLOAD_BYTES + 1)
+        size = len(source.encode("utf-8")) if isinstance(source, str) else len(source)
+        if size > resources.MAX_UPLOAD_BYTES:
+            raise ValueError("The upload exceeds the 50 MiB file limit.")
+        return source
+    finally:
+        uploaded_file.seek(position)
+
+
+def _text_source(uploaded_file, encoding):
+    if not isinstance(encoding, str) or not encoding:
+        raise ValueError("Choose a text encoding.")
+    source = _read_source(uploaded_file)
+    if isinstance(source, str):
+        return source.removeprefix("\ufeff")
+    try:
+        return source.decode(encoding, errors="strict")
+    except LookupError as exc:
+        raise ValueError(f"Unknown text encoding: {encoding}.") from exc
+    except UnicodeError as exc:
+        raise ValueError(f"The file cannot be decoded with {encoding}; choose its actual encoding.") from exc
+
+
+def _excel_engine(uploaded_file):
+    name = uploaded_file.name.lower()
+    if name.endswith(".xlsx"):
+        return "openpyxl"
+    if name.endswith(".xls"):
+        return "xlrd"
+    raise ValueError("Choose an .xlsx or .xls workbook.")
+
+
+def list_excel_sheets(uploaded_file) -> list[str]:
+    """List workbook sheets without consuming or closing the uploaded stream."""
+    with pd.ExcelFile(io.BytesIO(_read_source(uploaded_file)), engine=_excel_engine(uploaded_file)) as workbook:
+        return list(workbook.sheet_names)
+
+
+def _unique_json_keys(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"Duplicate JSON key: {key!r}.")
+        result[key] = value
+    return result
+
+
+def _json_document(text):
+    def finite_float(token):
+        value = float(token)
+        if not np.isfinite(value):
+            raise ValueError("A JSON number exceeds the supported finite floating-point range.")
+        if value == 0 and Decimal(token) != 0:
+            raise ValueError("A JSON number is too small to represent without becoming zero; quote it to preserve it as text.")
+        return value
+
+    return json.loads(
+        text, object_pairs_hook=_unique_json_keys,
+        parse_float=finite_float,
+        parse_constant=lambda value: (_ for _ in ()).throw(ValueError(f"Non-finite JSON value: {value}.")),
+    )
+
+
+def _json_frame(value):
+    def scalar(item):
+        return item is None or isinstance(item, (str, bool, int, float))
+
+    if isinstance(value, list) and all(isinstance(row, dict) for row in value):
+        if any(not scalar(item) for row in value for item in row.values()):
+            raise ValueError("Nested JSON cells are unsupported; choose a path to a flat records array.")
+        return pd.DataFrame(value, dtype=object)
+    if isinstance(value, dict):
+        if all(scalar(item) for item in value.values()):
+            return pd.DataFrame([value], dtype=object)
+        if all(isinstance(column, list) for column in value.values()):
+            columns = list(value.values())
+            if len({len(column) for column in columns}) > 1:
+                raise ValueError("JSON columns must contain the same number of values.")
+            if any(not scalar(item) for column in columns for item in column):
+                raise ValueError("Nested JSON cells are unsupported; choose a path to a flat table.")
+            return pd.DataFrame(value, dtype=object)
+        if value and all(isinstance(column, dict) for column in value.values()):
+            if all(scalar(item) for column in value.values() for item in column.values()):
+                return pd.DataFrame(value, dtype=object)
+    raise ValueError("Select a JSON records array or a flat column-oriented object.")
+
+
+def parse_file(
+    uploaded_file, *, delimiter=None, encoding="utf-8-sig", sheet_name=0,
+    json_path=None, json_lines=False,
+) -> pd.DataFrame:
     """Preserve textual values until the user reviews the schema.
 
     Only empty fields are treated as missing in CSV/TSV/Excel. In particular,
     'NA' and 'NULL' remain literal strings. Native Excel numeric/date cells and
-    native JSON scalars retain their existing types.
+    native JSON scalars retain their existing types. Numeric separator choices
+    belong to schema conversion, so reading a file never normalizes its text.
     """
     name = uploaded_file.name.lower()
     options = {"dtype": object, "keep_default_na": False, "na_values": [""]}
-    if name.endswith(".csv"):
-        return pd.read_csv(uploaded_file, **options)
-    if name.endswith((".tsv", ".txt")):
-        return pd.read_csv(uploaded_file, sep="\t", **options)
+    if name.endswith((".csv", ".tsv", ".txt")):
+        delimiter = ("," if name.endswith(".csv") else "\t") if delimiter is None else delimiter
+        if not isinstance(delimiter, str) or len(delimiter) != 1 or delimiter in ('"', "\r", "\n", "\0"):
+            raise ValueError("The delimiter must be one literal character (not a regular expression).")
+        text = _text_source(uploaded_file, encoding)
+        try:
+            rows = csv.reader(io.StringIO(text), delimiter=delimiter, strict=True)
+            header = next((row for row in rows if row), [])
+            if not header:
+                raise ValueError("The delimited file has no header row.")
+            if len(header) > resources.MAX_DATASET_COLUMNS:
+                raise ValueError("The file exceeds the column budget. Select fewer columns before uploading.")
+            if len(set(header)) != len(header):
+                raise ValueError("Column names must be unique; the file contains duplicate headers.")
+            for number, row in enumerate(rows, start=2):
+                if len(row) > len(header):
+                    raise ValueError(f"Row {number} has more fields than the header; check the delimiter.")
+        except csv.Error as exc:
+            raise ValueError(f"The delimited file has invalid quoting: {exc}") from exc
+        result = pd.read_csv(io.StringIO(text), sep=delimiter, nrows=resources.MAX_DATASET_ROWS + 1, **options)
+        resources.validate_dataset(result)
+        return result
     if name.endswith((".xlsx", ".xls")):
-        return pd.read_excel(uploaded_file, **options)
-    if name.endswith(".json"):
-        return pd.read_json(uploaded_file, dtype=False, convert_dates=False)
+        if isinstance(sheet_name, bool) or not isinstance(sheet_name, (str, int)) or isinstance(sheet_name, int) and sheet_name < 0:
+            raise ValueError("Choose one Excel sheet by name or non-negative position.")
+        raw = pd.read_excel(io.BytesIO(_read_source(uploaded_file)), sheet_name=sheet_name,
+                            header=None, nrows=resources.MAX_DATASET_ROWS + 2,
+                            engine=_excel_engine(uploaded_file), **options)
+        if raw.empty:
+            raise ValueError("The selected Excel sheet has no header row.")
+        header = [f"Unnamed: {position}" if pd.isna(value) else value for position, value in enumerate(raw.iloc[0])]
+        if len(set(header)) != len(header):
+            raise ValueError("Column names must be unique; the sheet contains duplicate headers.")
+        result = raw.iloc[1:].reset_index(drop=True).copy()
+        result.columns = header
+        resources.validate_dataset(result)
+        return result
+    if name.endswith((".json", ".jsonl", ".ndjson")):
+        if not isinstance(json_lines, bool):
+            raise ValueError("JSON Lines must be a boolean option.")
+        if json_path is not None and (not isinstance(json_path, list) or any(not isinstance(key, str) for key in json_path)):
+            raise ValueError("The JSON path must be a list of object keys.")
+        text = _text_source(uploaded_file, encoding)
+        if json_lines or name.endswith((".jsonl", ".ndjson")):
+            if json_path:
+                raise ValueError("JSON paths are unavailable for JSON Lines files.")
+            value = [_json_document(line) for line in text.splitlines() if line.strip()]
+        else:
+            value = _json_document(text)
+            for key in json_path or []:
+                if not isinstance(value, dict) or key not in value:
+                    raise ValueError(f"JSON path key {key!r} was not found in an object.")
+                value = value[key]
+        result = _json_frame(value)
+        resources.validate_dataset(result)
+        return result
     raise ValueError(f"Unsupported file type: {uploaded_file.name}")
 
 
-def _numeric_column(col: pd.Series, target: str) -> pd.Series:
-    text = col.astype("string").str.strip()
-    present = text.dropna()
-    if not present.str.fullmatch(_NUMBER).all():
-        raise ValueError("Expected plain numbers; units and compound values need explicit parsing.")
+def validate_numeric_format(decimal=".", thousands=None) -> None:
+    if decimal not in (".", ","):
+        raise ValueError("The decimal separator must be a dot or comma.")
+    if thousands not in (None, ".", ",", " ") or thousands == decimal:
+        raise ValueError("Choose no thousands separator, a space, or a separator different from the decimal mark.")
+
+
+def _numeric_text(col, decimal=".", thousands=None):
+    validate_numeric_format(decimal, thousands)
+    integer = r"\d+"
+    if thousands is not None:
+        integer = rf"(?:\d+|\d{{1,3}}(?:{re.escape(thousands)}\d{{3}})+)"
+    mark = re.escape(decimal)
+    pattern = re.compile(rf"[+-]?(?:{integer}(?:{mark}\d*)?|{mark}\d+)(?:[eE][+-]?\d+)?")
+    values = []
+    for value in col:
+        if pd.isna(value):
+            values.append(pd.NA)
+            continue
+        text = str(value).strip()
+        # Workbook/JSON numbers already have native numerical meaning.
+        native = not isinstance(value, str)
+        if not (bool(_NUMBER.fullmatch(text)) if native else bool(pattern.fullmatch(text))):
+            raise ValueError("Expected plain numbers with the selected separators and groups of three; units and compound values need explicit parsing.")
+        if not native:
+            if thousands is not None:
+                text = text.replace(thousands, "")
+            if decimal != ".":
+                text = text.replace(decimal, ".")
+        values.append(text)
+    return pd.Series(values, index=col.index, name=col.name, dtype="string")
+
+
+def _numeric_column(col: pd.Series, target: str, decimal=".", thousands=None) -> pd.Series:
+    text = _numeric_text(col, decimal, thousands)
 
     decimals = [None if pd.isna(value) else Decimal(value) for value in text]
     if target == "int64":
@@ -76,12 +261,13 @@ def _numeric_column(col: pd.Series, target: str) -> pd.Series:
     return result if result.isna().any() else result.astype("float64")
 
 
-def infer_dtype(col: pd.Series) -> tuple[str, float]:
+def infer_dtype(col: pd.Series, *, decimal=".", thousands=None) -> tuple[str, float]:
     """Infer only when every present value has an unambiguous interpretation.
 
     Confidence measures parser coverage, not semantic certainty. Ambiguous dates,
     leading-zero codes, units, and mixed numeric/text columns remain text.
     """
+    validate_numeric_format(decimal, thousands)
     present = col.dropna()
     if present.empty:
         return "object", 0.0
@@ -95,10 +281,14 @@ def infer_dtype(col: pd.Series) -> tuple[str, float]:
     text = present.astype("string").str.strip()
     if set(text.str.lower().unique()).issubset(_BOOL_WORDS):
         return "bool", 1.0
-    if text.str.fullmatch(_NUMBER).all() and not text.str.fullmatch(_LEADING_ZERO).any():
+    try:
+        numeric_text = _numeric_text(col, decimal, thousands).dropna()
+    except (ValueError, TypeError, OverflowError):
+        numeric_text = None
+    if numeric_text is not None and not numeric_text.str.fullmatch(_LEADING_ZERO).any():
         for target in ("int64", "float64"):
             try:
-                _numeric_column(col, target)
+                _numeric_column(col, target, decimal, thousands)
                 return target, 1.0
             except (ValueError, TypeError, OverflowError):
                 continue
@@ -121,12 +311,13 @@ def classify_role(col: pd.Series, col_name: str) -> str:
     return "feature"
 
 
-def infer_column_meta(df: pd.DataFrame) -> dict:
+def infer_column_meta(df: pd.DataFrame, *, decimal=".", thousands=None) -> dict:
+    validate_numeric_format(decimal, thousands)
     meta = {}
     for name in df.columns:
         col = df[name]
         role = classify_role(col, name)
-        dtype, confidence = infer_dtype(col)
+        dtype, confidence = infer_dtype(col, decimal=decimal, thousands=thousands)
         if role == "id" and not pd.api.types.is_numeric_dtype(col):
             dtype = "object"
         if dtype == "datetime64[ns]" and role != "id":
@@ -146,6 +337,8 @@ def infer_column_meta(df: pd.DataFrame) -> dict:
             ),
             "allowed_values": None,
             "date_format": None,
+            "numeric_decimal": decimal,
+            "numeric_thousands": thousands,
         }
     return meta
 
@@ -166,7 +359,7 @@ def apply_inferred_dtypes(df: pd.DataFrame, column_meta: dict) -> pd.DataFrame:
             continue
         try:
             if target in ("int64", "float64"):
-                converted = _numeric_column(col, target)
+                converted = _numeric_column(col, target, meta.get("numeric_decimal", "."), meta.get("numeric_thousands"))
             elif target == "bool":
                 text = col.astype("string").str.strip().str.lower()
                 if not text.dropna().isin(_BOOL_MAP).all():
