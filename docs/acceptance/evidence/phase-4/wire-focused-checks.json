@@ -1,0 +1,62 @@
+{
+  "scope": "compact fulfillment persistence, ownership, corruption and legacy codec checks",
+  "checks": [
+    {
+      "name": "test_fulfillment_wire.py",
+      "command": [
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_fulfillment_wire.py",
+        "-v"
+      ],
+      "started_at_utc": "2026-10-27T18:47:54.530778+00:00",
+      "elapsed_seconds": 1.211,
+      "exit_code": 0,
+      "tests_run": 15,
+      "log": "wire-test_fulfillment_wire.txt"
+    },
+    {
+      "name": "test_project_io.py",
+      "command": [
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_project_io.py",
+        "-v"
+      ],
+      "started_at_utc": "2026-10-27T18:47:55.741600+00:00",
+      "elapsed_seconds": 4.439,
+      "exit_code": 0,
+      "tests_run": 15,
+      "log": "wire-test_project_io.txt"
+    },
+    {
+      "name": "test_fulfillment_archive_versions.py",
+      "command": [
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_fulfillment_archive_versions.py",
+        "-v"
+      ],
+      "started_at_utc": "2026-10-27T18:48:00.180721+00:00",
+      "elapsed_seconds": 1.362,
+      "exit_code": 0,
+      "tests_run": 8,
+      "log": "wire-test_fulfillment_archive_versions.txt"
+    }
+  ]
+}

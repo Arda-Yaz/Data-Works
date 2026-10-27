@@ -1,0 +1,24 @@
+{
+  "checked_at_utc": "2026-10-27T18:37:01.845553+00:00",
+  "command": [
+    "C:\\Users\\Gaming\\AppData\\Local\\Python\\bin\\pip.exe",
+    "--python",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+    "install",
+    "--dry-run",
+    "--ignore-installed",
+    "--no-cache-dir",
+    "--disable-pip-version-check",
+    "--retries",
+    "0",
+    "--timeout",
+    "15",
+    "-r",
+    "requirements.txt"
+  ],
+  "exit_code": 1,
+  "seconds": 12.97955410000003,
+  "environment_modified": false,
+  "requirements_modified": false,
+  "log": "declared-dependency-resolution.txt"
+}

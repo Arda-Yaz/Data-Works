@@ -288,7 +288,7 @@ def replay_operations(original_df, original_metadata, operation_log):
     Unknown legacy/custom records fail rather than being silently skipped.
     Audit names and other extra fields are never interpreted as code.
     """
-    from backend.state import _prepare_dataset
+    from backend.dataset_preparation import prepare_dataset as _prepare_dataset
 
     if not isinstance(operation_log, list):
         raise ValueError("A transformation history must be a list of operation records.")

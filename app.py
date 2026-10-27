@@ -17,7 +17,7 @@ _PAGES_NEED_DATA = {"Data Cleaning", "EDA", "Visualization", "Machine Learning"}
 def home_page():
     st.sidebar.title("DataWorks")
 
-    all_pages = ["Upload", "Data Cleaning", "EDA", "Visualization", "Machine Learning", "Project & Exports"]
+    all_pages = ["Upload", "Order Fulfillment", "Data Cleaning", "EDA", "Visualization", "Machine Learning", "Project & Exports"]
     page = st.sidebar.selectbox("Navigate", all_pages)
 
     # Undo button + operation history in sidebar
@@ -48,6 +48,9 @@ def _show_page(page: str):
     if page == "Upload":
         from frontend.pages.data_upload import data_upload
         data_upload()
+    elif page == "Order Fulfillment":
+        from frontend.pages.data_fulfillment import data_fulfillment
+        data_fulfillment()
     elif page == "Data Cleaning":
         from frontend.pages.data_cleaning import data_cleaning
         data_cleaning()

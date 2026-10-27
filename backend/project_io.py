@@ -18,6 +18,7 @@ import pandas as pd
 
 FORMAT = "dataworks-project"
 FORMAT_VERSION = 1
+FULFILLMENT_FORMAT_VERSION = 2
 MAX_ARCHIVE_BYTES = 50 * 1024 * 1024
 MAX_JSON_BYTES = 100 * 1024 * 1024
 MAX_DATA_ITEMS = 5_000_000
@@ -456,10 +457,22 @@ def _unique_keys(pairs):
 
 
 def dumps_project(payload: dict) -> bytes:
-    """Create a data-only project archive; unsupported objects raise ValueError."""
+    """Create bounded data-only archives with an explicit compatibility barrier.
+
+    Version 1 remains readable for generic projects. Fulfillment data requires
+    version 2 so older readers cannot silently ignore and discard its ledger.
+    """
     if not isinstance(payload, dict):
         raise ValueError("A project payload must be a dictionary.")
-    encoded = {"format": FORMAT, "version": FORMAT_VERSION, "payload": encode_value(payload)}
+    version = FULFILLMENT_FORMAT_VERSION if "fulfillment" in payload else FORMAT_VERSION
+    wire_payload = payload
+    fulfillment = payload.get("fulfillment")
+    if (type(fulfillment) is dict and type(fulfillment.get("version")) is int
+            and fulfillment.get("version") == 1 and "format" not in fulfillment):
+        from backend.fulfillment_wire import pack_fulfillment
+
+        wire_payload = {**payload, "fulfillment": pack_fulfillment(fulfillment)}
+    encoded = {"format": FORMAT, "version": version, "payload": encode_value(wire_payload)}
     data = json.dumps(encoded, ensure_ascii=False, allow_nan=False, separators=(",", ":")).encode("utf-8")
     if len(data) > MAX_JSON_BYTES:
         raise ValueError("The project is too large; omit undo snapshots or use a smaller dataset.")
@@ -492,13 +505,26 @@ def loads_project(data: bytes) -> dict:
                 raise ValueError("The project has an invalid or oversized JSON member.")
         decoded = json.loads(raw.decode("utf-8"), object_pairs_hook=_unique_keys,
                              parse_constant=lambda token: (_ for _ in ()).throw(ValueError(f"Invalid JSON constant {token}.")))
+        del raw
         if not isinstance(decoded, dict) or set(decoded) != {"format", "version", "payload"}:
             raise ValueError("The file is not a supported DataWorks project.")
-        if decoded["format"] != FORMAT or type(decoded["version"]) is not int or decoded["version"] != FORMAT_VERSION:
+        if (decoded["format"] != FORMAT or type(decoded["version"]) is not int
+                or decoded["version"] not in (FORMAT_VERSION, FULFILLMENT_FORMAT_VERSION)):
             raise ValueError("The DataWorks project format/version is not supported.")
+        envelope_version = decoded["version"]
         payload = decode_value(decoded["payload"])
+        del decoded
         if not isinstance(payload, dict):
             raise ValueError("The project payload must be a dictionary.")
+        if ("fulfillment" in payload) != (envelope_version == FULFILLMENT_FORMAT_VERSION):
+            raise ValueError("The project envelope version does not match its fulfillment data.")
+        fulfillment = payload.get("fulfillment")
+        if type(fulfillment) is dict and (
+                "format" in fulfillment or "sources" in fulfillment
+                or "attempts" in fulfillment or fulfillment.get("version") == 2):
+            from backend.fulfillment_wire import unpack_fulfillment
+
+            payload["fulfillment"] = unpack_fulfillment(fulfillment)
         return payload
     except (zipfile.BadZipFile, UnicodeError, json.JSONDecodeError, RuntimeError, RecursionError, NotImplementedError, EOFError) as exc:
         raise ValueError("The project file is malformed or unsupported.") from exc

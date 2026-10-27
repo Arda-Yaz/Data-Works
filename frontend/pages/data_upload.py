@@ -96,7 +96,7 @@ def data_upload():
     if df.shape[1] == 0:
         st.info("No columns remain. Undo the last operation or clear the dataset to upload another file.")
         if st.button("Clear Dataset"):
-            StateManager.clear()
+            StateManager.clear_dataset()
             st.rerun()
         return
 
@@ -212,7 +212,7 @@ def data_upload():
 
     with col2:
         if st.button("Clear Dataset"):
-            StateManager.clear()
+            StateManager.clear_dataset()
             st.rerun()
 
     # ── Expanders ────────────────────────────────────────────────────────

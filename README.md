@@ -14,6 +14,8 @@ Data-Works is a Streamlit application for uploading tabular datasets, reviewing 
 - Train and compare basic classification and regression models.
 - Retain completed experiments across reruns and download reports or fitted models.
 - Export cleaned CSV, save/reopen projects, and verify recorded transformations.
+- Prepare monthly order-fulfillment files with saved plans, traceable quarantine,
+  reconciled reports, and complete-run commitment.
 
 ## Architecture
 
@@ -29,6 +31,9 @@ Data-Works is a Streamlit application for uploading tabular datasets, reviewing 
 - `backend/operations.py`: parameterized transformation history and replay.
 - `backend/text_transform.py`: explicit text normalization and exact category mapping.
 - `backend/project_io.py`: versioned, data-only project archives.
+- `backend/fulfillment.py`: source evidence, saved plans, and complete fulfillment execution.
+- `backend/fulfillment_state.py`: committed results, recovery, and coherent fulfillment undo.
+- `backend/fulfillment_wire.py`: compact persisted evidence with strict reference validation.
 - `frontend/pages/`: Streamlit page implementations.
 - `frontend/components/`: reusable UI widgets.
 
@@ -59,6 +64,64 @@ streamlit run app.py
 - Transformation history can be verified against the original upload and exported as a recipe. Older or custom operations without complete parameters are marked non-replayable.
 - Project loading accepts only bounded JSON archives, without extracting files or executing serialized Python objects. Limits: 50 MiB compressed, 100 MiB JSON, and five million data values across frames, history, and reports. Omit undo snapshots when needed.
 - Dataset changes clear dependent charts. Save a project before changing data if you need to retain its charts.
+
+## Monthly order fulfillment
+
+Open **Order Fulfillment** for the six-column order-line workflow: `order_id`,
+`line_id`, `order_date`, `sku`, `quantity`, and `fulfillment_status`. Load the CSV,
+review or import the saved plan, and click **Run fulfillment plan**. Input column
+order may vary; missing/extra columns block execution. Dates must be explicit
+`YYYY-MM-DD` or `YYYY/MM/DD`; identifiers preserve leading zeros. Quantities are
+positive signed-64 integers and are never imputed. SKU/status normalization and
+the complete rules are declared in [the acceptance specification](docs/acceptance/phase-1.md).
+
+Exact canonical duplicates retain the first `(order_id, line_id)` record and
+quarantine later copies with a source reference. Conflicting payloads and unseen
+statuses require an explicit decision. Invalid rows retain raw values, source-row
+identities, all applicable reasons, and validation stages. Completed reports
+reconcile source lines to accepted/quarantined lines and distinguish distinct
+orders from line and quantity totals. An unsuccessful attempt preserves the last
+successful result; older results retain their source/plan associations.
+
+Download accepted CSV, quarantine CSV, and the report from that page. Use
+**Project & Exports** to save/reopen either a fulfillment-only or mixed project.
+Archives retain source bytes/read options, saved plans, results, and optional
+bounded undo history. Existing projects without fulfillment state still open.
+Fulfillment archives use format version 2 and require a fulfillment-aware build;
+older version 1 builds reject them rather than ignoring their new evidence.
+Reopening verifies the new evidence against its source and plan before replacing
+the current session. Retain the downloaded archive; preparation alone does not
+provide durable storage.
+
+The synthetic reproduction command writes actual saved plans/projects and checks
+fresh-process reopening and unchanged-plan reuse. Choose a new output directory:
+
+```powershell
+python scripts/verify_fulfillment.py --output-dir .test-tmp/fulfillment-proof
+```
+
+The [synthetic fixtures](tests/fixtures/fulfillment_v1/README.md) define engineering
+correctness. Real-operator confirmation, customer exports, dashboard integration,
+observed time savings, and workload performance remain separate release gates.
+
+The repeatable workload protocol uses 100,000 mixed-quality rows, one warm-up,
+and ten measured samples, including real archive reopening in fresh processes.
+Use a new output directory and the history-inclusive reference profile:
+
+```powershell
+python scripts/benchmark_fulfillment.py --include-history --output-dir .test-tmp/fulfillment-benchmark
+```
+
+The runner records code/input hashes, installed package versions, wall times,
+whole-process peak memory, and correctness checks. Smaller pilots are explicitly
+separate from a full protocol pass. See [the frozen protocol](docs/acceptance/phase-4-protocol.md).
+Its results qualify only the recorded hardware, packages, and workload.
+
+Fulfillment archives store each original source and actual attempt once, then
+restore independently owned values. [The persistence notes](docs/acceptance/phase-4-persistence.md)
+describe compatibility, identity checks, and unchanged resource limits. Existing
+generic statistical recipe replay refits statistics on each input; frozen fitted
+statistics are unsupported. The fulfillment plan excludes statistical operations.
 
 ## Uploading and transforming arbitrary datasets
 

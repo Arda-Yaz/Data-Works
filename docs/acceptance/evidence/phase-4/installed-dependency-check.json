@@ -1,0 +1,12 @@
+{
+  "checked_at_utc": "2026-10-27T19:14:21.974577+00:00",
+  "command": [
+    "C:\\Users\\Gaming\\AppData\\Local\\Python\\bin\\pip.exe",
+    "--python",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+    "check"
+  ],
+  "exit_code": 0,
+  "log": "installed-dependency-check.txt",
+  "claim": "Installed packages only; changed requirements have not been installed or validated."
+}

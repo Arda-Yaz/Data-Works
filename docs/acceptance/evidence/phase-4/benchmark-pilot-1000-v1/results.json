@@ -1,0 +1,210 @@
+{
+  "protocol_version": 1,
+  "started_at_utc": "2026-10-27T18:39:23.672229+00:00",
+  "scope": "synthetic single-user backend workload; no UI, customer, or business-value claim",
+  "status": "pilot_complete",
+  "configuration": {
+    "rows": 1000,
+    "runs": 1,
+    "warmups": 0,
+    "include_history": false
+  },
+  "workload": {
+    "input_bytes": 42360,
+    "input_sha256": "5a9b358cbde1e6bf9ce5c75ef4ab6494310d485f888c68a48cfcf5e314b5090a",
+    "columns": [
+      "order_id",
+      "line_id",
+      "order_date",
+      "sku",
+      "quantity",
+      "fulfillment_status"
+    ],
+    "encoding": "utf-8-sig",
+    "delimiter": ",",
+    "expected_report": {
+      "source_rows": 1000,
+      "accepted_rows": 500,
+      "rejected_rows": 500,
+      "rejection_reason_assignments": 700,
+      "accepted_distinct_orders": 400,
+      "accepted_quantity": 1200,
+      "accepted_line_counts_by_status": {
+        "fulfilled": 200,
+        "pending": 200,
+        "cancelled": 100
+      },
+      "accepted_quantity_by_status": {
+        "fulfilled": 600,
+        "pending": 300,
+        "cancelled": 300
+      }
+    }
+  },
+  "measurement": {
+    "execution": "run_project complete candidate/commit transition; ingestion and setup recorded separately",
+    "export": "export_project plus typed archive serialization/compression; archive write recorded separately",
+    "reopen": "fresh process backend imports plus archive read, loads_project and validate_project",
+    "rss": "OS whole-process high-water mark including imports and oracle checks, maximum across execution and reopen processes",
+    "percentile": "nearest-rank p95 of measured samples; warm-up excluded from timing percentile",
+    "timeout_seconds_per_process": 180
+  },
+  "reference_host": {
+    "platform": "Windows-11-10.0.26300-SP0",
+    "architecture": "AMD64",
+    "processor": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+    "logical_cpus": 12,
+    "physical_ram_bytes": 16282554368,
+    "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "python_executable": "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe"
+  },
+  "packages": {
+    "streamlit": "1.55.0",
+    "pandas": "2.3.3",
+    "numpy": "2.4.2",
+    "plotly": "6.6.0",
+    "scikit-learn": "1.8.0",
+    "scipy": "1.18.1",
+    "joblib": "1.6.0",
+    "threadpoolctl": "3.7.0",
+    "Authlib": "1.9.1",
+    "openpyxl": "3.1.5",
+    "xlrd": "2.0.2",
+    "watchdog": "6.0.0"
+  },
+  "samples": [
+    {
+      "index": 0,
+      "kind": "measured",
+      "status": "passed",
+      "archive": "sample-00.dataworks",
+      "run": {
+        "status": "passed",
+        "kind": "run",
+        "stage": "complete",
+        "import_seconds": 0.5861423000000059,
+        "input_read_seconds": 0.007236299999988205,
+        "input_bytes": 42360,
+        "input_sha256": "5a9b358cbde1e6bf9ce5c75ef4ab6494310d485f888c68a48cfcf5e314b5090a",
+        "ingestion_seconds": 0.002882699999986471,
+        "setup_seconds": 0.0026171000000090316,
+        "execution_seconds": 0.06379600000002483,
+        "oracle_seconds": 0.0002540000000408327,
+        "source_id": "b906cc635f26e11fd9d22646cc5a57d48a491a9ede33f72a09cb706fd9469e54",
+        "plan_digest": "5c7c1e54afc5411a256f882461fd48481dafb39b0a4cc9da738a10f0e88c1afc",
+        "run_id": "1802459d77eb4383b4ddb564bb565ccd",
+        "actual_report": {
+          "source_rows": 1000,
+          "accepted_rows": 500,
+          "rejected_rows": 500,
+          "rejection_reason_assignments": 700,
+          "accepted_distinct_orders": 400,
+          "accepted_quantity": 1200,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 200,
+            "pending": 200,
+            "cancelled": 100
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 600,
+            "pending": 300,
+            "cancelled": 300
+          }
+        },
+        "runtime_history_snapshots": 2,
+        "export_seconds": 0.09220260000000735,
+        "exported_history_snapshots": 0,
+        "archive_write_seconds": 0.000697100000024875,
+        "archive_bytes": 45152,
+        "archive_sha256": "33de54664eae7450405d94e4be1efce73e6e86a719e6b4138d711f95f6a69561",
+        "process_operation_seconds": 0.7562426000000073,
+        "peak_rss_bytes": 92422144,
+        "packages": {
+          "streamlit": "1.55.0",
+          "pandas": "2.3.3",
+          "numpy": "2.4.2",
+          "plotly": "6.6.0",
+          "scikit-learn": "1.8.0",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "returncode": 0
+      },
+      "reopen": {
+        "status": "passed",
+        "kind": "reopen",
+        "stage": "complete",
+        "import_seconds": 0.5203442999999766,
+        "reopen_seconds": 0.6025081999999884,
+        "source_id": "b906cc635f26e11fd9d22646cc5a57d48a491a9ede33f72a09cb706fd9469e54",
+        "plan_digest": "5c7c1e54afc5411a256f882461fd48481dafb39b0a4cc9da738a10f0e88c1afc",
+        "run_id": "1802459d77eb4383b4ddb564bb565ccd",
+        "actual_report": {
+          "source_rows": 1000,
+          "accepted_rows": 500,
+          "rejected_rows": 500,
+          "rejection_reason_assignments": 700,
+          "accepted_distinct_orders": 400,
+          "accepted_quantity": 1200,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 200,
+            "pending": 200,
+            "cancelled": 100
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 600,
+            "pending": 300,
+            "cancelled": 300
+          }
+        },
+        "reopened_history_snapshots": 0,
+        "process_operation_seconds": 0.6030139999999733,
+        "peak_rss_bytes": 90529792,
+        "packages": {
+          "streamlit": "1.55.0",
+          "pandas": "2.3.3",
+          "numpy": "2.4.2",
+          "plotly": "6.6.0",
+          "scikit-learn": "1.8.0",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "returncode": 0
+      }
+    }
+  ],
+  "assessment": {
+    "status": "pilot_complete",
+    "full_protocol": false,
+    "f14_gate_passed": false,
+    "archive_profile": "without_history",
+    "measured_samples": 1,
+    "warmup_samples": 0,
+    "metrics": {
+      "execution_p95_seconds": 0.06379600000002483,
+      "export_p95_seconds": 0.09220260000000735,
+      "reopen_p95_seconds": 0.6025081999999884,
+      "peak_rss_bytes": 92422144
+    },
+    "gates": {
+      "sample_protocol_complete": true,
+      "all_samples_correct": true,
+      "input_within_20_mib": true,
+      "execution_p95_at_most_30_seconds": true,
+      "export_p95_at_most_30_seconds": true,
+      "reopen_p95_at_most_30_seconds": true,
+      "whole_process_peak_at_most_1_gib": true
+    }
+  },
+  "finished_at_utc": "2026-10-27T18:39:26.089916+00:00"
+}

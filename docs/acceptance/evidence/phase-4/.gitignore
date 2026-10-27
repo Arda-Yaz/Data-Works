@@ -1,0 +1,5 @@
+# Reproducible generated inputs and project binaries remain available locally.
+# Commit the generator, hashes, command logs, and measured JSON results.
+*.csv
+*.dataworks
+*.tmp

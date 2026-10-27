@@ -1,0 +1,20 @@
+{
+  "command": [
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+    "scripts/verify_fulfillment_workload_ui.py",
+    "--rows",
+    "100000",
+    "--output-dir",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-4\\ui-workload-100000"
+  ],
+  "client_date": "2026-10-27",
+  "started_at_utc": "2026-10-27T18:49:51.080407+00:00",
+  "elapsed_seconds": 43.371,
+  "exit_code": 0,
+  "environment_overrides": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "DATAWORKS_REQUIRE_AUTH": "false"
+  }
+}

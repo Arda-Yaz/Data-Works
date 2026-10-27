@@ -1,0 +1,37 @@
+{
+  "rows": 100000,
+  "scope": "initial all-valid diagnostic, not the mixed F14 acceptance workload",
+  "stages": [
+    {
+      "name": "ingest",
+      "seconds": 0.23324889999997822,
+      "peak_rss_bytes": 159772672
+    },
+    {
+      "name": "draft",
+      "seconds": 0.27652480000000423,
+      "peak_rss_bytes": 212922368
+    },
+    {
+      "name": "execute",
+      "seconds": 4.522041399999978,
+      "peak_rss_bytes": 443158528
+    },
+    {
+      "name": "export_without_history",
+      "seconds": 4.900985600000013,
+      "peak_rss_bytes": 586702848
+    },
+    {
+      "name": "encode",
+      "seconds": 2.4475991999999565,
+      "peak_rss_bytes": 743919616
+    },
+    {
+      "name": "decode_validate",
+      "seconds": 6.149189299999989,
+      "peak_rss_bytes": 1011609600
+    }
+  ],
+  "input_bytes": 4200060
+}

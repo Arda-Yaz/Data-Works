@@ -1,0 +1,586 @@
+{
+  "checked_at_utc": "2026-10-27T19:16:01.705246+00:00",
+  "status": "passed",
+  "starting_head": "7408223e8542f2bcc39086e9e94b38ee32fcc131",
+  "head_unchanged": true,
+  "git_index_unchanged": true,
+  "changed_starting_paths": [
+    "README.md",
+    "backend/fulfillment_state.py",
+    "backend/project_io.py",
+    "frontend/pages/data_fulfillment.py"
+  ],
+  "unexpected_starting_path_changes": [],
+  "source_changes_after_regression": [],
+  "measurement_source_changes": [],
+  "phase1_fixture_changes": [],
+  "owner_dependency_pins_preserved": true,
+  "packages": [
+    {
+      "name": "streamlit",
+      "required": "1.66.1",
+      "installed": "1.55.0",
+      "matches": false,
+      "installed_now": "1.55.0",
+      "unchanged_from_start": true
+    },
+    {
+      "name": "pandas",
+      "required": "3.1.0",
+      "installed": "2.3.3",
+      "matches": false,
+      "installed_now": "2.3.3",
+      "unchanged_from_start": true
+    },
+    {
+      "name": "numpy",
+      "required": "2.5.4",
+      "installed": "2.4.2",
+      "matches": false,
+      "installed_now": "2.4.2",
+      "unchanged_from_start": true
+    },
+    {
+      "name": "plotly",
+      "required": "7.1.0",
+      "installed": "6.6.0",
+      "matches": false,
+      "installed_now": "6.6.0",
+      "unchanged_from_start": true
+    },
+    {
+      "name": "scikit-learn",
+      "required": "1.9.1",
+      "installed": "1.8.0",
+      "matches": false,
+      "installed_now": "1.8.0",
+      "unchanged_from_start": true
+    },
+    {
+      "name": "scipy",
+      "required": "1.18.1",
+      "installed": "1.18.1",
+      "matches": true,
+      "installed_now": "1.18.1",
+      "unchanged_from_start": true
+    },
+    {
+      "name": "joblib",
+      "required": "1.6.0",
+      "installed": "1.6.0",
+      "matches": true,
+      "installed_now": "1.6.0",
+      "unchanged_from_start": true
+    },
+    {
+      "name": "threadpoolctl",
+      "required": "3.7.0",
+      "installed": "3.7.0",
+      "matches": true,
+      "installed_now": "3.7.0",
+      "unchanged_from_start": true
+    },
+    {
+      "name": "Authlib",
+      "required": "1.9.1",
+      "installed": "1.9.1",
+      "matches": true,
+      "installed_now": "1.9.1",
+      "unchanged_from_start": true
+    },
+    {
+      "name": "openpyxl",
+      "required": "3.1.5",
+      "installed": "3.1.5",
+      "matches": true,
+      "installed_now": "3.1.5",
+      "unchanged_from_start": true
+    },
+    {
+      "name": "xlrd",
+      "required": "2.0.2",
+      "installed": "2.0.2",
+      "matches": true,
+      "installed_now": "2.0.2",
+      "unchanged_from_start": true
+    },
+    {
+      "name": "watchdog",
+      "required": "6.0.0",
+      "installed": "6.0.0",
+      "matches": true,
+      "installed_now": "6.0.0",
+      "unchanged_from_start": true
+    }
+  ],
+  "changed_pins_installed_and_verified": false,
+  "relative_links_checked": 134,
+  "broken_links": [],
+  "evidence_json_errors": [],
+  "diff_check_exit_code": 0,
+  "unexpected_new_paths": [],
+  "new_nonignored_paths": [
+    "backend/fulfillment_wire.py",
+    "docs/acceptance/evidence/phase-4/.gitignore",
+    "docs/acceptance/evidence/phase-4/README.md",
+    "docs/acceptance/evidence/phase-4/benchmark-full-with-history-invocation.json",
+    "docs/acceptance/evidence/phase-4/benchmark-full-with-history-stdout.txt",
+    "docs/acceptance/evidence/phase-4/benchmark-full-with-history/results.json",
+    "docs/acceptance/evidence/phase-4/benchmark-pilot-1000-v1/results.json",
+    "docs/acceptance/evidence/phase-4/benchmark-pilot-1000-v2/results.json",
+    "docs/acceptance/evidence/phase-4/benchmark-pilot-100k-nohistory-v1/results.json",
+    "docs/acceptance/evidence/phase-4/benchmark-pilot-100k-withhistory-v1/results.json",
+    "docs/acceptance/evidence/phase-4/declared-dependency-resolution.json",
+    "docs/acceptance/evidence/phase-4/declared-dependency-resolution.txt",
+    "docs/acceptance/evidence/phase-4/diff-check.txt",
+    "docs/acceptance/evidence/phase-4/final-integrity.json",
+    "docs/acceptance/evidence/phase-4/frozen-fixture-audit.txt",
+    "docs/acceptance/evidence/phase-4/initial-pilot.json",
+    "docs/acceptance/evidence/phase-4/initial-pilot.py",
+    "docs/acceptance/evidence/phase-4/installed-dependency-check.json",
+    "docs/acceptance/evidence/phase-4/installed-dependency-check.txt",
+    "docs/acceptance/evidence/phase-4/large-month-reuse.json",
+    "docs/acceptance/evidence/phase-4/large-month-reuse.py",
+    "docs/acceptance/evidence/phase-4/recovery-tests.json",
+    "docs/acceptance/evidence/phase-4/recovery-tests.txt",
+    "docs/acceptance/evidence/phase-4/regression-suite.txt",
+    "docs/acceptance/evidence/phase-4/starting-state.json",
+    "docs/acceptance/evidence/phase-4/syntax-check.txt",
+    "docs/acceptance/evidence/phase-4/synthetic-workflow.txt",
+    "docs/acceptance/evidence/phase-4/ui-workload-100000/command.json",
+    "docs/acceptance/evidence/phase-4/ui-workload-100000/results.json",
+    "docs/acceptance/evidence/phase-4/ui-workload-100000/stderr.txt",
+    "docs/acceptance/evidence/phase-4/ui-workload-100000/stdout.txt",
+    "docs/acceptance/evidence/phase-4/verification.json",
+    "docs/acceptance/evidence/phase-4/wire-focused-checks.json",
+    "docs/acceptance/evidence/phase-4/wire-test_fulfillment_archive_versions.txt",
+    "docs/acceptance/evidence/phase-4/wire-test_fulfillment_wire.txt",
+    "docs/acceptance/evidence/phase-4/wire-test_project_io.txt",
+    "docs/acceptance/evidence/phase-4/workflow-current/results.json",
+    "docs/acceptance/evidence/phase-4/workflow-current/saved-plan.json",
+    "docs/acceptance/phase-4-commit-message.txt",
+    "docs/acceptance/phase-4-persistence.md",
+    "docs/acceptance/phase-4-protocol.md",
+    "docs/acceptance/phase-4-results.md",
+    "scripts/benchmark_fulfillment.py",
+    "scripts/verify_fulfillment_workload_ui.py",
+    "tests/test_fulfillment_benchmark.py",
+    "tests/test_fulfillment_recovery.py",
+    "tests/test_fulfillment_wire.py",
+    "tests/test_statistical_recipe_characterization.py"
+  ],
+  "artifacts_excluding_this_inventory": [
+    {
+      "path": "README.md",
+      "bytes": 11235,
+      "sha256": "54242b7dcfcd9575b6ee09f0c67bd97bbc068a8c4bda093d3e42dae4f54318c7"
+    },
+    {
+      "path": "backend/fulfillment_state.py",
+      "bytes": 17993,
+      "sha256": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8"
+    },
+    {
+      "path": "backend/fulfillment_wire.py",
+      "bytes": 15387,
+      "sha256": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3"
+    },
+    {
+      "path": "backend/project_io.py",
+      "bytes": 28810,
+      "sha256": "42abec67beedde6704c5f0f676c9bec9ac9b9b2218959f7852c992098655dd2f"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/.gitignore",
+      "bytes": 176,
+      "sha256": "d8aacd7716db066be2c4032b23ecfa913d34ef75f2832e71ec9a2caceb30d620"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/README.md",
+      "bytes": 7059,
+      "sha256": "d9a9a99e8247a2cf5a6a41429d7f906eda621a5f88852d3a851d6c85f9ddaa32"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-full-with-history-invocation.json",
+      "bytes": 1820,
+      "sha256": "938db838bd7aebb5b2ebf743e1cdd02574e1154887930b0c754e37df1b9f2bd4"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-full-with-history-stdout.txt",
+      "bytes": 2819,
+      "sha256": "bdf72e2b39eaad757078e0e6ca9ef98386418dfeb35c53792ac03c1b26b5f524"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-full-with-history/results.json",
+      "bytes": 65897,
+      "sha256": "3b6e859d5c91298f1ec9ade187b4fd3d17bcf514b379039283a0fde90ce4f0d4"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-pilot-1000-v1/results.json",
+      "bytes": 7265,
+      "sha256": "6cd4f960d99699b187e15229ba92f615449b2b27d2753047f7cecc3f1305fb77"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-pilot-1000-v2/results.json",
+      "bytes": 8977,
+      "sha256": "4069476ccf2c21272614a3914cd8bcc62eaf4b97de7b311f2df4524385c8e670"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-pilot-100k-nohistory-v1/results.json",
+      "bytes": 10591,
+      "sha256": "0dd634674f41978796c02936b3d57938e0f427a630761d0f51762ff5292d30f6"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-pilot-100k-withhistory-v1/results.json",
+      "bytes": 10588,
+      "sha256": "1733235190a6ab61d24866e2486cc8af96bb9be0d893ad5acdcce4a2cfa211c0"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/declared-dependency-resolution.json",
+      "bytes": 623,
+      "sha256": "f4e2c28c0506ba1f526f216605f7bf92b4185ef96976acc9ebd62834629f8473"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/declared-dependency-resolution.txt",
+      "bytes": 826,
+      "sha256": "533b56f4f502c3f284002fa85c6e6db82e76b67e7511bf8b99edfecbe685ca0d"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/diff-check.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/frozen-fixture-audit.txt",
+      "bytes": 1937,
+      "sha256": "294d39c7b759a9f23cbe838200b67edc151abb11c34c535facd361ec8e54d1b9"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/initial-pilot.json",
+      "bytes": 857,
+      "sha256": "f1a12d18b6efde0ccfde4a8939040b5e795bdfacec89fa5f52cf7d27fd9a3282"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/initial-pilot.py",
+      "bytes": 3503,
+      "sha256": "46d093e7cfd9d4d1b66b8fe0d1e109328b104e0f157cf5a6d131197a7eeeb133"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/installed-dependency-check.json",
+      "bytes": 417,
+      "sha256": "2af58f2adf142e20cac36c264f038f0078bde70795a69593bf12f77bc14da2c0"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/installed-dependency-check.txt",
+      "bytes": 31,
+      "sha256": "672aec65a45bed50e70229c70934a7eebf0462595c459b83023027645d57cccf"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/large-month-reuse.json",
+      "bytes": 5389,
+      "sha256": "a632aa177363ba03e5d33604ed2c70f002b6cfce948ebbf5f5855860deb7d7c8"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/large-month-reuse.py",
+      "bytes": 8790,
+      "sha256": "3d6d8f361ac695eab6a2e940a6389c6d694d33aa07afbdd73be67da209258df9"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/recovery-tests.json",
+      "bytes": 1468,
+      "sha256": "860c70b8872ebdd7c9001351cbca847095f4770e05185b10464d7a5ab1a89a0f"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/recovery-tests.txt",
+      "bytes": 7716,
+      "sha256": "9ab430e2a73034ee8199eeebfc5dbb775aafb2789fb9ebad1187162e39ad025a"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/regression-suite.txt",
+      "bytes": 17854,
+      "sha256": "64921302094fc24f505123f3cb60816814807d65621be953362f31ce02410ac7"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/starting-state.json",
+      "bytes": 35802,
+      "sha256": "cb5569ddb3e0b4b5398bcf589716d51a2e6a65a27fc35139205842f95f132825"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/syntax-check.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/synthetic-workflow.txt",
+      "bytes": 5097,
+      "sha256": "628b93c263b2f0a20095120d7b2911b829136a73f0c2b83547d45e7677a5e942"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/ui-workload-100000/command.json",
+      "bytes": 615,
+      "sha256": "7b1856ca6a9a1dba0807c221c5a91113f75e2ea8cbd044bd12c345fb21dfdec8"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/ui-workload-100000/results.json",
+      "bytes": 7509,
+      "sha256": "68ed2a752fbd14d2a7e3fb90ea830617c7590474a5c0e7dde7bbc7630f639245"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/ui-workload-100000/stderr.txt",
+      "bytes": 192,
+      "sha256": "e7a41eceb9da4128fd080b5090d784f1f085fb570f0255cb8b38f913eeb5e559"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/ui-workload-100000/stdout.txt",
+      "bytes": 7509,
+      "sha256": "68ed2a752fbd14d2a7e3fb90ea830617c7590474a5c0e7dde7bbc7630f639245"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/verification.json",
+      "bytes": 10394,
+      "sha256": "1e85cfa3e85a416f96f245bd25ad88943a9407bc8ad033f9db3380550543b777"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/wire-focused-checks.json",
+      "bytes": 1675,
+      "sha256": "851fb48f8bf7a691b3a094c1376b908f87f6f0e199386f699de33a9106b20e72"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/wire-test_fulfillment_archive_versions.txt",
+      "bytes": 1691,
+      "sha256": "ecceed3db1365b3a60e7eb09d58782d130c568ddf374eb4e1e184b781a3bfeaf"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/wire-test_fulfillment_wire.txt",
+      "bytes": 2913,
+      "sha256": "d5c843becf609c41f83b97885d1b32399c6870905614ebedd440f4eba00ec606"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/wire-test_project_io.txt",
+      "bytes": 2446,
+      "sha256": "7f91299c2393d20c275e9536242a8b37008e7bbae41d3d926c33b0ebc2d0fcc4"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/workflow-current/results.json",
+      "bytes": 5097,
+      "sha256": "628b93c263b2f0a20095120d7b2911b829136a73f0c2b83547d45e7677a5e942"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/workflow-current/saved-plan.json",
+      "bytes": 908,
+      "sha256": "64a39bd8df6bc70bd78d618c4acdbaf1a0dab6793299ce2e07aa6f9bb90cf3e4"
+    },
+    {
+      "path": "docs/acceptance/phase-4-commit-message.txt",
+      "bytes": 714,
+      "sha256": "b53d1b1f9545b1d062e5f57bf8a899a5879260877cf5d36696c192c2f5cc4f53"
+    },
+    {
+      "path": "docs/acceptance/phase-4-persistence.md",
+      "bytes": 4629,
+      "sha256": "465a12ce5aad1df49c2a378db81ea40301c8dff38aa4693c76aba3000997b467"
+    },
+    {
+      "path": "docs/acceptance/phase-4-protocol.md",
+      "bytes": 5689,
+      "sha256": "d8c4af7938a77711cafb71fb52d946558ac717aa60503c8446a362d03309c203"
+    },
+    {
+      "path": "docs/acceptance/phase-4-results.md",
+      "bytes": 8615,
+      "sha256": "c75bb8df50cf978eadc75c20b499fb4aa925eff47b3231e37ef4ef9656cb7073"
+    },
+    {
+      "path": "frontend/pages/data_fulfillment.py",
+      "bytes": 13533,
+      "sha256": "412911f87bf8be31960ad123adf0ce0629d64653f051839a503bb0d9d5205786"
+    },
+    {
+      "path": "scripts/benchmark_fulfillment.py",
+      "bytes": 23090,
+      "sha256": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290"
+    },
+    {
+      "path": "scripts/verify_fulfillment_workload_ui.py",
+      "bytes": 13261,
+      "sha256": "1826eab5a85c5aaf57dac1e6452d85a1f6addaa5b8cf7b992256d95fe139a2f1"
+    },
+    {
+      "path": "tests/test_fulfillment_benchmark.py",
+      "bytes": 4250,
+      "sha256": "8b855312c16f1d22f1b9a81062628e2e5497eb31cad8e3131e4b09a7ec36c76b"
+    },
+    {
+      "path": "tests/test_fulfillment_recovery.py",
+      "bytes": 24887,
+      "sha256": "a6efed62a796c4fe9a0c20a2af84ff0d0adc824282f7c9d16461e0903d8928ee"
+    },
+    {
+      "path": "tests/test_fulfillment_wire.py",
+      "bytes": 11349,
+      "sha256": "9f7b42ec9016e595d12254e51c6b70305b124ff27756b60f8c3cde249fbb2287"
+    },
+    {
+      "path": "tests/test_statistical_recipe_characterization.py",
+      "bytes": 2482,
+      "sha256": "7dae2be807055f57d93b4354eea9ebd5642a0fefeb5c5b1b08d893ba04433bb4"
+    }
+  ],
+  "local_generated_artifacts_ignored_by_git": [
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-full-with-history/sample-00.dataworks",
+      "bytes": 1284719,
+      "sha256": "65f8ca4954b762349f20cb4b26d559cb3a3f938f1c7c0522bb460de8cb8291e0"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-full-with-history/sample-01.dataworks",
+      "bytes": 1284720,
+      "sha256": "04a9e0fe4b986834f047188e5865f113fa2d0a43a2f3d24710d0a70b8f4b2a38"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-full-with-history/sample-02.dataworks",
+      "bytes": 1284719,
+      "sha256": "14982e8378c243777ebc7eda18a195cd2e9f19a512a004c5ed34075dee8e0e54"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-full-with-history/sample-03.dataworks",
+      "bytes": 1284724,
+      "sha256": "9e38574cd0060f7cbac31c711d1bf2d211a703f7efbedb112ec026df55407f14"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-full-with-history/sample-04.dataworks",
+      "bytes": 1284726,
+      "sha256": "77abe20aebc07f316568a23de5a3797c04801a52adadcbf9642284395fef4af3"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-full-with-history/sample-05.dataworks",
+      "bytes": 1284730,
+      "sha256": "21470f0f0f0501ca5733f26dc0a07f6df0246b1f56047e630439ffbe2309ce79"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-full-with-history/sample-06.dataworks",
+      "bytes": 1284728,
+      "sha256": "bcf506bb2224a517a852efc3361ae6b9d500228f908ca8383311adc901d2b6ab"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-full-with-history/sample-07.dataworks",
+      "bytes": 1284718,
+      "sha256": "128905d0a1d490b97b90d7a1ee9bcf0f4913925f5fd2109bb7fdf0911ad5db0b"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-full-with-history/sample-08.dataworks",
+      "bytes": 1284724,
+      "sha256": "ec1b4b1530cd296250030410975ac5774491424064e5d114fd00cf2b7a840bb5"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-full-with-history/sample-09.dataworks",
+      "bytes": 1284713,
+      "sha256": "af43ceaa893a3508143ab67ab43088b8ec2263076439db4d1f7ce32169495a53"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-full-with-history/sample-10.dataworks",
+      "bytes": 1284726,
+      "sha256": "ce2597a7fe9f331bba87d9151535f4dd5c791d39496af0d3dcc3737e7d26dfef"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-full-with-history/workload.csv",
+      "bytes": 4230060,
+      "sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-pilot-1000-v1/sample-00.dataworks",
+      "bytes": 45152,
+      "sha256": "33de54664eae7450405d94e4be1efce73e6e86a719e6b4138d711f95f6a69561"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-pilot-1000-v1/workload.csv",
+      "bytes": 42360,
+      "sha256": "5a9b358cbde1e6bf9ce5c75ef4ab6494310d485f888c68a48cfcf5e314b5090a"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-pilot-1000-v2/sample-00.dataworks",
+      "bytes": 45160,
+      "sha256": "9f9a5c57901f8f1bd0949f2d9dde0c19b61ffbcb0093ae5d9d3f136f88288db2"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-pilot-1000-v2/workload.csv",
+      "bytes": 42360,
+      "sha256": "5a9b358cbde1e6bf9ce5c75ef4ab6494310d485f888c68a48cfcf5e314b5090a"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-pilot-100k-nohistory-v1/sample-00.dataworks",
+      "bytes": 1284699,
+      "sha256": "1e5c0080f4292ece0c393b4295cab54d5ff11422765ac4be963a100014a8e0da"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-pilot-100k-nohistory-v1/workload.csv",
+      "bytes": 4230060,
+      "sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-pilot-100k-withhistory-v1/sample-00.dataworks",
+      "bytes": 1284728,
+      "sha256": "f8c89d2deab61d2e5894656a8f0ac67f01138aa3fe2d62699090af3c237546d2"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/benchmark-pilot-100k-withhistory-v1/workload.csv",
+      "bytes": 4230060,
+      "sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/ui-workload-100000/fulfillment-without-history.dataworks",
+      "bytes": 1284668,
+      "sha256": "4167d93b626c5ed788aa6e9afe0fecf32b7bbc13c73a26406d94e5dece734eef"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/ui-workload-100000/workload.csv",
+      "bytes": 4230060,
+      "sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/workflow-current/month-a.dataworks",
+      "bytes": 1901,
+      "sha256": "cb6fe0a839412056931b869c1d8da420e78eb4eb64aa9ce3687750c38525af55"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-4/workflow-current/month-b.dataworks",
+      "bytes": 1657,
+      "sha256": "a1cf9cecd4060cb15ec9582dc8b7a82199028358cb337d948ba335c3b82b62ee"
+    }
+  ],
+  "regression_tests": 516,
+  "f14_history_inclusive_reference": {
+    "status": "passed",
+    "full_protocol": true,
+    "f14_gate_passed": true,
+    "archive_profile": "with_history",
+    "measured_samples": 10,
+    "warmup_samples": 1,
+    "metrics": {
+      "execution_p95_seconds": 8.174650799999881,
+      "export_p95_seconds": 15.26918210000008,
+      "reopen_p95_seconds": 16.870697199999995,
+      "peak_rss_bytes": 787718144
+    },
+    "gates": {
+      "sample_protocol_complete": true,
+      "all_samples_correct": true,
+      "input_within_20_mib": true,
+      "execution_p95_at_most_30_seconds": true,
+      "export_p95_at_most_30_seconds": true,
+      "reopen_p95_at_most_30_seconds": true,
+      "whole_process_peak_at_most_1_gib": true
+    }
+  },
+  "supplemental_large_reuse_peak_bytes": 995594240,
+  "supplemental_large_reuse_history_counts": {
+    "reopened_a": 2,
+    "after_set_source_b": 0,
+    "after_failed_b": 0,
+    "after_completed_b": 0
+  },
+  "scope": "Engineering pass on recorded installed environment and synthetic workloads; changed pins/customer/deployment gates remain open.",
+  "release_approval": "withheld",
+  "next_phase": "5: paused pending owner approval",
+  "suggested_commit_message": "docs/acceptance/phase-4-commit-message.txt"
+}

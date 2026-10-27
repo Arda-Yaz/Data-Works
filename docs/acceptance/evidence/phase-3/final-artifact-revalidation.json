@@ -1,0 +1,123 @@
+{
+  "checked_at_utc": "2026-10-26T19:17:29.449011+00:00",
+  "reason": "Revalidate retained artifacts and unchanged-plan reuse after final strict persisted-evidence checks were added.",
+  "status": "passed",
+  "checks": [
+    {
+      "command": [
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+        "scripts/verify_fulfillment.py",
+        "--project",
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-3\\workflow\\month-a.dataworks",
+        "--expected-input",
+        "month_a.csv"
+      ],
+      "exit_code": 0,
+      "result": {
+        "input": "month_a.csv",
+        "run_id": "d9429e119d5342f4b9e43ba5f0875287",
+        "source_id": "87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0",
+        "plan_digest": "81e17c4b43cbb6d59decb836bd09edceb9f61e7942c27be2f2c5e6a5dcac1b73",
+        "report": {
+          "source_rows": 12,
+          "accepted_rows": 4,
+          "rejected_rows": 8,
+          "rejection_reason_assignments": 8,
+          "accepted_distinct_orders": 3,
+          "accepted_quantity": 5,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 2,
+            "pending": 1,
+            "cancelled": 1
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 3,
+            "pending": 1,
+            "cancelled": 1
+          }
+        },
+        "status": "passed",
+        "plan_digest_before": "81e17c4b43cbb6d59decb836bd09edceb9f61e7942c27be2f2c5e6a5dcac1b73",
+        "streamlit_imported": false
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+        "scripts/verify_fulfillment.py",
+        "--project",
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-3\\workflow\\month-b.dataworks",
+        "--expected-input",
+        "month_b.csv"
+      ],
+      "exit_code": 0,
+      "result": {
+        "input": "month_b.csv",
+        "run_id": "e3446a58c71a48fc95138d4a5ec09410",
+        "source_id": "42383cf80a0d8b4c36495425c65b5afc4a3de3aab887d6868f4b5a13363c0b01",
+        "plan_digest": "81e17c4b43cbb6d59decb836bd09edceb9f61e7942c27be2f2c5e6a5dcac1b73",
+        "report": {
+          "source_rows": 8,
+          "accepted_rows": 5,
+          "rejected_rows": 3,
+          "rejection_reason_assignments": 3,
+          "accepted_distinct_orders": 4,
+          "accepted_quantity": 11,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 2,
+            "pending": 2,
+            "cancelled": 1
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 7,
+            "pending": 2,
+            "cancelled": 2
+          }
+        },
+        "status": "passed",
+        "plan_digest_before": "81e17c4b43cbb6d59decb836bd09edceb9f61e7942c27be2f2c5e6a5dcac1b73",
+        "streamlit_imported": false
+      }
+    },
+    {
+      "command": [
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+        "scripts/verify_fulfillment.py",
+        "--project",
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-3\\workflow\\month-a.dataworks",
+        "--input",
+        "tests/fixtures/fulfillment_v1/month_b.csv",
+        "--write-project",
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-3\\workflow\\month-b-final.dataworks"
+      ],
+      "exit_code": 0,
+      "result": {
+        "input": "month_b.csv",
+        "run_id": "ce9c858c9e61478b867de43a8362a974",
+        "source_id": "42383cf80a0d8b4c36495425c65b5afc4a3de3aab887d6868f4b5a13363c0b01",
+        "plan_digest": "81e17c4b43cbb6d59decb836bd09edceb9f61e7942c27be2f2c5e6a5dcac1b73",
+        "report": {
+          "source_rows": 8,
+          "accepted_rows": 5,
+          "rejected_rows": 3,
+          "rejection_reason_assignments": 3,
+          "accepted_distinct_orders": 4,
+          "accepted_quantity": 11,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 2,
+            "pending": 2,
+            "cancelled": 1
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 7,
+            "pending": 2,
+            "cancelled": 2
+          }
+        },
+        "status": "passed",
+        "plan_digest_before": "81e17c4b43cbb6d59decb836bd09edceb9f61e7942c27be2f2c5e6a5dcac1b73",
+        "streamlit_imported": false
+      }
+    }
+  ]
+}

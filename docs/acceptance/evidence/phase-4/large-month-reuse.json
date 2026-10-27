@@ -1,0 +1,138 @@
+{
+  "status": "passed",
+  "client_date": "2026-10-27",
+  "started_at_utc": "2026-10-27T19:08:25.245904+00:00",
+  "scope": "one fresh-process large prior-result reuse/recovery diagnostic; no ten-sample F14 or UI claim",
+  "rows": 100000,
+  "input_archive": "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-4\\benchmark-full-with-history\\sample-00.dataworks",
+  "input_csv": "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-4\\benchmark-full-with-history\\workload.csv",
+  "phase_seconds": {
+    "imports": 0.6783751000002667,
+    "cold_reopen_a": 15.49114439999994,
+    "set_source_b_retaining_a": 9.209595799999988,
+    "injected_b_failure_retaining_a": 4.6936100000002625,
+    "retry_b_commit": 13.074991999999838
+  },
+  "phase_peak_rss_bytes": {
+    "cold_reopen_a": 660602880,
+    "set_source_b_retaining_a": 995594240,
+    "injected_b_failure_retaining_a": 995594240,
+    "retry_b_commit": 995594240
+  },
+  "history_counts": {
+    "reopened_a": 2,
+    "after_set_source_b": 0,
+    "after_failed_b": 0,
+    "after_completed_b": 0
+  },
+  "installed_packages": {
+    "streamlit": "1.55.0",
+    "pandas": "2.3.3",
+    "numpy": "2.4.2",
+    "plotly": "6.6.0",
+    "scikit-learn": "1.8.0",
+    "scipy": "1.18.1",
+    "joblib": "1.6.0",
+    "threadpoolctl": "3.7.0",
+    "Authlib": "1.9.1",
+    "openpyxl": "3.1.5",
+    "xlrd": "2.0.2",
+    "watchdog": "6.0.0"
+  },
+  "implementation_sha256": {
+    "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+    "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+    "backend/project_io.py": "42abec67beedde6704c5f0f676c9bec9ac9b9b2218959f7852c992098655dd2f",
+    "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+    "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+    "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+    "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+  },
+  "source_changes": [
+    "2026-09 -> 2026-10",
+    "2026/09 -> 2026/10"
+  ],
+  "invalid_date_preserved": "2026-02-30",
+  "history_policy": "10 checkpoints / 128 MiB; source change and success attempt checkpoints, evict oldest/oversized snapshots",
+  "additional_export_reopen": "omitted: diagnostic focuses on retaining prior large A during B failure/retry; fresh-process archives are measured separately",
+  "stage": "complete",
+  "prior_a": {
+    "run_id": "2975cf7e926b4094b9227eae1f8ba575",
+    "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+    "plan_digest": "ab7ee2b6c82f6d8c7eac52f9be66c8180ee58ed21a2101decac85090af1d8979",
+    "report": {
+      "source_rows": 100000,
+      "accepted_rows": 50000,
+      "rejected_rows": 50000,
+      "rejection_reason_assignments": 70000,
+      "accepted_distinct_orders": 40000,
+      "accepted_quantity": 120000,
+      "accepted_line_counts_by_status": {
+        "fulfilled": 20000,
+        "pending": 20000,
+        "cancelled": 10000
+      },
+      "accepted_quantity_by_status": {
+        "fulfilled": 60000,
+        "pending": 30000,
+        "cancelled": 30000
+      }
+    },
+    "history_snapshots": 2
+  },
+  "next_input_sha256": "6842ba5f7aaf1d033572db78ef7022d0f682661ed92cc56e6922ecbf0efb11d6",
+  "failed_b": {
+    "run_id": "5df33326da7440d2addd421f2d3335d2",
+    "source_id": "cd4416f6bd07fdc07bf26db0a16109f269f0f1f0e7507a45d4495a30896e0514",
+    "status": "failed",
+    "prior_a_preserved": true,
+    "outputs_are_none": true
+  },
+  "completed_b": {
+    "run_id": "f3efd32a96534b78a6e82e791f4de40b",
+    "source_id": "cd4416f6bd07fdc07bf26db0a16109f269f0f1f0e7507a45d4495a30896e0514",
+    "plan_digest": "ab7ee2b6c82f6d8c7eac52f9be66c8180ee58ed21a2101decac85090af1d8979",
+    "report": {
+      "source_rows": 100000,
+      "accepted_rows": 50000,
+      "rejected_rows": 50000,
+      "rejection_reason_assignments": 70000,
+      "accepted_distinct_orders": 40000,
+      "accepted_quantity": 120000,
+      "accepted_line_counts_by_status": {
+        "fulfilled": 20000,
+        "pending": 20000,
+        "cancelled": 10000
+      },
+      "accepted_quantity_by_status": {
+        "fulfilled": 60000,
+        "pending": 30000,
+        "cancelled": 30000
+      }
+    },
+    "history_snapshots": 0
+  },
+  "history_pruned": true,
+  "unchanged_plan": true,
+  "accepted_dates_all_october": true,
+  "finished_at_utc": "2026-10-27T19:09:08.858106+00:00",
+  "total_seconds": 43.61274439999988,
+  "peak_rss_bytes": 995594240,
+  "whole_process_peak_at_most_1_gib": true,
+  "execution_command": {
+    "command": [
+      "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+      "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-4\\large-month-reuse.py"
+    ],
+    "timeout_seconds": 180,
+    "started_at_utc": "2026-10-27T19:08:24.969462+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 44.138,
+    "environment_overrides": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "DATAWORKS_REQUIRE_AUTH": "false"
+    }
+  }
+}

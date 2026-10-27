@@ -1,0 +1,192 @@
+{
+  "protocol_version": 1,
+  "status": "passed",
+  "started_at_utc": "2026-10-27T18:49:51.319450+00:00",
+  "scope": "one headless Streamlit AppTest workload profile; not a real browser, fresh-process reopen, customer validation, or ten-sample UI p95",
+  "f14_full_protocol_claimed": false,
+  "configuration": {
+    "rows": 100000,
+    "samples": 1,
+    "include_history": false,
+    "apptest_timeout_seconds": 120
+  },
+  "mocks": [
+    "streamlit.file_uploader returns actual synthetic CSV/project bytes"
+  ],
+  "measurement_limits": "Whole-process high-water RSS includes imports, AppTest/protobuf/session overhead and all prior stages. Source CSV bytes and actual archive bytes are retained for boundary uploads; no original full project copy or standalone decoded archive is retained.",
+  "hardware": {
+    "platform": "Windows-11-10.0.26300-SP0",
+    "architecture": "AMD64",
+    "processor": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+    "logical_cpus": 12,
+    "physical_ram_bytes": 16282554368,
+    "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "python_executable": "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe"
+  },
+  "installed_packages": {
+    "streamlit": "1.55.0",
+    "pandas": "2.3.3",
+    "numpy": "2.4.2",
+    "plotly": "6.6.0",
+    "scikit-learn": "1.8.0",
+    "scipy": "1.18.1",
+    "joblib": "1.6.0",
+    "threadpoolctl": "3.7.0",
+    "Authlib": "1.9.1",
+    "openpyxl": "3.1.5",
+    "xlrd": "2.0.2",
+    "watchdog": "6.0.0"
+  },
+  "dependency_claim": "Installed versions recorded only; no clean-install or declared-pin compatibility claim.",
+  "implementation_sha256": {
+    "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+    "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+    "backend/state.py": "aafeae962bd6a9e15130b1d68655c998571996ab434b15abae3a88c3698710c7",
+    "backend/project_io.py": "42abec67beedde6704c5f0f676c9bec9ac9b9b2218959f7852c992098655dd2f",
+    "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+    "frontend/pages/data_fulfillment.py": "412911f87bf8be31960ad123adf0ce0629d64653f051839a503bb0d9d5205786",
+    "frontend/pages/data_project.py": "e1eeb48703495a7b5237de9a5435459e6343344463be5ab5766c663fafeaef84",
+    "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+    "scripts/verify_fulfillment_workload_ui.py": "1826eab5a85c5aaf57dac1e6452d85a1f6addaa5b8cf7b992256d95fe139a2f1",
+    "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+  },
+  "phase_seconds": {
+    "apptest_imports": 0.6539591000000655,
+    "initial_render": 1.2075730999999905,
+    "load_source": 0.7811801999998806,
+    "execute_plan": 9.755365900000015,
+    "oracle_before_save": 0.1841375000001335,
+    "switch_to_project": 0.019765199999937977,
+    "disable_history": 0.004209899999978006,
+    "prepare_archive": 13.241792799999985,
+    "archive_write": 0.0008155000000442669,
+    "clear_session": 0.005049200000030396,
+    "enable_project_open": 0.1499852000001738,
+    "reopen_project": 15.510386899999958,
+    "switch_back_to_fulfillment": 0.014476300000069386,
+    "oracle_after_reopen": 0.1549824000001081
+  },
+  "phase_peak_rss_bytes": {
+    "apptest_imports": 70328320,
+    "initial_render": 129777664,
+    "load_source": 259018752,
+    "execute_plan": 576602112,
+    "oracle_before_save": 576602112,
+    "switch_to_project": 576602112,
+    "disable_history": 576602112,
+    "prepare_archive": 765386752,
+    "archive_write": 765386752,
+    "clear_session": 765386752,
+    "enable_project_open": 765386752,
+    "reopen_project": 768425984,
+    "switch_back_to_fulfillment": 768425984,
+    "oracle_after_reopen": 768425984
+  },
+  "expected_report": {
+    "source_rows": 100000,
+    "accepted_rows": 50000,
+    "rejected_rows": 50000,
+    "rejection_reason_assignments": 70000,
+    "accepted_distinct_orders": 40000,
+    "accepted_quantity": 120000,
+    "accepted_line_counts_by_status": {
+      "fulfilled": 20000,
+      "pending": 20000,
+      "cancelled": 10000
+    },
+    "accepted_quantity_by_status": {
+      "fulfilled": 60000,
+      "pending": 30000,
+      "cancelled": 30000
+    }
+  },
+  "input": {
+    "path": "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-4\\ui-workload-100000\\workload.csv",
+    "bytes": 4230060,
+    "sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e"
+  },
+  "stage": "complete",
+  "before_archive": {
+    "run_id": "fc2b632bed1548f0a23bde468dc63c6c",
+    "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+    "plan_id": "d7706254707d444d964289324d2b521c",
+    "plan_revision": 1,
+    "plan_digest": "a64a331eeec81979760858e42ad947186335cba7514c86057243fdfd36ccd3ee",
+    "report": {
+      "source_rows": 100000,
+      "accepted_rows": 50000,
+      "rejected_rows": 50000,
+      "rejection_reason_assignments": 70000,
+      "accepted_distinct_orders": 40000,
+      "accepted_quantity": 120000,
+      "accepted_line_counts_by_status": {
+        "fulfilled": 20000,
+        "pending": 20000,
+        "cancelled": 10000
+      },
+      "accepted_quantity_by_status": {
+        "fulfilled": 60000,
+        "pending": 30000,
+        "cancelled": 30000
+      }
+    },
+    "source_sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e",
+    "multi_reason_quarantined_rows": 10000,
+    "exact_duplicate_rows": 10000,
+    "rendered_table_rows": [
+      100,
+      3,
+      100,
+      100
+    ],
+    "history_snapshots": 2
+  },
+  "archive": {
+    "path": "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-4\\ui-workload-100000\\fulfillment-without-history.dataworks",
+    "bytes": 1284668,
+    "sha256": "4167d93b626c5ed788aa6e9afe0fecf32b7bbc13c73a26406d94e5dece734eef",
+    "include_history": false
+  },
+  "after_reopen": {
+    "run_id": "fc2b632bed1548f0a23bde468dc63c6c",
+    "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+    "plan_id": "d7706254707d444d964289324d2b521c",
+    "plan_revision": 1,
+    "plan_digest": "a64a331eeec81979760858e42ad947186335cba7514c86057243fdfd36ccd3ee",
+    "report": {
+      "source_rows": 100000,
+      "accepted_rows": 50000,
+      "rejected_rows": 50000,
+      "rejection_reason_assignments": 70000,
+      "accepted_distinct_orders": 40000,
+      "accepted_quantity": 120000,
+      "accepted_line_counts_by_status": {
+        "fulfilled": 20000,
+        "pending": 20000,
+        "cancelled": 10000
+      },
+      "accepted_quantity_by_status": {
+        "fulfilled": 60000,
+        "pending": 30000,
+        "cancelled": 30000
+      }
+    },
+    "source_sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e",
+    "multi_reason_quarantined_rows": 10000,
+    "exact_duplicate_rows": 10000,
+    "rendered_table_rows": [
+      100,
+      3,
+      100,
+      100
+    ],
+    "history_snapshots": 0
+  },
+  "observed_gates": {
+    "correctness_and_identity": true,
+    "whole_process_peak_at_most_1_gib": true
+  },
+  "finished_at_utc": "2026-10-27T18:50:33.750924+00:00",
+  "whole_profile_seconds": 42.43086779999999,
+  "peak_rss_bytes": 768425984
+}

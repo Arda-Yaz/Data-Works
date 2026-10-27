@@ -1,0 +1,13 @@
+feat: add auditable fulfillment workflows and recovery verification
+
+Add versioned sources, saved plans, traceable quarantine, reconciled reports,
+and atomic fulfillment runs with bounded undo and project reopening.
+
+Store original sources and actual run evidence once in compact versioned
+archives while preserving independent public values and legacy imports.
+Reject reused run identities and conflicting plan revisions, and preserve
+fulfillment work when clearing an unrelated dataset.
+
+Add frozen acceptance fixtures, fresh-process recovery checks, deterministic
+100,000-row workload measurements, and headless Streamlit workflow evidence.
+Record installed dependencies and remaining release gates explicitly.

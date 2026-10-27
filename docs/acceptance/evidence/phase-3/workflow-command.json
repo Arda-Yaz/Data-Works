@@ -1,0 +1,12 @@
+{
+  "started_at_utc": "2026-10-26T19:14:36.182412+00:00",
+  "command": [
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+    "scripts/verify_fulfillment.py",
+    "--output-dir",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-3\\workflow"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 3.827,
+  "log": "workflow-run.txt"
+}

@@ -1,0 +1,20 @@
+test_custom_objects_and_executable_serialization_are_rejected (test_project_io.ProjectCodecTests.test_custom_objects_and_executable_serialization_are_rejected) ... ok
+test_declared_allocations_have_a_total_budget (test_project_io.ProjectCodecTests.test_declared_allocations_have_a_total_budget) ... ok
+test_declared_narrow_float_cannot_silently_round_a_value (test_project_io.ProjectCodecTests.test_declared_narrow_float_cannot_silently_round_a_value) ... ok
+test_depth_and_duplicate_json_keys_are_rejected (test_project_io.ProjectCodecTests.test_depth_and_duplicate_json_keys_are_rejected) ... ok
+test_empty_tables_and_named_range_index_round_trip (test_project_io.ProjectCodecTests.test_empty_tables_and_named_range_index_round_trip) ... ok
+test_invalid_envelopes_and_zip_members_are_rejected (test_project_io.ProjectCodecTests.test_invalid_envelopes_and_zip_members_are_rejected) ... ok
+test_large_integer_categorical_levels_are_not_converted_to_floats (test_project_io.ProjectCodecTests.test_large_integer_categorical_levels_are_not_converted_to_floats) ... ok
+test_limits_are_enforced_on_save_and_load (test_project_io.ProjectCodecTests.test_limits_are_enforced_on_save_and_load) ... ok
+test_malformed_shapes_dtypes_and_missing_lengths_are_rejected (test_project_io.ProjectCodecTests.test_malformed_shapes_dtypes_and_missing_lengths_are_rejected) ... ok
+test_mixed_column_labels_and_mapping_keys_are_preserved (test_project_io.ProjectCodecTests.test_mixed_column_labels_and_mapping_keys_are_preserved) ... ok
+test_multi_index_levels_and_datetime_frequency_are_preserved (test_project_io.ProjectCodecTests.test_multi_index_levels_and_datetime_frequency_are_preserved) ... ok
+test_nullable_and_time_dtypes_round_trip_without_precision_loss (test_project_io.ProjectCodecTests.test_nullable_and_time_dtypes_round_trip_without_precision_loss) ... ok
+test_object_scalar_types_and_missing_markers_are_preserved (test_project_io.ProjectCodecTests.test_object_scalar_types_and_missing_markers_are_preserved) ... ok
+test_period_and_interval_values_use_data_only_constructors (test_project_io.ProjectCodecTests.test_period_and_interval_values_use_data_only_constructors) ... ok
+test_series_arrays_and_reserved_mapping_tags_round_trip (test_project_io.ProjectCodecTests.test_series_arrays_and_reserved_mapping_tags_round_trip) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 3.093s
+
+OK

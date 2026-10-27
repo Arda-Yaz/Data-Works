@@ -15,10 +15,39 @@ def _filename(name):
     return re.sub(r"[^A-Za-z0-9_.-]+", "-", name).strip(".-_")[:80] or "dataworks"
 
 
+def _save_project_section(filename):
+    st.subheader("Save this project")
+    st.caption(
+        "Includes source/working data, schema, transformation parameters, saved charts, completed experiment reports, "
+        "and fulfillment source, plan, results, and quarantine evidence when present. "
+        "Live fitted models are exported separately from Machine Learning."
+    )
+    with_history = st.checkbox("Include undo snapshots (larger file)", value=True, key="project_include_history")
+    token = (st.session_state.project_revision, with_history)
+    prepared = st.session_state.get("prepared_project_download")
+    if prepared and prepared["token"] != token:
+        st.session_state.pop("prepared_project_download", None)
+        prepared = None
+    if st.button("Prepare Project Download", key="project_prepare"):
+        try:
+            archive = dumps_project(StateManager.export_project(include_history=with_history))
+            prepared = {"data": archive, "token": token}
+            st.session_state.prepared_project_download = prepared
+        except Exception as exc:
+            log_failure("project_save_failed", exc)
+            st.error(f"Could not prepare the project. {exc}")
+    if prepared:
+        st.download_button(
+            "Download DataWorks Project", prepared["data"], file_name=f"{filename}.dataworks",
+            mime="application/zip", key="project_download", on_click="ignore",
+        )
+        st.caption(f"Prepared {len(prepared['data']):,} bytes. Retain the download to reopen this work; new changes require a fresh download.")
+
+
 def data_project():
     st.title("Project & Exports")
     st.subheader("Open a project")
-    st.caption("Opening a project replaces this session's dataset, history, charts, and experiment reports.")
+    st.caption("Opening a project replaces this session's dataset, history, charts, experiment reports, and fulfillment workspace.")
     uploaded = st.file_uploader("Choose a DataWorks project", type=["dataworks"], key="project_file")
     if st.button("Open Project", key="project_open", disabled=uploaded is None):
         try:
@@ -28,12 +57,17 @@ def data_project():
             log_failure("project_open_failed", exc)
             st.error(f"Project was not opened; the current session is unchanged. {exc}")
         else:
-            log_event("project_opened", rows=len(st.session_state.df), columns=st.session_state.df.shape[1])
+            opened_df = st.session_state.df
+            fulfillment_source = st.session_state.fulfillment.get("source")
+            rows = len(opened_df) if opened_df is not None else len(fulfillment_source["rows"]) if fulfillment_source else 0
+            columns = opened_df.shape[1] if opened_df is not None else len(fulfillment_source["columns"]) if fulfillment_source else 0
+            log_event("project_opened", rows=rows, columns=columns)
             st.toast("Project opened.")
             st.rerun()
 
-    if not StateManager.has_dataset():
-        st.info("Upload a dataset or open a project to prepare downloads.")
+    fulfillment = st.session_state.fulfillment
+    if not StateManager.has_dataset() and fulfillment["source"] is None and fulfillment["committed"] is None:
+        st.info("Upload a dataset, load an Order Fulfillment source, or open a project to prepare downloads.")
         return
     name = st.text_input("Project name", value=st.session_state.project_name, max_chars=200, key="project_name_input")
     try:
@@ -43,6 +77,10 @@ def data_project():
         return
     filename = _filename(name)
     df = st.session_state.df
+    if df is None:
+        st.caption("Fulfillment project. Review the source, saved plan, accepted lines, and quarantined lines on Order Fulfillment.")
+        _save_project_section(filename)
+        return
     st.caption(f"Working dataset: {len(df)} rows, {len(df.columns)} columns · State {st.session_state.data_version[:8]}")
     with st.expander("Session resource usage"):
         st.json(StateManager.resource_summary())
@@ -66,31 +104,7 @@ def data_project():
         file_name=f"{filename}-cleaned.csv", mime="text/csv", key="export_cleaned_csv", on_click="ignore",
     )
 
-    st.subheader("Save this project")
-    st.caption(
-        "Includes original/working data, schema, transformation parameters, saved charts, and completed experiment reports. "
-        "Live fitted models are exported separately from Machine Learning; reopened reports can be viewed without executing model binaries."
-    )
-    with_history = st.checkbox("Include undo snapshots (larger file)", value=True, key="project_include_history")
-    token = (st.session_state.project_revision, with_history)
-    prepared = st.session_state.get("prepared_project_download")
-    if prepared and prepared["token"] != token:
-        st.session_state.pop("prepared_project_download", None)
-        prepared = None
-    if st.button("Prepare Project Download", key="project_prepare"):
-        try:
-            archive = dumps_project(StateManager.export_project(include_history=with_history))
-            prepared = {"data": archive, "token": token}
-            st.session_state.prepared_project_download = prepared
-        except Exception as exc:
-            log_failure("project_save_failed", exc)
-            st.error(f"Could not prepare the project. {exc}")
-    if prepared:
-        st.download_button(
-            "Download DataWorks Project", prepared["data"], file_name=f"{filename}.dataworks",
-            mime="application/zip", key="project_download", on_click="ignore",
-        )
-        st.caption(f"Prepared {len(prepared['data']):,} bytes. New changes require a fresh download.")
+    _save_project_section(filename)
 
     st.subheader("Transformation history")
     operations = st.session_state.operation_log

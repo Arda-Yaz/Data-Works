@@ -1,0 +1,26 @@
+{
+  "client_date": "2026-10-27",
+  "started_at_utc": "2026-10-27T18:44:52.159684+00:00",
+  "command": [
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+    "-c",
+    "\nfrom pathlib import Path\nimport sys,tempfile,unittest\nroot=Path.cwd().resolve()\nscratch=root/'.test-tmp'\nscratch.mkdir(exist_ok=True)\nif not scratch.resolve().is_relative_to(root):\n    raise SystemExit('Scratch path left repository.')\nprevious=tempfile.tempdir\ntry:\n    with tempfile.TemporaryDirectory(prefix='recovery-',dir=scratch) as folder:\n        tempfile.tempdir=folder\n        suite=unittest.TestSuite()\n        for pattern in ('test_fulfillment_recovery.py','test_fulfillment_state.py'):\n            suite.addTests(unittest.defaultTestLoader.discover(str(root/'tests'),pattern=pattern))\n        result=unittest.TextTestRunner(verbosity=2).run(suite)\nfinally:\n    tempfile.tempdir=previous\n    try:\n        scratch.rmdir()\n    except OSError:\n        pass\nraise SystemExit(0 if result.wasSuccessful() else 1)\n"
+  ],
+  "elapsed_seconds": 5.645,
+  "exit_code": 0,
+  "scope": [
+    "tests/test_fulfillment_recovery.py",
+    "tests/test_fulfillment_state.py"
+  ],
+  "environment_overrides": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "DATAWORKS_REQUIRE_AUTH": "false"
+  },
+  "result_log": "recovery-tests.txt",
+  "tests_run": 38,
+  "outcome_lines": [
+    "OK"
+  ]
+}

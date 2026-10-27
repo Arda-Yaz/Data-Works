@@ -1,0 +1,343 @@
+{
+  "checked_at_utc": "2026-10-26T19:27:21.778505+00:00",
+  "status": "passed",
+  "starting_head": "7408223e8542f2bcc39086e9e94b38ee32fcc131",
+  "head_unchanged": true,
+  "git_index_unchanged": true,
+  "changed_existing_paths": [
+    "README.md",
+    "app.py",
+    "backend/operations.py",
+    "backend/project_io.py",
+    "backend/state.py",
+    "frontend/pages/data_project.py",
+    "frontend/pages/data_upload.py"
+  ],
+  "unexpected_existing_changes": [],
+  "source_changes_after_current_tests": [],
+  "frozen_fixture_changes": [],
+  "relative_links_checked": 95,
+  "broken_relative_links": [],
+  "evidence_json_errors": [],
+  "diff_check_exit_code": 0,
+  "unexpected_new_paths": [],
+  "new_paths": [
+    "backend/dataset_preparation.py",
+    "backend/fulfillment.py",
+    "backend/fulfillment_state.py",
+    "docs/acceptance/evidence/phase-2/README.md",
+    "docs/acceptance/evidence/phase-2/acceptance-before-implementation.txt",
+    "docs/acceptance/evidence/phase-2/production-starting-state.json",
+    "docs/acceptance/evidence/phase-2/results.json",
+    "docs/acceptance/evidence/phase-3/README.md",
+    "docs/acceptance/evidence/phase-3/dependency-check.txt",
+    "docs/acceptance/evidence/phase-3/diff-check.txt",
+    "docs/acceptance/evidence/phase-3/final-artifact-revalidation.json",
+    "docs/acceptance/evidence/phase-3/final-integrity.json",
+    "docs/acceptance/evidence/phase-3/frozen-fixture-audit.txt",
+    "docs/acceptance/evidence/phase-3/multireason-reopen.json",
+    "docs/acceptance/evidence/phase-3/regression-suite-current.txt",
+    "docs/acceptance/evidence/phase-3/regression-suite-final.txt",
+    "docs/acceptance/evidence/phase-3/regression-suite.txt",
+    "docs/acceptance/evidence/phase-3/syntax-check-current.txt",
+    "docs/acceptance/evidence/phase-3/syntax-check-final.txt",
+    "docs/acceptance/evidence/phase-3/syntax-check.txt",
+    "docs/acceptance/evidence/phase-3/verification-current.json",
+    "docs/acceptance/evidence/phase-3/verification-final.json",
+    "docs/acceptance/evidence/phase-3/verification-results.json",
+    "docs/acceptance/evidence/phase-3/workflow-command.json",
+    "docs/acceptance/evidence/phase-3/workflow-current-command.json",
+    "docs/acceptance/evidence/phase-3/workflow-current.txt",
+    "docs/acceptance/evidence/phase-3/workflow-current/month-a.dataworks",
+    "docs/acceptance/evidence/phase-3/workflow-current/month-b.dataworks",
+    "docs/acceptance/evidence/phase-3/workflow-current/month-c-with-history.dataworks",
+    "docs/acceptance/evidence/phase-3/workflow-current/results.json",
+    "docs/acceptance/evidence/phase-3/workflow-current/saved-plan.json",
+    "docs/acceptance/evidence/phase-3/workflow-run.txt",
+    "docs/acceptance/evidence/phase-3/workflow/month-a.dataworks",
+    "docs/acceptance/evidence/phase-3/workflow/month-b-final.dataworks",
+    "docs/acceptance/evidence/phase-3/workflow/month-b.dataworks",
+    "docs/acceptance/evidence/phase-3/workflow/results.json",
+    "docs/acceptance/evidence/phase-3/workflow/saved-plan.json",
+    "docs/acceptance/phase-2-contracts.md",
+    "docs/acceptance/phase-3-results.md",
+    "frontend/pages/data_fulfillment.py",
+    "scripts/verify_fulfillment.py",
+    "tests/test_fulfillment_acceptance.py",
+    "tests/test_fulfillment_archive_versions.py",
+    "tests/test_fulfillment_contracts.py",
+    "tests/test_fulfillment_pages.py",
+    "tests/test_fulfillment_state.py",
+    "tests/test_preparation_boundary.py"
+  ],
+  "artifacts_excluding_this_inventory": [
+    {
+      "path": "README.md",
+      "bytes": 9845,
+      "sha256": "f984948d971a7754d3fff28e09be6b17d672c813d67ffe6faa953966ebdda4f0"
+    },
+    {
+      "path": "app.py",
+      "bytes": 2618,
+      "sha256": "3b22d0f0e4c7331d5d4d95d2016ef6800298d1a0a6604f19026c14159002e335"
+    },
+    {
+      "path": "backend/dataset_preparation.py",
+      "bytes": 4513,
+      "sha256": "0bb7939feebb2a88f2238726a8648d0a26b3756551e5009790cfbbfac623364c"
+    },
+    {
+      "path": "backend/fulfillment.py",
+      "bytes": 17374,
+      "sha256": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37"
+    },
+    {
+      "path": "backend/fulfillment_state.py",
+      "bytes": 15907,
+      "sha256": "da05b6c3c56e566f2916b4b38413ac1db18ea07b1ede2b901f5f44d8029a305b"
+    },
+    {
+      "path": "backend/operations.py",
+      "bytes": 16629,
+      "sha256": "d126bb5717b924fca8305b5755e30eba85d1ea4f00f704f379e9cf042138a0ce"
+    },
+    {
+      "path": "backend/project_io.py",
+      "bytes": 27969,
+      "sha256": "20dffa5f9dc00769357311a08ede0347aca79f844f4bb4d6056381d2b2f12c72"
+    },
+    {
+      "path": "backend/state.py",
+      "bytes": 31887,
+      "sha256": "aafeae962bd6a9e15130b1d68655c998571996ab434b15abae3a88c3698710c7"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-2/README.md",
+      "bytes": 1358,
+      "sha256": "f8e3f94f7aa7827423f81e9d49bffe3834e4cb5f52e131f4d4cbfb3f3c56e656"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-2/acceptance-before-implementation.txt",
+      "bytes": 2359,
+      "sha256": "a8b06f35998700464b12301d28c1358da6a08c5de6bc53b40f6f614e91849a43"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-2/production-starting-state.json",
+      "bytes": 13774,
+      "sha256": "3283954ae2ad6ed9b85cb8272ebc481177d1aac9f84731fc60cecc2231cb8bfa"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-2/results.json",
+      "bytes": 573,
+      "sha256": "a6572630bf015f1fb047e2a0a4498198285a4aba713242d30271332d1aa35ddf"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/README.md",
+      "bytes": 5880,
+      "sha256": "029ca92af2788425c8510e69ed140dcdfa43a676f1d6077823eb5fa68b2581b4"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/dependency-check.txt",
+      "bytes": 31,
+      "sha256": "672aec65a45bed50e70229c70934a7eebf0462595c459b83023027645d57cccf"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/diff-check.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/final-artifact-revalidation.json",
+      "bytes": 4550,
+      "sha256": "7a24c2721b02cb92241b45e9e29f9853829c2f603b39bcffa16bebec4bfc927c"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/frozen-fixture-audit.txt",
+      "bytes": 1937,
+      "sha256": "294d39c7b759a9f23cbe838200b67edc151abb11c34c535facd361ec8e54d1b9"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/multireason-reopen.json",
+      "bytes": 1463,
+      "sha256": "c3b0728a43c4a64932035206726ae9f1928d6746a1d870112abd8813ccce15d6"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/regression-suite-current.txt",
+      "bytes": 17812,
+      "sha256": "00113e5b7a9758c250e9d0d3ca9a10453a69564ec63931d512709053812d54e6"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/regression-suite-final.txt",
+      "bytes": 17804,
+      "sha256": "e3d3e324f7f22a7170ac5bab850bb917655a1c87e9dca2fc6d6724a641829663"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/regression-suite.txt",
+      "bytes": 17804,
+      "sha256": "164c9086088fd7574972c4b8cbf0c9cef263f6a33f8e004a6380edeeff79a466"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/syntax-check-current.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/syntax-check-final.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/syntax-check.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/verification-current.json",
+      "bytes": 8656,
+      "sha256": "5509e9652bc0f9046f63977a8b0efe321710c3de2723107fc5f40b88f42e32c7"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/verification-final.json",
+      "bytes": 8523,
+      "sha256": "83d74d792df0f6b5a702f9565144435f86c00bb21772be64849a97afc80c7805"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/verification-results.json",
+      "bytes": 1751,
+      "sha256": "d6b1c6c4f1f8d7fcc95120c26e9e5b3752f95e1a3e36c97b3b69180bcb927c3b"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/workflow-command.json",
+      "bytes": 393,
+      "sha256": "59ea069d0354c6689c9c3b657f6297ea46ec5763a423446c38e5e574a5672a68"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/workflow-current-command.json",
+      "bytes": 594,
+      "sha256": "77daa8f6afd7c1837deb0c87caf8632f9dbe791f383ff857af32529ad14a0be0"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/workflow-current.txt",
+      "bytes": 5097,
+      "sha256": "58dd6a3645f9d150dc5313512e95a34e8062308f12939602a8652b0c48789cb5"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/workflow-current/month-a.dataworks",
+      "bytes": 2227,
+      "sha256": "4b0d08bf73a0f236d0620ff6890da9b4a9ea814dd3272f45e65cee79fba01089"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/workflow-current/month-b.dataworks",
+      "bytes": 1917,
+      "sha256": "31b77de657716dfe5729939fd244bd4c6a29df1d44c85fd932a1e039222ec77d"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/workflow-current/month-c-with-history.dataworks",
+      "bytes": 2989,
+      "sha256": "f866e65fc7d6679ac01b2882baba6a83b83d129bb95de8b31365bb43aa6eac62"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/workflow-current/results.json",
+      "bytes": 5097,
+      "sha256": "58dd6a3645f9d150dc5313512e95a34e8062308f12939602a8652b0c48789cb5"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/workflow-current/saved-plan.json",
+      "bytes": 908,
+      "sha256": "bde9417927d56f184c09b71d43a2b2a51313f32bacb18c4eb878c066e77f79fc"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/workflow-run.txt",
+      "bytes": 5097,
+      "sha256": "b7cc49c95c1b21899672f78a3f548ffe6f13906344dca6fbdbfb4d6588201289"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/workflow/month-a.dataworks",
+      "bytes": 2226,
+      "sha256": "0df0fb71759df7407c769c24d84cd3cfbade9aa48fb1cfa4236c9b909075c05f"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/workflow/month-b-final.dataworks",
+      "bytes": 1913,
+      "sha256": "dc6bc8d5b7d7af043a7ce6e804c737b74bdf76a6b94674f3f35b02ecede3b084"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/workflow/month-b.dataworks",
+      "bytes": 1913,
+      "sha256": "d2a3c8ab0923e9b9cb679b30c7e647fb2e324282e0c58eeb5a3a9ae87859c471"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/workflow/results.json",
+      "bytes": 5097,
+      "sha256": "b7cc49c95c1b21899672f78a3f548ffe6f13906344dca6fbdbfb4d6588201289"
+    },
+    {
+      "path": "docs/acceptance/evidence/phase-3/workflow/saved-plan.json",
+      "bytes": 908,
+      "sha256": "81e17c4b43cbb6d59decb836bd09edceb9f61e7942c27be2f2c5e6a5dcac1b73"
+    },
+    {
+      "path": "docs/acceptance/phase-2-contracts.md",
+      "bytes": 9265,
+      "sha256": "67fc28726f3eb2107f88c4ffce4789a511e990f8510139cebbec238e163aad60"
+    },
+    {
+      "path": "docs/acceptance/phase-3-results.md",
+      "bytes": 6652,
+      "sha256": "48be44f54b273acfb7e285ca7c655687b521046b6ad26c0ab03fd45ddfa81ecb"
+    },
+    {
+      "path": "frontend/pages/data_fulfillment.py",
+      "bytes": 13409,
+      "sha256": "fcfdd9ebb5fd84195416cff86e7a2d46eeebb12b885d35ce1bf1f77ecac45927"
+    },
+    {
+      "path": "frontend/pages/data_project.py",
+      "bytes": 8222,
+      "sha256": "e1eeb48703495a7b5237de9a5435459e6343344463be5ab5766c663fafeaef84"
+    },
+    {
+      "path": "frontend/pages/data_upload.py",
+      "bytes": 11597,
+      "sha256": "def29b2e54fcd54c06b9056fdad0442c07fb45a22485e82fe9169e35550ed6e2"
+    },
+    {
+      "path": "scripts/verify_fulfillment.py",
+      "bytes": 7454,
+      "sha256": "35b58e18751cb2f7a9e15b7bbff1d3136a0b651c4c3e91b4bc5144cd3aeb7e9f"
+    },
+    {
+      "path": "tests/test_fulfillment_acceptance.py",
+      "bytes": 19353,
+      "sha256": "85a5e6a31f4fc65235c4219a529d3994ea3bf3d492020cfc64235ef318839ba5"
+    },
+    {
+      "path": "tests/test_fulfillment_archive_versions.py",
+      "bytes": 4844,
+      "sha256": "2069414c516bad7047e946422b8b4e7ad148497644c2387ec9b737d5acb8eb22"
+    },
+    {
+      "path": "tests/test_fulfillment_contracts.py",
+      "bytes": 13566,
+      "sha256": "3f286d60e2982c828cd160bdbd2de604a9b6d8c02b7691e3ba77079248040352"
+    },
+    {
+      "path": "tests/test_fulfillment_pages.py",
+      "bytes": 12475,
+      "sha256": "e90a978f352f440624b1437e40752a6073df98a43365fe0dab4c2bd1c89b019d"
+    },
+    {
+      "path": "tests/test_fulfillment_state.py",
+      "bytes": 18705,
+      "sha256": "535f535a0ff6b0d264a23a7118873702e03a20a06f4817934a64373bddfd0670"
+    },
+    {
+      "path": "tests/test_preparation_boundary.py",
+      "bytes": 4542,
+      "sha256": "81945ba2dbbbd2269bd1e03165f57c84c17ae35efa4566d20a73ed575fc30539"
+    }
+  ],
+  "engineering_result": "Synthetic fulfillment slice verified; customer and workload gates open.",
+  "release_approval": "withheld",
+  "next_phase": "4: paused pending owner approval"
+}

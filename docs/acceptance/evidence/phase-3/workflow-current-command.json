@@ -1,0 +1,22 @@
+{
+  "started_at_utc": "2026-10-26T19:24:07.792247+00:00",
+  "command": [
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+    "scripts/verify_fulfillment.py",
+    "--output-dir",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-3\\workflow-current"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 3.64,
+  "log": "workflow-current.txt",
+  "archive_versions": [
+    {
+      "file": "month-a.dataworks",
+      "envelope_version": 2
+    },
+    {
+      "file": "month-b.dataworks",
+      "envelope_version": 2
+    }
+  ]
+}

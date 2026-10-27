@@ -1,0 +1,62 @@
+{
+  "checks": [
+    {
+      "name": "dependency-check",
+      "command": [
+        "C:\\Users\\Gaming\\AppData\\Local\\Python\\bin\\pip.exe",
+        "--python",
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+        "check"
+      ],
+      "started_at_utc": "2026-10-26T19:15:22.924639+00:00",
+      "elapsed_seconds": 5.237,
+      "exit_code": 0,
+      "log": "dependency-check.txt"
+    },
+    {
+      "name": "syntax-check",
+      "command": [
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+        "-m",
+        "compileall",
+        "-q",
+        "app.py",
+        "backend",
+        "frontend",
+        "scripts",
+        "tests"
+      ],
+      "started_at_utc": "2026-10-26T19:15:28.162215+00:00",
+      "elapsed_seconds": 0.221,
+      "exit_code": 0,
+      "log": "syntax-check.txt"
+    },
+    {
+      "name": "regression-suite",
+      "command": [
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+        "scripts/run_tests.py"
+      ],
+      "started_at_utc": "2026-10-26T19:15:28.383020+00:00",
+      "elapsed_seconds": 16.021,
+      "exit_code": 0,
+      "log": "regression-suite.txt",
+      "tests_run": 466,
+      "test_runner_seconds": 12.394,
+      "outcome_lines": [
+        "OK"
+      ]
+    },
+    {
+      "name": "frozen-fixture-audit",
+      "command": [
+        "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+        "docs/acceptance/evidence/2026-10-26/fixture-audit.py"
+      ],
+      "started_at_utc": "2026-10-26T19:15:44.404730+00:00",
+      "elapsed_seconds": 0.135,
+      "exit_code": 0,
+      "log": "frozen-fixture-audit.txt"
+    }
+  ]
+}

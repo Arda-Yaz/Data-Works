@@ -1,0 +1,20 @@
+{
+  "captured_at_utc": "2026-10-26T19:06:11.552719+00:00",
+  "head": "7408223e8542f2bcc39086e9e94b38ee32fcc131",
+  "command": [
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_fulfillment_*.py",
+    "-v"
+  ],
+  "exit_code": 5,
+  "elapsed_seconds": 0.96,
+  "expected_state": "red: backend.fulfillment not implemented; no skipped or expected-failure substitutes",
+  "defined_test_cases": 31,
+  "log": "acceptance-before-implementation.txt"
+}

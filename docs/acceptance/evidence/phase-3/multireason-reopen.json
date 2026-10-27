@@ -1,0 +1,41 @@
+{
+  "checked_at_utc": "2026-10-26T19:25:38.035878+00:00",
+  "command": [
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+    "scripts/verify_fulfillment.py",
+    "--project",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-3\\workflow-current\\month-c-with-history.dataworks",
+    "--expected-input",
+    "month_c_invalid_rows.csv"
+  ],
+  "exit_code": 0,
+  "includes_history": true,
+  "scope": "Fresh-process C reopen preserves the multi-reason ledger and coherent undo checkpoints.",
+  "result": {
+    "input": "month_c_invalid_rows.csv",
+    "run_id": "b5e5856a5c684d819a17b8e79ce38950",
+    "source_id": "9e883ce310b549254330802c1c58bdffdf410a0317f883ede3afe630447dfe71",
+    "plan_digest": "bde9417927d56f184c09b71d43a2b2a51313f32bacb18c4eb878c066e77f79fc",
+    "report": {
+      "source_rows": 9,
+      "accepted_rows": 2,
+      "rejected_rows": 7,
+      "rejection_reason_assignments": 9,
+      "accepted_distinct_orders": 2,
+      "accepted_quantity": 3,
+      "accepted_line_counts_by_status": {
+        "fulfilled": 1,
+        "pending": 0,
+        "cancelled": 1
+      },
+      "accepted_quantity_by_status": {
+        "fulfilled": 2,
+        "pending": 0,
+        "cancelled": 1
+      }
+    },
+    "status": "passed",
+    "plan_digest_before": "bde9417927d56f184c09b71d43a2b2a51313f32bacb18c4eb878c066e77f79fc",
+    "streamlit_imported": false
+  }
+}

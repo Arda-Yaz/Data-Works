@@ -6,8 +6,11 @@ from uuid import UUID, uuid4
 import pandas as pd
 import streamlit as st
 
-from backend.ingestion import infer_column_meta, validate_numeric_format
-from backend.cleaning import validate_allowed_values
+from backend.dataset_preparation import (
+    empty_column_meta as _empty_column_meta,
+    prepare_dataset as _prepare_dataset,
+    _schema_dtype,
+)
 from backend.operations import validate_operation
 from backend import resources
 
@@ -25,24 +28,9 @@ _WIDGET_KEYS = {
 }
 
 
-def _empty_column_meta() -> dict:
-    return {
-        "original_dtype": "object",
-        "inferred_dtype": "object",
-        "current_dtype": "object",
-        "confidence": 0.0,
-        "user_dtype": None,
-        "role": "feature",
-        "cardinality": 0,
-        "is_categorical": False,
-        "allowed_values": None,
-        "date_format": None,
-        "numeric_decimal": ".",
-        "numeric_thousands": None,
-    }
-
-
 def _defaults() -> dict:
+    from backend.fulfillment_state import new_project
+
     return {
         "original_df": None, "df": None, "column_meta": {}, "history": [],
         "target_column": None, "schema_confirmed": False, "viz_charts": [],
@@ -53,81 +41,8 @@ def _defaults() -> dict:
         "_analysis_cache": {},
         "_visualization_cache": {},
         "_upload_summary_cache": {},
+        "fulfillment": new_project(),
     }
-
-
-def _schema_dtype(series: pd.Series) -> str:
-    """Map nullable storage types to the schema editor's equivalent choices."""
-    if pd.api.types.is_bool_dtype(series):
-        return "bool"
-    if pd.api.types.is_integer_dtype(series):
-        if not pd.api.types.is_unsigned_integer_dtype(series):
-            return "int64"
-        if series.dropna().empty or int(series.max()) <= 2**63 - 1:
-            return "int64"
-    if pd.api.types.is_float_dtype(series):
-        return "float64"
-    if pd.api.types.is_string_dtype(series.dtype):
-        return "object"
-    return str(series.dtype)
-
-
-def _prepare_dataset(df, metadata, previous_df=None, explicit_schema=False):
-    """Prepare owned copies and synchronized metadata before any state mutation."""
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("The dataset must be a pandas DataFrame.")
-    resources.validate_dataset(df)
-    if not df.columns.is_unique:
-        raise ValueError("Column names must be unique to maintain an unambiguous schema.")
-    if not isinstance(metadata, dict) or any(not isinstance(value, dict) for value in metadata.values()):
-        raise ValueError("Column metadata must map column names to metadata dictionaries.")
-    candidate = df.copy(deep=True)
-    missing = [name for name in df.columns if name not in metadata]
-    inferred = infer_column_meta(df[missing]) if missing else {}
-    synchronized = {}
-    for name in candidate.columns:
-        series = candidate[name]
-        supplied = metadata.get(name, inferred.get(name, {}))
-        meta = _empty_column_meta()
-        meta.update(copy.deepcopy(supplied))
-        if meta["role"] not in ("feature", "id", "datetime", "ignore"):
-            raise ValueError(f"Column {name!r}: choose a supported column role.")
-        if not isinstance(meta["inferred_dtype"], str) or not meta["inferred_dtype"]:
-            raise ValueError(f"Column {name!r}: the inferred type must be a non-empty string.")
-        if meta["user_dtype"] is not None and (
-            not isinstance(meta["user_dtype"], str) or not meta["user_dtype"]
-        ):
-            raise ValueError(f"Column {name!r}: the requested type must be a non-empty string.")
-        allowed = meta["allowed_values"]
-        if allowed is not None and (
-            not isinstance(allowed, list) or any(not isinstance(value, str) for value in allowed)
-        ):
-            raise ValueError(f"Column {name!r}: allowed values must be a list of strings.")
-        if meta["date_format"] is not None and not isinstance(meta["date_format"], str):
-            raise ValueError(f"Column {name!r}: the date format must be a string.")
-        # Validate project/schema settings before accepting any dataset mutation.
-        validate_numeric_format(meta["numeric_decimal"], meta["numeric_thousands"])
-        if allowed:
-            validate_allowed_values(series, allowed)
-        if "original_dtype" not in supplied:
-            meta["original_dtype"] = str(series.dtype)
-        if (
-            not explicit_schema and previous_df is not None
-            and name in previous_df.columns and previous_df[name].dtype != series.dtype
-        ):
-            meta["user_dtype"] = None
-            meta["inferred_dtype"] = _schema_dtype(series)
-        meta["current_dtype"] = str(series.dtype)
-        meta["cardinality"] = int(series.nunique())
-        meta["is_categorical"] = (
-            isinstance(series.dtype, pd.CategoricalDtype)
-            or pd.api.types.is_string_dtype(series.dtype)
-            or pd.api.types.is_bool_dtype(series.dtype)
-            or meta["cardinality"] / max(len(candidate), 1) < 0.05
-            or (meta["cardinality"] < 30 and not pd.api.types.is_datetime64_any_dtype(series.dtype))
-        )
-        synchronized[name] = meta
-    return candidate, synchronized
 
 
 def _identifier(value, field):
@@ -446,6 +361,58 @@ class StateManager:
             st.session_state[key] = value
 
     @staticmethod
+    def clear_dataset() -> None:
+        """Clear the generic dataset without discarding fulfillment project work."""
+        StateManager._invalidate_dependent_state()
+        for key, value in _defaults().items():
+            if key not in ("fulfillment", "project_name"):
+                st.session_state[key] = value
+
+    @staticmethod
+    def _set_fulfillment(candidate: dict) -> bool:
+        if candidate == st.session_state.fulfillment:
+            return False
+        st.session_state.fulfillment = candidate
+        StateManager._touch_project()
+        return True
+
+    @staticmethod
+    def set_fulfillment_source(source: dict) -> bool:
+        from backend.fulfillment_state import set_source
+
+        candidate = set_source(st.session_state.fulfillment, source)
+        return StateManager._set_fulfillment(candidate)
+
+    @staticmethod
+    def set_fulfillment_plan(plan: dict) -> bool:
+        from backend.fulfillment_state import set_plan
+
+        candidate = set_plan(st.session_state.fulfillment, plan)
+        return StateManager._set_fulfillment(candidate)
+
+    @staticmethod
+    def run_fulfillment() -> dict:
+        from backend.fulfillment_state import run_project
+
+        candidate = run_project(st.session_state.fulfillment)
+        attempt = copy.deepcopy(candidate["last_attempt"])
+        StateManager._set_fulfillment(candidate)
+        return attempt
+
+    @staticmethod
+    def undo_fulfillment() -> bool:
+        from backend.fulfillment_state import undo_project
+
+        candidate = undo_project(st.session_state.fulfillment)
+        return StateManager._set_fulfillment(candidate)
+
+    @staticmethod
+    def fulfillment_result_is_current() -> bool:
+        from backend.fulfillment_state import current_result
+
+        return current_result(st.session_state.fulfillment)
+
+    @staticmethod
     def add_experiment(experiment: dict) -> str:
         if not StateManager.has_dataset() or not isinstance(experiment, dict):
             raise ValueError("Load a dataset before saving a completed experiment.")
@@ -515,12 +482,20 @@ class StateManager:
             "saved_chart_json_bytes": sum(_chart_sizes(st.session_state.viz_charts)),
             "experiments": len(st.session_state.experiments),
             "experiment_bytes": sum(resources.estimate_bytes(experiment) for experiment in st.session_state.experiments),
+            "fulfillment_bytes": resources.estimate_bytes(st.session_state.fulfillment),
+            "fulfillment_undo_snapshots": len(st.session_state.fulfillment["history"]),
         }
 
     @staticmethod
     def export_project(include_history: bool = True) -> dict:
+        from backend.fulfillment_state import export_project as export_fulfillment
+
+        fulfillment = export_fulfillment(st.session_state.fulfillment, include_history=include_history)
         if not StateManager.has_dataset():
-            raise ValueError("Load a dataset before saving a project.")
+            if fulfillment["source"] is None and fulfillment["committed"] is None:
+                raise ValueError("Load a dataset or fulfillment source before saving a project.")
+            return {"mode": "fulfillment-only", "project_name": st.session_state.project_name,
+                    "fulfillment": fulfillment}
         from backend.experiments import project_experiments
         import plotly.io as pio
         import json
@@ -535,16 +510,36 @@ class StateManager:
         result["history"] = copy.deepcopy(st.session_state.history) if include_history else []
         result["experiments"] = project_experiments(st.session_state.experiments)
         result["viz_charts"] = [json.loads(pio.to_json(figure)) for figure in st.session_state.viz_charts]
+        result["fulfillment"] = fulfillment
         return result
 
     @staticmethod
     def restore_project(project: dict) -> None:
         """Validate every restored component before replacing the active project."""
         from backend.experiments import project_experiments
+        from backend.fulfillment_state import new_project, validate_project as validate_fulfillment
         import plotly.graph_objects as go
 
         if not isinstance(project, dict):
             raise ValueError("A project must contain a structured state object.")
+        if project.get("mode") == "fulfillment-only":
+            if set(project) != {"mode", "project_name", "fulfillment"}:
+                raise ValueError("The fulfillment-only project has unsupported fields.")
+            name = project["project_name"]
+            if not isinstance(name, str) or not name.strip() or len(name) > 200:
+                raise ValueError("The project name must contain 1–200 characters.")
+            fulfillment = validate_fulfillment(project["fulfillment"])
+            if fulfillment["source"] is None and fulfillment["committed"] is None:
+                raise ValueError("The fulfillment-only project contains no source or result.")
+            candidate = _defaults()
+            candidate.update(fulfillment=fulfillment, project_name=name)
+            StateManager._invalidate_dependent_state()
+            st.session_state.update(candidate)
+            return
+        if "mode" in project:
+            raise ValueError("The project payload mode is unsupported.")
+        fulfillment = (validate_fulfillment(project["fulfillment"])
+                       if "fulfillment" in project else new_project())
         required = {
             "df", "original_df", "column_meta", "original_column_meta", "history", "operation_log",
             "schema_confirmed", "target_column", "statistical_operations", "dataset_id", "data_version",
@@ -633,5 +628,6 @@ class StateManager:
             "target_column": target, "statistical_operations": statistical, "operation_log": operations,
             "history": history, "dataset_id": dataset_id, "data_version": version,
             "experiments": summaries, "viz_charts": figures, "project_name": name,
+            "fulfillment": fulfillment,
         })
 
