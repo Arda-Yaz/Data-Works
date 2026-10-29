@@ -51,7 +51,7 @@ def implementation_hashes():
     paths = (
         "backend/fulfillment.py", "backend/fulfillment_state.py", "backend/state.py",
         "backend/project_io.py", "backend/resources.py", "frontend/pages/data_fulfillment.py",
-        "frontend/pages/data_project.py", "scripts/benchmark_fulfillment.py",
+        "frontend/pages/data_project.py", "frontend/project_status.py", "scripts/benchmark_fulfillment.py",
         "scripts/verify_fulfillment_workload_ui.py", "requirements.txt",
     )
     return {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest() for name in paths}

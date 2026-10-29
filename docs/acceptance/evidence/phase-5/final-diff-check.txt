@@ -1,0 +1,6 @@
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/pages/data_fulfillment.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'frontend/pages/data_project.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/verify_fulfillment_workload_ui.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_project_pages.py', LF will be replaced by CRLF the next time Git touches it

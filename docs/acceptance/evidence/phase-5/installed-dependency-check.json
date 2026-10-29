@@ -1,0 +1,9 @@
+{
+  "command": [
+    "C:\\Users\\Gaming\\AppData\\Local\\Python\\bin\\pip.exe",
+    "--python",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+    "check"
+  ],
+  "exit_code": 0
+}

@@ -1,0 +1,13 @@
+feat: clarify fulfillment workspace decisions and recovery
+
+Show current source, plan, attempt, successful result, and next action together.
+Add explicit run-bound status decisions, readable conflict guidance, scoped
+quarantine inspection, and visible undo retention notices.
+
+Distinguish preview toolbar exports from full fulfillment downloads and session
+state from prepared project archives. Preserve history export preferences across
+navigation and label dataset undo separately from fulfillment undo.
+
+Verify decision, recovery, download, and reopen journeys with 531 passing tests,
+a repeated 100,000-row UI profile, and a synthetic browser keyboard smoke check.
+Record the remaining operator, dependency-installation, and release gates.

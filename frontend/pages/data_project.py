@@ -9,6 +9,7 @@ from backend.operations import export_recipe, replay_operations
 from backend.project_io import dumps_project, encode_value, loads_project
 from backend.state import StateManager
 from backend.diagnostics import log_event, log_failure
+from frontend.project_status import show_project_download_status
 
 
 def _filename(name):
@@ -22,7 +23,26 @@ def _save_project_section(filename):
         "and fulfillment source, plan, results, and quarantine evidence when present. "
         "Live fitted models are exported separately from Machine Learning."
     )
-    with_history = st.checkbox("Include undo snapshots (larger file)", value=True, key="project_include_history")
+    with_history = st.checkbox(
+        "Include undo snapshots (larger file)",
+        value=st.session_state.get("_project_history_preference", True), key="project_include_history",
+    )
+    # Streamlit removes widget state when navigating away. Keep this choice so
+    # archive validity and the returning checkbox use the same save options.
+    st.session_state["_project_history_preference"] = with_history
+    dataset_history = len(st.session_state.get("history", []))
+    fulfillment_history = len(st.session_state.fulfillment["history"])
+    st.caption(
+        f"Retained undo snapshots: dataset {dataset_history}; fulfillment {fulfillment_history}. "
+        "Undo history is bounded by count and estimated memory; older snapshots can be released."
+    )
+    if with_history:
+        st.caption("This archive includes the retained snapshots only. Previously released undo history cannot be recovered from it.")
+    else:
+        st.warning(
+            "Undo snapshots are omitted from this download. Reopening it starts with no undo history; "
+            "the current data, fulfillment source, plan, and recorded results remain included."
+        )
     token = (st.session_state.project_revision, with_history)
     prepared = st.session_state.get("prepared_project_download")
     if prepared and prepared["token"] != token:
@@ -30,7 +50,8 @@ def _save_project_section(filename):
         prepared = None
     if st.button("Prepare Project Download", key="project_prepare"):
         try:
-            archive = dumps_project(StateManager.export_project(include_history=with_history))
+            with st.spinner("Preparing the project archive…"):
+                archive = dumps_project(StateManager.export_project(include_history=with_history))
             prepared = {"data": archive, "token": token}
             st.session_state.prepared_project_download = prepared
         except Exception as exc:
@@ -42,6 +63,7 @@ def _save_project_section(filename):
             mime="application/zip", key="project_download", on_click="ignore",
         )
         st.caption(f"Prepared {len(prepared['data']):,} bytes. Retain the download to reopen this work; new changes require a fresh download.")
+    show_project_download_status()
 
 
 def data_project():
@@ -51,8 +73,9 @@ def data_project():
     uploaded = st.file_uploader("Choose a DataWorks project", type=["dataworks"], key="project_file")
     if st.button("Open Project", key="project_open", disabled=uploaded is None):
         try:
-            payload = loads_project(uploaded.getvalue())
-            StateManager.restore_project(payload)
+            with st.spinner("Checking and opening the project archive…"):
+                payload = loads_project(uploaded.getvalue())
+                StateManager.restore_project(payload)
         except Exception as exc:
             log_failure("project_open_failed", exc)
             st.error(f"Project was not opened; the current session is unchanged. {exc}")

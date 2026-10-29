@@ -24,10 +24,10 @@ def home_page():
     history = st.session_state.get("history", [])
     if history:
         st.sidebar.markdown("---")
-        st.sidebar.subheader("History")
+        st.sidebar.subheader("Dataset history")
         for entry in reversed(history[-5:]):
             st.sidebar.text(f"• {entry['name']}")
-        if st.sidebar.button("↩ Undo Last"):
+        if st.sidebar.button("↩ Undo dataset change"):
             if StateManager.undo():
                 st.rerun()
 

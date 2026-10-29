@@ -83,6 +83,19 @@ reconcile source lines to accepted/quarantined lines and distinguish distinct
 orders from line and quantity totals. An unsuccessful attempt preserves the last
 successful result; older results retain their source/plan associations.
 
+The workspace overview separates the current source and plan from the latest
+attempt and last successful result, and gives the next action. For an unseen
+status, choose its meaning under **Resolve an unseen status**, apply the reviewed
+mapping, then run again. Each decision creates a plan revision; no meaning is
+preselected. Conflicting duplicates identify their source records and differing
+fields so the source can be corrected explicitly.
+
+**Inspect quarantine reason** filters the bounded preview only. The displayed
+report totals and fulfillment download buttons cover the full successful run.
+Streamlit's table toolbar exports only that displayed preview. The
+page shows retained fulfillment undo checkpoints and warns when a change releases
+checkpoints under the budget. Dataset undo in the sidebar is labeled separately.
+
 Download accepted CSV, quarantine CSV, and the report from that page. Use
 **Project & Exports** to save/reopen either a fulfillment-only or mixed project.
 Archives retain source bytes/read options, saved plans, results, and optional
@@ -92,6 +105,11 @@ older version 1 builds reject them rather than ignoring their new evidence.
 Reopening verifies the new evidence against its source and plan before replacing
 the current session. Retain the downloaded archive; preparation alone does not
 provide durable storage.
+
+The archive status distinguishes session-only changes from a prepared current
+archive. DataWorks cannot confirm that the browser retained a download. The
+chosen undo-history export option persists across navigation, and omitting
+history visibly explains what will be unavailable after reopening.
 
 The synthetic reproduction command writes actual saved plans/projects and checks
 fresh-process reopening and unchanged-plan reuse. Choose a new output directory:
@@ -122,6 +140,10 @@ restore independently owned values. [The persistence notes](docs/acceptance/phas
 describe compatibility, identity checks, and unchanged resource limits. Existing
 generic statistical recipe replay refits statistics on each input; frozen fitted
 statistics are unsupported. The fulfillment plan excludes statistical operations.
+
+The [Phase 5 observation sheet](docs/acceptance/phase-5-observation.md) defines the
+still-pending unaided operator check. Automated synthetic interaction checks do
+not establish customer usability, dashboard compatibility, or achieved savings.
 
 ## Uploading and transforming arbitrary datasets
 

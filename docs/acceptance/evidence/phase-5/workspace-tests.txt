@@ -1,0 +1,56 @@
+test_conflicts_are_actionable_and_downloads_remain_bound_to_prior_result (test_fulfillment_workspace.FulfillmentWorkspaceTests.test_conflicts_are_actionable_and_downloads_remain_bound_to_prior_result) ... 2026-10-29 20:52:10.160 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_dataset_and_fulfillment_undo_controls_restore_their_own_workspace (test_fulfillment_workspace.FulfillmentWorkspaceTests.test_dataset_and_fulfillment_undo_controls_restore_their_own_workspace) ... 2026-10-29 20:52:10.585 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-29T17:52:10.616100+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":12,"columns":6}
+{"time":"2026-10-29T17:52:10.628565+00:00","level":"INFO","event":"fulfillment_completed","accepted":4,"rejected":8}
+{"time":"2026-10-29T17:52:10.675033+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":8,"columns":6}
+ok
+test_each_unknown_status_requires_its_own_explicit_decision (test_fulfillment_workspace.FulfillmentWorkspaceTests.test_each_unknown_status_requires_its_own_explicit_decision) ... 2026-10-29 20:52:10.713 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-29T17:52:10.729610+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":2,"columns":6}
+{"time":"2026-10-29T17:52:10.818891+00:00","level":"INFO","event":"fulfillment_completed","accepted":2,"rejected":0}
+ok
+test_failed_latest_attempt_and_previous_result_survive_page_save_reopen (test_fulfillment_workspace.FulfillmentWorkspaceTests.test_failed_latest_attempt_and_previous_result_survive_page_save_reopen) ... 2026-10-29 20:52:10.827 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-29T17:52:10.841462+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":12,"columns":6}
+{"time":"2026-10-29T17:52:10.851643+00:00","level":"INFO","event":"fulfillment_completed","accepted":4,"rejected":8}
+{"time":"2026-10-29T17:52:10.876922+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":8,"columns":6}
+{"time":"2026-10-29T17:52:11.968379+00:00","level":"INFO","event":"project_opened","rows":8,"columns":6}
+ok
+test_first_failed_run_does_not_claim_a_previous_result_exists (test_fulfillment_workspace.FulfillmentWorkspaceTests.test_first_failed_run_does_not_claim_a_previous_result_exists) ... 2026-10-29 20:52:11.982 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-29T17:52:11.998273+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":12,"columns":6}
+{"time":"2026-10-29T17:52:12.028352+00:00","level":"INFO","event":"fulfillment_completed","accepted":4,"rejected":8}
+ok
+test_guided_status_decision_requires_explicit_choice_then_a_new_run (test_fulfillment_workspace.FulfillmentWorkspaceTests.test_guided_status_decision_requires_explicit_choice_then_a_new_run) ... 2026-10-29 20:52:12.036 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-29T17:52:12.052650+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":12,"columns":6}
+{"time":"2026-10-29T17:52:12.062903+00:00","level":"INFO","event":"fulfillment_completed","accepted":4,"rejected":8}
+{"time":"2026-10-29T17:52:12.090535+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":1,"columns":6}
+{"time":"2026-10-29T17:52:12.150270+00:00","level":"INFO","event":"fulfillment_completed","accepted":1,"rejected":0}
+ok
+test_quarantine_filter_limits_preview_only_and_keeps_full_downloads (test_fulfillment_workspace.FulfillmentWorkspaceTests.test_quarantine_filter_limits_preview_only_and_keeps_full_downloads) ... 2026-10-29 20:52:12.161 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-29T17:52:12.175711+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":12,"columns":6}
+{"time":"2026-10-29T17:52:12.186253+00:00","level":"INFO","event":"fulfillment_completed","accepted":4,"rejected":8}
+ok
+test_reason_filter_preserves_all_reasons_and_counts_a_line_once (test_fulfillment_workspace.FulfillmentWorkspaceTests.test_reason_filter_preserves_all_reasons_and_counts_a_line_once) ... 2026-10-29 20:52:12.225 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-29T17:52:12.240260+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":9,"columns":6}
+{"time":"2026-10-29T17:52:12.251810+00:00","level":"INFO","event":"fulfillment_completed","accepted":2,"rejected":7}
+ok
+test_replacing_source_removes_unapplied_decision_and_preserves_plan (test_fulfillment_workspace.FulfillmentWorkspaceTests.test_replacing_source_removes_unapplied_decision_and_preserves_plan) ... 2026-10-29 20:52:12.287 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-29T17:52:12.302014+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":12,"columns":6}
+{"time":"2026-10-29T17:52:12.313404+00:00","level":"INFO","event":"fulfillment_completed","accepted":4,"rejected":8}
+{"time":"2026-10-29T17:52:12.339329+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":1,"columns":6}
+{"time":"2026-10-29T17:52:12.394236+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":8,"columns":6}
+{"time":"2026-10-29T17:52:12.412318+00:00","level":"INFO","event":"fulfillment_completed","accepted":5,"rejected":3}
+ok
+test_skipped_checkpoint_is_visible_even_when_history_remains_empty (test_fulfillment_workspace.FulfillmentWorkspaceTests.test_skipped_checkpoint_is_visible_even_when_history_remains_empty) ... 2026-10-29 20:52:12.422 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-29T17:52:12.437116+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":12,"columns":6}
+{"time":"2026-10-29T17:52:12.449080+00:00","level":"INFO","event":"fulfillment_completed","accepted":4,"rejected":8}
+ok
+test_undo_guided_mapping_restores_source_plan_attempt_and_prior_result (test_fulfillment_workspace.FulfillmentWorkspaceTests.test_undo_guided_mapping_restores_source_plan_attempt_and_prior_result) ... 2026-10-29 20:52:12.458 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-29T17:52:12.474247+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":12,"columns":6}
+{"time":"2026-10-29T17:52:12.486511+00:00","level":"INFO","event":"fulfillment_completed","accepted":4,"rejected":8}
+{"time":"2026-10-29T17:52:12.510252+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":1,"columns":6}
+ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 2.422s
+
+OK

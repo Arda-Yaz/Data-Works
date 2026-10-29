@@ -1,0 +1,41 @@
+{
+  "started_at_utc": "2026-10-29T17:52:08.760594+00:00",
+  "finished_at_utc": "2026-10-29T17:52:12.587167+00:00",
+  "elapsed_seconds": 3.8260221000000456,
+  "command": ".venv\\Scripts\\python.exe -m unittest discover -s tests -p test_fulfillment_workspace.py -v (with workspace-local tempfile.tempdir configured before discovery)",
+  "tests_run": 11,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "passed": true,
+  "implementation_sha256_before": {
+    "tests/test_fulfillment_workspace.py": "e94ca142287f081e36ccc82c8fd40bb9799a24ff737841bbbe30e3b75104d761",
+    "frontend/pages/data_fulfillment.py": "c70ba1f4ebc45eaa336892ac2efc0eae77806929b2a7f90621c45421913a74ee",
+    "frontend/pages/data_project.py": "f2c4d42e5d4db4bf18d83a847657b6cf6db46ea5a63bf31124cf66faddd407f2",
+    "frontend/project_status.py": "211dd1911e5b149336b6509bb91d196ee543729b463b6d9287e292ef23272408",
+    "app.py": "86af0b24e810f5b5aaa25a96fe61036846e10e080390ce7eb32a41599897a0ed",
+    "backend/state.py": "aafeae962bd6a9e15130b1d68655c998571996ab434b15abae3a88c3698710c7",
+    "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+    "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+    "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+  },
+  "implementation_sha256_after": {
+    "tests/test_fulfillment_workspace.py": "e94ca142287f081e36ccc82c8fd40bb9799a24ff737841bbbe30e3b75104d761",
+    "frontend/pages/data_fulfillment.py": "c70ba1f4ebc45eaa336892ac2efc0eae77806929b2a7f90621c45421913a74ee",
+    "frontend/pages/data_project.py": "f2c4d42e5d4db4bf18d83a847657b6cf6db46ea5a63bf31124cf66faddd407f2",
+    "frontend/project_status.py": "211dd1911e5b149336b6509bb91d196ee543729b463b6d9287e292ef23272408",
+    "app.py": "86af0b24e810f5b5aaa25a96fe61036846e10e080390ce7eb32a41599897a0ed",
+    "backend/state.py": "aafeae962bd6a9e15130b1d68655c998571996ab434b15abae3a88c3698710c7",
+    "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+    "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+    "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+  },
+  "implementation_unchanged": true,
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "installed_versions": {
+    "streamlit": "1.55.0",
+    "pandas": "2.3.3",
+    "numpy": "2.4.2"
+  },
+  "evidence_limit": "Headless Streamlit AppTest with only upload transport supplied actual synthetic bytes; no real-browser usability or operator time-saving claim."
+}

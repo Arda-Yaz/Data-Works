@@ -1,0 +1,87 @@
+Browser tab: 2, Title: "DataWorks synthetic workspace check", URL: "http://127.0.0.1:8515/".
+The following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
++							537 table
++								538 row Status Accepted lines Accepted quantity
++									539 cell (selectable) Status
++									540 cell (selectable) Accepted lines
++									541 cell (selectable) Accepted quantity
++								542 container
++									543 row (selectable) fulfilled 2 3
++										544 cell (selectable) Value: fulfilled, ID: glide-cell-0-0
++										545 cell (selectable) Value: 2, ID: glide-cell-1-0
++										546 cell (selectable) Value: 3, ID: glide-cell-2-0
++									547 row (selectable) pending 1 1
++										548 cell (selectable) Value: pending, ID: glide-cell-0-1
++										549 cell (selectable) Value: 1, ID: glide-cell-1-1
++										550 cell (selectable) Value: 1, ID: glide-cell-2-1
++									551 row (selectable) cancelled 1 1
++										552 cell (selectable) Value: cancelled, ID: glide-cell-0-2
++										553 cell (selectable) Value: 1, ID: glide-cell-1-2
++										554 cell (selectable) Value: 1, ID: glide-cell-2-2
++							555 table
++								556 row order_id line_id order_date sku quantity fulfillment_status
++									557 cell (selectable) order_id
++									558 cell (selectable) line_id
++									559 cell (selectable) order_date
++									560 cell (selectable) sku
++									561 cell (selectable) quantity
++									562 cell (selectable) fulfillment_status
++								563 container
++									564 row (selectable) 000101 01 2026-08-01 SKU-001 2 fulfilled
++										565 cell (selectable) Value: 000101, ID: glide-cell-0-0
++										566 cell (selectable) Value: 01, ID: glide-cell-1-0
++										567 cell (selectable) Value: 2026-08-01, ID: glide-cell-2-0
++										568 cell (selectable) Value: SKU-001, ID: glide-cell-3-0
++										569 cell (selectable) Value: 2, ID: glide-cell-4-0
++										570 cell (selectable) Value: fulfilled, ID: glide-cell-5-0
++									571 row (selectable) 000101 02 2026-08-01 SKU-002 1 pending
++										572 cell (selectable) Value: 000101, ID: glide-cell-0-1
++										573 cell (selectable) Value: 02, ID: glide-cell-1-1
++										574 cell (selectable) Value: 2026-08-01, ID: glide-cell-2-1
++										575 cell (selectable) Value: SKU-002, ID: glide-cell-3-1
++										576 cell (selectable) Value: 1, ID: glide-cell-4-1
++										577 cell (selectable) Value: pending, ID: glide-cell-5-1
++									578 row (selectable) 000102 01 2026-08-02 SKU-003 1 fulfilled
++										579 cell (selectable) Value: 000102, ID: glide-cell-0-2
++										580 cell (selectable) Value: 01, ID: glide-cell-1-2
++										581 cell (selectable) Value: 2026-08-02, ID: glide-cell-2-2
++										582 cell (selectable) Value: SKU-003, ID: glide-cell-3-2
++										583 cell (selectable) Value: 1, ID: glide-cell-4-2
++										584 cell (selectable) Value: fulfilled, ID: glide-cell-5-2
++									585 row (selectable) 000106 01 2026-08-06 SKU-007 1 cancelled
++										586 cell (selectable) Value: 000106, ID: glide-cell-0-3
++										587 cell (selectable) Value: 01, ID: glide-cell-1-3
++										588 cell (selectable) Value: 2026-08-06, ID: glide-cell-2-3
++										589 cell (selectable) Value: SKU-007, ID: glide-cell-3-3
++										590 cell (selectable) Value: 1, ID: glide-cell-4-3
++										591 cell (selectable) Value: cancelled, ID: glide-cell-5-3
++							592 table
++								593 row source_record row_id
++									594 cell (selectable) source_record
++									595 cell (selectable) row_id
++								596 container
++									597 row (selectable) 4 87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0:4
++										598 cell (selectable) Value: 4, ID: glide-cell-0-0
++										599 cell (selectable) Value: 87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0:4, ID: glide-cell-1-0
++									600 row (selectable) 5 87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0:5
++										601 cell (selectable) Value: 5, ID: glide-cell-0-1
++										602 cell (selectable) Value: 87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0:5, ID: glide-cell-1-1
++									603 row (selectable) 6 87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0:6
++										604 cell (selectable) Value: 6, ID: glide-cell-0-2
++										605 cell (selectable) Value: 87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0:6, ID: glide-cell-1-2
++									606 row (selectable) 7 87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0:7
++										607 cell (selectable) Value: 7, ID: glide-cell-0-3
++										608 cell (selectable) Value: 87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0:7, ID: glide-cell-1-3
++									609 row (selectable) 9 87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0:9
++										610 cell (selectable) Value: 9, ID: glide-cell-0-4
++										611 cell (selectable) Value: 87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0:9, ID: glide-cell-1-4
++									612 row (selectable) 10 87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0:10
++										613 cell (selectable) Value: 10, ID: glide-cell-0-5
++										614 cell (selectable) Value: 87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0:10, ID: glide-cell-1-5
++									615 row (selectable) 11 87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0:11
++										616 cell (selectable) Value: 11, ID: glide-cell-0-6
++										617 cell (selectable) Value: 87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0:11, ID: glide-cell-1-6
++									618 row (selectable) 12 87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0:12
++										619 cell (selectable) Value: 12, ID: glide-cell-0-7
++										620 cell (selectable) Value: 87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0:12, ID: glide-cell-1-7
+The focused UI element is 1 AXWebArea DataWorks synthetic workspace check, URL: 127.0.0.1:8515/
