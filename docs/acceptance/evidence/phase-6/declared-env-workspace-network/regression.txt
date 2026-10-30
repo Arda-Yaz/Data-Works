@@ -1,0 +1,713 @@
+...........................................2026-10-30 21:00:45.727 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:00:46.129 The widget with key "outlier_columns" was created with a default value but also had its value set via the Session State API.
+Stack (most recent call last):
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\threading.py", line 1032, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\threading.py", line 1075, in _bootstrap_inner
+    self.run()
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\testing\v1\local_script_runner.py", line 144, in _run_script_thread
+    super()._run_script_thread()
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 436, in _run_script_thread
+    self._run_script(request.rerun_data)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 949, in _run_script
+    ) = exec_func_with_error_handling(code_to_exec, ctx)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 136, in exec_func_with_error_handling
+    result = func()
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 924, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\run-k7e4lcnl\tmpt80f1sxe\244a94219284ef7e3645083b4c11fac6", line 11, in <module>
+    data_cleaning()
+  File "C:\Users\Gaming\Documents\Data-Works\frontend\pages\data_cleaning.py", line 225, in data_cleaning
+    selected = st.multiselect(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\runtime\metrics_util.py", line 725, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\elements\widgets\multiselect.py", line 676, in multiselect
+    return self._multiselect(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\elements\widgets\multiselect.py", line 732, in _multiselect
+    check_widget_policies(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\elements\lib\policies.py", line 146, in check_widget_policies
+    check_session_state_rules(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\elements\lib\policies.py", line 90, in check_session_state_rules
+    _LOGGER.warning(
+
+.2026-10-30 21:00:46.141 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:46.285 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:46.410 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:46.532 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+
+....................2026-10-30 21:00:46.686 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:46.845 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:47.000 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:00:47.130 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:47.246 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:47.368 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:47.490 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:47.606 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:47.728 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:47.849 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.........................................2026-10-30 21:00:48.251 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:48.346 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:00:48.454 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:48.471 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:00:48.579 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:00:48.671 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:48.776 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:00:48.882 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:48.900 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:00:49.008 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:49.024 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:49.268 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:49.470 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+
+.2026-10-30 21:00:49.633 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:49.900 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:00:50.049 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:50.073 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+............................FF.............................2026-10-30 21:00:52.080 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+..2026-10-30 21:00:52.255 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:52.426 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+
+.2026-10-30 21:00:52.563 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+
+
+.2026-10-30 21:00:52.738 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:52.974 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+
+.E2026-10-30 21:00:53.115 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:53.285 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+......................................................2026-10-30 21:00:55.166 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:55.363 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:55.489368+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":12,"columns":6}
+{"time":"2026-10-30T18:00:55.503425+00:00","level":"INFO","event":"fulfillment_completed","accepted":4,"rejected":8}
+{"time":"2026-10-30T18:00:55.534903+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":8,"columns":6}
+.2026-10-30 21:00:55.580 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:55.683914+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":2,"columns":6}
+{"time":"2026-10-30T18:00:55.793697+00:00","level":"INFO","event":"fulfillment_completed","accepted":2,"rejected":0}
+.2026-10-30 21:00:55.806 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:55.910760+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":12,"columns":6}
+{"time":"2026-10-30T18:00:55.925701+00:00","level":"INFO","event":"fulfillment_completed","accepted":4,"rejected":8}
+{"time":"2026-10-30T18:00:55.954756+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":8,"columns":6}
+{"time":"2026-10-30T18:00:56.010417+00:00","level":"INFO","event":"project_opened","rows":8,"columns":6}
+.2026-10-30 21:00:56.024 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:56.128925+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":12,"columns":6}
+{"time":"2026-10-30T18:00:56.163516+00:00","level":"INFO","event":"fulfillment_completed","accepted":4,"rejected":8}
+.2026-10-30 21:00:56.174 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:56.282687+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":12,"columns":6}
+{"time":"2026-10-30T18:00:56.297317+00:00","level":"INFO","event":"fulfillment_completed","accepted":4,"rejected":8}
+{"time":"2026-10-30T18:00:56.327188+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":1,"columns":6}
+{"time":"2026-10-30T18:00:56.398778+00:00","level":"INFO","event":"fulfillment_completed","accepted":1,"rejected":0}
+.2026-10-30 21:00:56.410 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:56.511770+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":12,"columns":6}
+{"time":"2026-10-30T18:00:56.527082+00:00","level":"INFO","event":"fulfillment_completed","accepted":4,"rejected":8}
+.2026-10-30 21:00:56.568 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:56.668344+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":9,"columns":6}
+{"time":"2026-10-30T18:00:56.682760+00:00","level":"INFO","event":"fulfillment_completed","accepted":2,"rejected":7}
+.2026-10-30 21:00:56.724 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:56.825525+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":12,"columns":6}
+{"time":"2026-10-30T18:00:56.839095+00:00","level":"INFO","event":"fulfillment_completed","accepted":4,"rejected":8}
+{"time":"2026-10-30T18:00:56.867650+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":1,"columns":6}
+{"time":"2026-10-30T18:00:56.928850+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":8,"columns":6}
+{"time":"2026-10-30T18:00:56.949266+00:00","level":"INFO","event":"fulfillment_completed","accepted":5,"rejected":3}
+.2026-10-30 21:00:56.960 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:57.063908+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":12,"columns":6}
+{"time":"2026-10-30T18:00:57.077614+00:00","level":"INFO","event":"fulfillment_completed","accepted":4,"rejected":8}
+.2026-10-30 21:00:57.086 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:57.189581+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":12,"columns":6}
+{"time":"2026-10-30T18:00:57.202623+00:00","level":"INFO","event":"fulfillment_completed","accepted":4,"rejected":8}
+{"time":"2026-10-30T18:00:57.229784+00:00","level":"INFO","event":"fulfillment_source_loaded","rows":1,"columns":6}
+................2026-10-30 21:00:57.568 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:57.711964+00:00","level":"INFO","event":"cleaning_applied","rows":3,"columns":2}
+.2026-10-30 21:00:57.721 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:57.869 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:57.973522+00:00","level":"INFO","event":"dataset_loaded","rows":1,"columns":1}
+.2026-10-30 21:00:57.980 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:58.068457+00:00","level":"WARNING","event":"dataset_load_failed","error_type":"ValueError"}
+2026-10-30 21:00:58.069 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:58.157791+00:00","level":"WARNING","event":"upload_options_failed","error_type":"ValueError"}
+.2026-10-30 21:00:58.159 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:58.251165+00:00","level":"INFO","event":"dataset_loaded","rows":1,"columns":1}
+2026-10-30 21:00:58.258 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:58.346752+00:00","level":"INFO","event":"dataset_loaded","rows":2,"columns":1}
+.2026-10-30 21:00:58.352 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:58.480754+00:00","level":"INFO","event":"cleaning_applied","rows":3,"columns":2}
+F2026-10-30 21:00:58.502 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:58.596373+00:00","level":"INFO","event":"dataset_loaded","rows":2,"columns":3}
+.........................2026-10-30 21:00:58.705 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:58.828 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:58.933 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:59.057098+00:00","level":"INFO","event":"ml_model_completed","training_rows":48,"test_rows":12,"features":1}
+.2026-10-30 21:00:59.090 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:59.224772+00:00","level":"INFO","event":"ml_model_completed","training_rows":64,"test_rows":16,"features":1}
+.2026-10-30 21:00:59.254 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:59.391961+00:00","level":"INFO","event":"ml_model_completed","training_rows":48,"test_rows":12,"features":2}
+.2026-10-30 21:00:59.422 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:59.536560+00:00","level":"INFO","event":"ml_model_completed","training_rows":32,"test_rows":8,"features":1}
+.2026-10-30 21:00:59.566 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:00:59.675 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:59.778038+00:00","level":"WARNING","event":"ml_preprocessing_failed","error_type":"ValueError"}
+.2026-10-30 21:00:59.779 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:00:59.889486+00:00","level":"INFO","event":"ml_model_completed","training_rows":32,"test_rows":8,"features":1}
+.2026-10-30 21:00:59.921 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:01:00.034648+00:00","level":"INFO","event":"ml_model_completed","training_rows":2,"test_rows":2,"features":1}
+{"time":"2026-10-30T18:01:00.035549+00:00","level":"WARNING","event":"ml_model_failed","error_type":"ValueError"}
+.....................................................F........2026-10-30 21:01:00.446 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:01:00.567 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:01:00.619 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+...2026-10-30 21:01:00.803 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:01:00.911 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+...FF....F.F..FFFFFF2026-10-30 21:01:01.635 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:01:01.744 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:01:01.892 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:01:02.010653+00:00","level":"WARNING","event":"project_open_failed","error_type":"ValueError"}
+.2026-10-30 21:01:02.015 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:01:02.145877+00:00","level":"INFO","event":"cleaning_applied","rows":1,"columns":2}
+.2026-10-30 21:01:02.153 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:01:02.286 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:01:02.405 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:01:02.520750+00:00","level":"INFO","event":"project_opened","rows":3,"columns":2}
+.E2026-10-30 21:01:02.525 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:01:02.650994+00:00","level":"INFO","event":"project_opened","rows":3,"columns":2}
+.2026-10-30 21:01:02.663 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+......F..............2026-10-30 21:01:03.529 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:01:03.626877+00:00","level":"WARNING","event":"schema_preview_failed","error_type":"ValueError"}
+.2026-10-30 21:01:03.628 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:01:03.740 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:01:03.848122+00:00","level":"INFO","event":"ml_model_completed","training_rows":32,"test_rows":8,"features":1}
+.....F......................2026-10-30 21:01:03.978 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:01:04.071 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:01:04.161 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:01:04.255 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.{"time":"2026-10-30T18:01:04.417720+00:00","level":"INFO","event":"auth_access_denied"}
+{"time":"2026-10-30T18:01:04.417720+00:00","level":"INFO","event":"auth_access_denied"}
+{"time":"2026-10-30T18:01:04.418720+00:00","level":"INFO","event":"auth_access_denied"}
+....{"time":"2026-10-30T18:01:04.420719+00:00","level":"WARNING","event":"auth_configuration_failed","error_type":"ValueError"}
+..{"time":"2026-10-30T18:01:04.421719+00:00","level":"WARNING","event":"auth_configuration_failed","error_type":"ValueError"}
+{"time":"2026-10-30T18:01:04.423721+00:00","level":"WARNING","event":"auth_configuration_failed","error_type":"ValueError"}
+{"time":"2026-10-30T18:01:04.423721+00:00","level":"WARNING","event":"auth_configuration_failed","error_type":"ValueError"}
+{"time":"2026-10-30T18:01:04.425225+00:00","level":"WARNING","event":"auth_configuration_failed","error_type":"ValueError"}
+......................................2026-10-30 21:01:04.617 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:01:04.802 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:01:04.927731+00:00","level":"INFO","event":"cleaning_applied","rows":3,"columns":1}
+.2026-10-30 21:01:04.947 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:01:05.087 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:01:05.199 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:01:05.298 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:01:05.303376+00:00","level":"WARNING","event":"cleaning_preview_failed","error_type":"ValueError"}
+2026-10-30 21:01:05.305 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:01:05.399 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:01:05.407 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:01:05.566 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:01:05.571785+00:00","level":"WARNING","event":"cleaning_preview_failed","error_type":"ValueError"}
+.2026-10-30 21:01:05.574 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+{"time":"2026-10-30T18:01:05.690373+00:00","level":"INFO","event":"cleaning_applied","rows":3,"columns":1}
+.2026-10-30 21:01:05.703 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:01:05.828 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:01:05.828 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:01:05.842 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+E2026-10-30 21:01:05.853 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.2026-10-30 21:01:06.018 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:01:06.157 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:01:06.284 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.............F......................2026-10-30 21:01:06.665 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-10-30 21:01:06.760 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+.
+======================================================================
+ERROR: test_route_requires_no_generic_dataset_and_run_waits_for_a_source (test_fulfillment_pages.FulfillmentPageTests.test_route_requires_no_generic_dataset_and_run_waits_for_a_source)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_fulfillment_pages.py", line 69, in test_route_requires_no_generic_dataset_and_run_waits_for_a_source
+    app = AppTest.from_file("app.py", default_timeout=30).run(timeout=30)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\testing\v1\app_test.py", line 475, in from_file
+    raise FileNotFoundError(
+FileNotFoundError: AppTest script not found at C:\Users\Gaming\Documents\Data-Works\tests\app.py. Relative paths are resolved against the file that calls AppTest.from_file().
+
+======================================================================
+ERROR: test_project_route_is_accessible_without_an_upload (test_project_pages.ProjectPageTests.test_project_route_is_accessible_without_an_upload)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_project_pages.py", line 207, in test_project_route_is_accessible_without_an_upload
+    app = AppTest.from_file("app.py").run(timeout=30)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\testing\v1\app_test.py", line 475, in from_file
+    raise FileNotFoundError(
+FileNotFoundError: AppTest script not found at C:\Users\Gaming\Documents\Data-Works\tests\app.py. Relative paths are resolved against the file that calls AppTest.from_file().
+
+======================================================================
+ERROR: test_replacement_and_clear_reset_active_widgets_and_saved_charts (test_state_consistency_pages.StateConsistencyPageTests.test_replacement_and_clear_reset_active_widgets_and_saved_charts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\runtime\state\session_state.py", line 790, in __getitem__
+    base_value = self._getitem(widget_id, key)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\runtime\state\session_state.py", line 843, in _getitem
+    raise KeyError
+KeyError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\testing\v1\app_test.py", line 202, in __getattr__
+    return self[key]
+           ~~~~^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\testing\v1\app_test.py", line 187, in __getitem__
+    return self._state[key]
+           ~~~~~~~~~~~^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\runtime\state\safe_session_state.py", line 123, in __getitem__
+    return self._state[key]
+           ~~~~~~~~~~~^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\runtime\state\session_state.py", line 797, in __getitem__
+    raise KeyError(_missing_key_error_message(key))
+KeyError: 'st.session_state has no key "filtered_state". Did you forget to initialize it? More info: https://docs.streamlit.io/develop/concepts/architecture/session-state#initialization'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_state_consistency_pages.py", line 206, in test_replacement_and_clear_reset_active_widgets_and_saved_charts
+    self.assertNotIn("ml_target", app.session_state.filtered_state)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\testing\v1\app_test.py", line 204, in __getattr__
+    raise AttributeError(f"{key} not found in session_state.")
+AttributeError: filtered_state not found in session_state.
+
+======================================================================
+FAIL: test_generic_projects_retain_legacy_version_one_and_round_trip (test_fulfillment_archive_versions.FulfillmentArchiveVersionTests.test_generic_projects_retain_legacy_version_one_and_round_trip)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_fulfillment_archive_versions.py", line 47, in test_generic_projects_retain_legacy_version_one_and_round_trip
+    assert_frame_equal(reopened["df"], payload["df"])
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 1537, in assert_frame_equal
+    assert_index_equal(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 356, in assert_index_equal
+    _check_types(left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 350, in _check_types
+    assert_attr_equal("dtype", left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 589, in assert_attr_equal
+    raise_assert_detail(obj, msg, left_attr, right_attr)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 782, in raise_assert_detail
+    raise AssertionError(msg)
+AssertionError: DataFrame.columns are different
+
+Attribute "dtype" are different
+[left]:  <StringDtype(na_value=<NA>)>
+[right]: <StringDtype(na_value=nan)>
+
+======================================================================
+FAIL: test_mixed_projects_write_v2_instead_of_risking_legacy_ledger_loss (test_fulfillment_archive_versions.FulfillmentArchiveVersionTests.test_mixed_projects_write_v2_instead_of_risking_legacy_ledger_loss)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_fulfillment_archive_versions.py", line 70, in test_mixed_projects_write_v2_instead_of_risking_legacy_ledger_loss
+    assert_frame_equal(reopened["df"], payload["df"])
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 1537, in assert_frame_equal
+    assert_index_equal(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 356, in assert_index_equal
+    _check_types(left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 350, in _check_types
+    assert_attr_equal("dtype", left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 589, in assert_attr_equal
+    raise_assert_detail(obj, msg, left_attr, right_attr)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 782, in raise_assert_detail
+    raise AssertionError(msg)
+AssertionError: DataFrame.columns are different
+
+Attribute "dtype" are different
+[left]:  <StringDtype(na_value=<NA>)>
+[right]: <StringDtype(na_value=nan)>
+
+======================================================================
+FAIL: test_text_preview_apply_and_project_recipe_agree_and_are_undoable (test_ingestion_transform_pages.IngestionAndTransformPageTests.test_text_preview_apply_and_project_recipe_agree_and_are_undoable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_ingestion_transform_pages.py", line 136, in test_text_preview_apply_and_project_recipe_agree_and_are_undoable
+    self.assertEqual(replayed["column_meta"], saved["column_meta"])
+AssertionError: {'lab[75 chars] 'string', 'confidence': 1.0, 'user_dtype': No[441 chars]one}} != {'lab[75 chars] 'str', 'confidence': 1.0, 'user_dtype': None,[435 chars]one}}
+Diff is 977 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_complete_chain_reproduces_values_schema_and_provenance (test_operation_recipes.ReplayTests.test_complete_chain_reproduces_values_schema_and_provenance)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_operation_recipes.py", line 200, in test_complete_chain_reproduces_values_schema_and_provenance
+    assert_frame_equal(result["df"], expected)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 1587, in assert_frame_equal
+    assert_series_equal(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 192, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 1226, in assert_series_equal
+    assert_attr_equal("dtype", left, right, obj=f"Attributes of {obj}")
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 589, in assert_attr_equal
+    raise_assert_detail(obj, msg, left_attr, right_attr)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 782, in raise_assert_detail
+    raise AssertionError(msg)
+AssertionError: Attributes of DataFrame.iloc[:, 1] (column name="label") are different
+
+Attribute "dtype" are different
+[left]:  object
+[right]: <StringDtype(na_value=nan)>
+
+======================================================================
+FAIL: test_preparation_owns_frame_and_nested_metadata_and_preserves_index (test_preparation_boundary.PreparationBoundaryTests.test_preparation_owns_frame_and_nested_metadata_and_preserves_index)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_preparation_boundary.py", line 28, in test_preparation_owns_frame_and_nested_metadata_and_preserves_index
+    self.assertEqual(synchronized["code"]["current_dtype"], "object")
+AssertionError: 'str' != 'object'
+- str
++ object
+
+
+======================================================================
+FAIL: test_replay_runs_in_fresh_process_that_rejects_streamlit_imports (test_preparation_boundary.PreparationBoundaryTests.test_replay_runs_in_fresh_process_that_rejects_streamlit_imports)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_preparation_boundary.py", line 92, in test_replay_runs_in_fresh_process_that_rejects_streamlit_imports
+    self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "<string>", line 29, in <module>
+AssertionError
+
+
+======================================================================
+FAIL: test_empty_tables_and_named_range_index_round_trip (test_project_io.ProjectCodecTests.test_empty_tables_and_named_range_index_round_trip) (frame=(0, 1))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_project_io.py", line 89, in test_empty_tables_and_named_range_index_round_trip
+    assert_frame_equal(loads_project(dumps_project({"df": frame}))["df"], frame)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 1537, in assert_frame_equal
+    assert_index_equal(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 356, in assert_index_equal
+    _check_types(left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 350, in _check_types
+    assert_attr_equal("dtype", left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 589, in assert_attr_equal
+    raise_assert_detail(obj, msg, left_attr, right_attr)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 782, in raise_assert_detail
+    raise AssertionError(msg)
+AssertionError: DataFrame.columns are different
+
+Attribute "dtype" are different
+[left]:  <StringDtype(na_value=<NA>)>
+[right]: <StringDtype(na_value=nan)>
+
+======================================================================
+FAIL: test_large_integer_categorical_levels_are_not_converted_to_floats (test_project_io.ProjectCodecTests.test_large_integer_categorical_levels_are_not_converted_to_floats)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_project_io.py", line 51, in test_large_integer_categorical_levels_are_not_converted_to_floats
+    assert_frame_equal(result, frame)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 1537, in assert_frame_equal
+    assert_index_equal(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 356, in assert_index_equal
+    _check_types(left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 350, in _check_types
+    assert_attr_equal("dtype", left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 589, in assert_attr_equal
+    raise_assert_detail(obj, msg, left_attr, right_attr)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 782, in raise_assert_detail
+    raise AssertionError(msg)
+AssertionError: DataFrame.columns are different
+
+Attribute "dtype" are different
+[left]:  <StringDtype(na_value=<NA>)>
+[right]: <StringDtype(na_value=nan)>
+
+======================================================================
+FAIL: test_mixed_column_labels_and_mapping_keys_are_preserved (test_project_io.ProjectCodecTests.test_mixed_column_labels_and_mapping_keys_are_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_project_io.py", line 58, in test_mixed_column_labels_and_mapping_keys_are_preserved
+    assert_frame_equal(result["df"], frame)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 1587, in assert_frame_equal
+    assert_series_equal(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 192, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 1226, in assert_series_equal
+    assert_attr_equal("dtype", left, right, obj=f"Attributes of {obj}")
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 589, in assert_attr_equal
+    raise_assert_detail(obj, msg, left_attr, right_attr)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 782, in raise_assert_detail
+    raise AssertionError(msg)
+AssertionError: Attributes of DataFrame.iloc[:, 1] (column name="1") are different
+
+Attribute "dtype" are different
+[left]:  <StringDtype(na_value=<NA>)>
+[right]: <StringDtype(na_value=nan)>
+
+======================================================================
+FAIL: test_multi_index_levels_and_datetime_frequency_are_preserved (test_project_io.ProjectCodecTests.test_multi_index_levels_and_datetime_frequency_are_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 392, in assert_index_equal
+    assert_index_equal(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 356, in assert_index_equal
+    _check_types(left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 350, in _check_types
+    assert_attr_equal("dtype", left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 589, in assert_attr_equal
+    raise_assert_detail(obj, msg, left_attr, right_attr)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 782, in raise_assert_detail
+    raise AssertionError(msg)
+AssertionError: DataFrame.index level [0] are different
+
+Attribute "dtype" are different
+[left]:  <StringDtype(na_value=<NA>)>
+[right]: <StringDtype(na_value=nan)>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_project_io.py", line 95, in test_multi_index_levels_and_datetime_frequency_are_preserved
+    assert_frame_equal(decode_value(encode_value(frame)), frame)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 1522, in assert_frame_equal
+    assert_index_equal(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 409, in assert_index_equal
+    assert_index_equal(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 356, in assert_index_equal
+    _check_types(left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 350, in _check_types
+    assert_attr_equal("dtype", left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 589, in assert_attr_equal
+    raise_assert_detail(obj, msg, left_attr, right_attr)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 782, in raise_assert_detail
+    raise AssertionError(msg)
+AssertionError: DataFrame.index level [0] are different
+
+Attribute "dtype" are different
+[left]:  <StringDtype(na_value=<NA>)>
+[right]: <StringDtype(na_value=nan)>
+
+======================================================================
+FAIL: test_nullable_and_time_dtypes_round_trip_without_precision_loss (test_project_io.ProjectCodecTests.test_nullable_and_time_dtypes_round_trip_without_precision_loss)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_project_io.py", line 44, in test_nullable_and_time_dtypes_round_trip_without_precision_loss
+    assert_frame_equal(result, frame)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 1522, in assert_frame_equal
+    assert_index_equal(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 356, in assert_index_equal
+    _check_types(left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 350, in _check_types
+    assert_attr_equal("dtype", left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 589, in assert_attr_equal
+    raise_assert_detail(obj, msg, left_attr, right_attr)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 782, in raise_assert_detail
+    raise AssertionError(msg)
+AssertionError: DataFrame.index are different
+
+Attribute "dtype" are different
+[left]:  <StringDtype(na_value=<NA>)>
+[right]: <StringDtype(na_value=nan)>
+
+======================================================================
+FAIL: test_object_scalar_types_and_missing_markers_are_preserved (test_project_io.ProjectCodecTests.test_object_scalar_types_and_missing_markers_are_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_project_io.py", line 67, in test_object_scalar_types_and_missing_markers_are_preserved
+    assert_frame_equal(result, frame)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 1537, in assert_frame_equal
+    assert_index_equal(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 356, in assert_index_equal
+    _check_types(left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 350, in _check_types
+    assert_attr_equal("dtype", left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 589, in assert_attr_equal
+    raise_assert_detail(obj, msg, left_attr, right_attr)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 782, in raise_assert_detail
+    raise AssertionError(msg)
+AssertionError: DataFrame.columns are different
+
+Attribute "dtype" are different
+[left]:  <StringDtype(na_value=<NA>)>
+[right]: <StringDtype(na_value=nan)>
+
+======================================================================
+FAIL: test_period_and_interval_values_use_data_only_constructors (test_project_io.ProjectCodecTests.test_period_and_interval_values_use_data_only_constructors)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_project_io.py", line 102, in test_period_and_interval_values_use_data_only_constructors
+    assert_frame_equal(decode_value(encode_value(frame)), frame)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 1537, in assert_frame_equal
+    assert_index_equal(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 356, in assert_index_equal
+    _check_types(left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 350, in _check_types
+    assert_attr_equal("dtype", left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 589, in assert_attr_equal
+    raise_assert_detail(obj, msg, left_attr, right_attr)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 782, in raise_assert_detail
+    raise AssertionError(msg)
+AssertionError: DataFrame.columns are different
+
+Attribute "dtype" are different
+[left]:  <StringDtype(na_value=<NA>)>
+[right]: <StringDtype(na_value=nan)>
+
+======================================================================
+FAIL: test_series_arrays_and_reserved_mapping_tags_round_trip (test_project_io.ProjectCodecTests.test_series_arrays_and_reserved_mapping_tags_round_trip)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_project_io.py", line 78, in test_series_arrays_and_reserved_mapping_tags_round_trip
+    assert_series_equal(result["series"], series)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 1198, in assert_series_equal
+    assert_index_equal(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 356, in assert_index_equal
+    _check_types(left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 350, in _check_types
+    assert_attr_equal("dtype", left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 589, in assert_attr_equal
+    raise_assert_detail(obj, msg, left_attr, right_attr)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 782, in raise_assert_detail
+    raise AssertionError(msg)
+AssertionError: Series.index are different
+
+Attribute "dtype" are different
+[left]:  <StringDtype(na_value=<NA>)>
+[right]: <StringDtype(na_value=nan)>
+
+======================================================================
+FAIL: test_project_round_trip_preserves_data_schema_history_charts_and_reports (test_project_state.ProjectStateTests.test_project_round_trip_preserves_data_schema_history_charts_and_reports)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_project_state.py", line 81, in test_project_round_trip_preserves_data_schema_history_charts_and_reports
+    assert_frame_equal(self.state.df, expected["df"])
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 1537, in assert_frame_equal
+    assert_index_equal(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 356, in assert_index_equal
+    _check_types(left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 350, in _check_types
+    assert_attr_equal("dtype", left, right, obj=obj)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 589, in assert_attr_equal
+    raise_assert_detail(obj, msg, left_attr, right_attr)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 782, in raise_assert_detail
+    raise AssertionError(msg)
+AssertionError: DataFrame.columns are different
+
+Attribute "dtype" are different
+[left]:  <StringDtype(na_value=<NA>)>
+[right]: <StringDtype(na_value=nan)>
+
+======================================================================
+FAIL: test_id_named_column_is_not_reinterpreted (test_review_regressions.IngestionTests.test_id_named_column_is_not_reinterpreted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_review_regressions.py", line 112, in test_id_named_column_is_not_reinterpreted
+    assert_frame_equal(df, after)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 219, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 1587, in assert_frame_equal
+    assert_series_equal(
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\util\_decorators.py", line 192, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 1226, in assert_series_equal
+    assert_attr_equal("dtype", left, right, obj=f"Attributes of {obj}")
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 589, in assert_attr_equal
+    raise_assert_detail(obj, msg, left_attr, right_attr)
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\pandas\_testing\asserters.py", line 782, in raise_assert_detail
+    raise AssertionError(msg)
+AssertionError: Attributes of DataFrame.iloc[:, 0] (column name="customer_id") are different
+
+Attribute "dtype" are different
+[left]:  <StringDtype(na_value=nan)>
+[right]: object
+
+======================================================================
+FAIL: test_mapping_is_exact_simultaneous_and_retains_unmatched (test_text_transform.TextTransformationTests.test_mapping_is_exact_simultaneous_and_retains_unmatched)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_text_transform.py", line 57, in test_mapping_is_exact_simultaneous_and_retains_unmatched
+    self.assertEqual(result["label"].tolist(), ["b", "c", " a", "c", None])
+AssertionError: Lists differ: ['b', 'c', ' a', 'c', nan] != ['b', 'c', ' a', 'c', None]
+
+First differing element 4:
+nan
+None
+
+- ['b', 'c', ' a', 'c', nan]
+?                        ^^
+
++ ['b', 'c', ' a', 'c', None]
+?                       ++ ^
+
+
+----------------------------------------------------------------------
+Ran 551 tests in 21.112s
+
+FAILED (failures=17, errors=3)

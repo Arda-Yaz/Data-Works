@@ -1,0 +1,195 @@
+{
+  "protocol_version": 1,
+  "status": "passed",
+  "started_at_utc": "2026-10-30T18:15:06.484845+00:00",
+  "scope": "one headless Streamlit AppTest workload profile; not a real browser, fresh-process reopen, customer validation, or ten-sample UI p95",
+  "f14_full_protocol_claimed": false,
+  "configuration": {
+    "rows": 100000,
+    "samples": 1,
+    "include_history": false,
+    "apptest_timeout_seconds": 120
+  },
+  "mocks": [
+    "streamlit.file_uploader returns actual synthetic CSV/project bytes"
+  ],
+  "measurement_limits": "Whole-process high-water RSS includes imports, AppTest/protobuf/session overhead and all prior stages. Source CSV bytes and actual archive bytes are retained for boundary uploads; no original full project copy or standalone decoded archive is retained.",
+  "hardware": {
+    "platform": "Windows-11-10.0.26300-SP0",
+    "architecture": "AMD64",
+    "processor": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+    "logical_cpus": 12,
+    "physical_ram_bytes": 16282554368,
+    "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "python_executable": "C:\\Users\\Gaming\\Documents\\Data-Works\\.test-tmp\\phase6-declared-env\\Scripts\\python.exe"
+  },
+  "installed_packages": {
+    "streamlit": "1.66.1",
+    "pandas": "3.1.0",
+    "numpy": "2.5.4",
+    "plotly": "7.1.0",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1",
+    "joblib": "1.6.0",
+    "threadpoolctl": "3.7.0",
+    "Authlib": "1.9.1",
+    "openpyxl": "3.1.5",
+    "xlrd": "2.0.2",
+    "watchdog": "6.0.0"
+  },
+  "dependency_claim": "Installed versions recorded only; no clean-install or declared-pin compatibility claim.",
+  "implementation_sha256": {
+    "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+    "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+    "backend/state.py": "aafeae962bd6a9e15130b1d68655c998571996ab434b15abae3a88c3698710c7",
+    "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+    "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+    "frontend/pages/data_fulfillment.py": "42664feb7f623406349068506622b7f29dd335462ba41472063a1a8c4cea05cd",
+    "frontend/pages/data_project.py": "f2c4d42e5d4db4bf18d83a847657b6cf6db46ea5a63bf31124cf66faddd407f2",
+    "frontend/project_status.py": "211dd1911e5b149336b6509bb91d196ee543729b463b6d9287e292ef23272408",
+    "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+    "scripts/verify_fulfillment_workload_ui.py": "d43c21986fe3959ee3ef22572fb5306b2271d993ee8373b189fa992f130b96d9",
+    "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+  },
+  "phase_seconds": {
+    "apptest_imports": 0.6173512000004848,
+    "initial_render": 1.1080767000003107,
+    "load_source": 0.5719988999999259,
+    "execute_plan": 7.343090599999414,
+    "oracle_before_save": 0.16649429999961285,
+    "switch_to_project": 0.016442099999949278,
+    "disable_history": 0.004069200000230921,
+    "prepare_archive": 11.497943000000305,
+    "archive_write": 0.0005856999996467493,
+    "clear_session": 0.010196999999607215,
+    "enable_project_open": 0.12851250000039727,
+    "reopen_project": 18.085091699999793,
+    "switch_back_to_fulfillment": 0.03582950000054552,
+    "oracle_after_reopen": 0.15080869999928836
+  },
+  "phase_peak_rss_bytes": {
+    "apptest_imports": 74936320,
+    "initial_render": 135028736,
+    "load_source": 263663616,
+    "execute_plan": 582975488,
+    "oracle_before_save": 582975488,
+    "switch_to_project": 582975488,
+    "disable_history": 582975488,
+    "prepare_archive": 768663552,
+    "archive_write": 768663552,
+    "clear_session": 768663552,
+    "enable_project_open": 768663552,
+    "reopen_project": 773578752,
+    "switch_back_to_fulfillment": 773578752,
+    "oracle_after_reopen": 773578752
+  },
+  "expected_report": {
+    "source_rows": 100000,
+    "accepted_rows": 50000,
+    "rejected_rows": 50000,
+    "rejection_reason_assignments": 70000,
+    "accepted_distinct_orders": 40000,
+    "accepted_quantity": 120000,
+    "accepted_line_counts_by_status": {
+      "fulfilled": 20000,
+      "pending": 20000,
+      "cancelled": 10000
+    },
+    "accepted_quantity_by_status": {
+      "fulfilled": 60000,
+      "pending": 30000,
+      "cancelled": 30000
+    }
+  },
+  "input": {
+    "path": "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-6\\benchmark-declared\\workload.csv",
+    "bytes": 4230060,
+    "sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e"
+  },
+  "stage": "complete",
+  "before_archive": {
+    "run_id": "00c7bd37c36f4892b0bf0322af5e0b15",
+    "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+    "plan_id": "2203dfaddce64fd99132bf7058632ace",
+    "plan_revision": 1,
+    "plan_digest": "c60f6d71fcb60fac84b5413afe0d94cb5cd429f4d733cb679d841be4ab36259d",
+    "report": {
+      "source_rows": 100000,
+      "accepted_rows": 50000,
+      "rejected_rows": 50000,
+      "rejection_reason_assignments": 70000,
+      "accepted_distinct_orders": 40000,
+      "accepted_quantity": 120000,
+      "accepted_line_counts_by_status": {
+        "fulfilled": 20000,
+        "pending": 20000,
+        "cancelled": 10000
+      },
+      "accepted_quantity_by_status": {
+        "fulfilled": 60000,
+        "pending": 30000,
+        "cancelled": 30000
+      }
+    },
+    "source_sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e",
+    "multi_reason_quarantined_rows": 10000,
+    "exact_duplicate_rows": 10000,
+    "rendered_table_rows": [
+      100,
+      9,
+      3,
+      100,
+      100
+    ],
+    "history_snapshots": 2
+  },
+  "archive": {
+    "path": "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-6\\ui-workload-declared\\fulfillment-without-history.dataworks",
+    "bytes": 1284677,
+    "sha256": "d86423f5f72eb31f3683a95b6527c14388b8ab87e5a37384c0efd76dd78b173c",
+    "include_history": false
+  },
+  "after_reopen": {
+    "run_id": "00c7bd37c36f4892b0bf0322af5e0b15",
+    "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+    "plan_id": "2203dfaddce64fd99132bf7058632ace",
+    "plan_revision": 1,
+    "plan_digest": "c60f6d71fcb60fac84b5413afe0d94cb5cd429f4d733cb679d841be4ab36259d",
+    "report": {
+      "source_rows": 100000,
+      "accepted_rows": 50000,
+      "rejected_rows": 50000,
+      "rejection_reason_assignments": 70000,
+      "accepted_distinct_orders": 40000,
+      "accepted_quantity": 120000,
+      "accepted_line_counts_by_status": {
+        "fulfilled": 20000,
+        "pending": 20000,
+        "cancelled": 10000
+      },
+      "accepted_quantity_by_status": {
+        "fulfilled": 60000,
+        "pending": 30000,
+        "cancelled": 30000
+      }
+    },
+    "source_sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e",
+    "multi_reason_quarantined_rows": 10000,
+    "exact_duplicate_rows": 10000,
+    "rendered_table_rows": [
+      100,
+      9,
+      3,
+      100,
+      100
+    ],
+    "history_snapshots": 0
+  },
+  "observed_gates": {
+    "correctness_and_identity": true,
+    "whole_process_peak_at_most_1_gib": true
+  },
+  "finished_at_utc": "2026-10-30T18:15:46.417382+00:00",
+  "whole_profile_seconds": 39.93179220000002,
+  "peak_rss_bytes": 773578752
+}

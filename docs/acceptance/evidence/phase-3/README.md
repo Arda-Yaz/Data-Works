@@ -35,10 +35,16 @@ encountered an unwritable system temporary directory during development.
 ## Retained current proof artifacts
 
 - [Saved plan](workflow-current/saved-plan.json).
-- [Month A project](workflow-current/month-a.dataworks), envelope version 2.
-- [Month B project](workflow-current/month-b.dataworks), envelope version 2.
-- [Month C with undo history](workflow-current/month-c-with-history.dataworks),
+- `workflow-current/month-a.dataworks`, envelope version 2.
+- `workflow-current/month-b.dataworks`, envelope version 2.
+- `workflow-current/month-c-with-history.dataworks`,
   envelope version 2, including a row with three reasons counted once.
+
+These generated archives remain in the original local checkout. The Phase 6
+verification ZIP intentionally omits generated projects; its reproduction runner
+creates new A/B archives and its regression suite verifies C recovery/history.
+Direct commands below against retained historical archives require those local
+files. Source fixtures, the oracle, saved plan, and textual results are included.
 
 The original expected outputs were not regenerated from these archives. The
 implementation, tests, and reproduction script compare against the independently

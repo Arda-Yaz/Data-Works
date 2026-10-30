@@ -17,7 +17,8 @@ from backend.project_io import loads_project
 from frontend.pages.data_fulfillment import _accepted_frame, _mapping_from_json, _rejected_frame
 
 
-FIXTURES = Path(__file__).resolve().parent / "fixtures" / "fulfillment_v1"
+ROOT = Path(__file__).resolve().parents[1]
+FIXTURES = ROOT / "tests" / "fixtures" / "fulfillment_v1"
 SCRIPT = '''
 import streamlit as st
 from backend.state import StateManager
@@ -66,7 +67,7 @@ class FulfillmentPageTests(unittest.TestCase):
         return app
 
     def test_route_requires_no_generic_dataset_and_run_waits_for_a_source(self):
-        app = AppTest.from_file("app.py", default_timeout=30).run(timeout=30)
+        app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=30).run(timeout=30)
         app.sidebar.selectbox[0].set_value("Order Fulfillment").run()
         self.assert_clean(app)
         self.assertEqual(app.title[0].value, "Order Fulfillment")

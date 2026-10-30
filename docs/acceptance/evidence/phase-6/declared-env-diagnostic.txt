@@ -1,0 +1,72 @@
+Discovering tests
+Discovery complete
+test_all_missing_columns_still_accept_explicit_constants (test_cleaning_correctness.MissingValueTests.test_all_missing_columns_still_accept_explicit_constants) ... ok
+test_all_missing_statistics_raise_actionable_errors (test_cleaning_correctness.MissingValueTests.test_all_missing_statistics_raise_actionable_errors) ... ok
+test_ambiguous_local_dates_request_an_explicit_offset (test_cleaning_correctness.MissingValueTests.test_ambiguous_local_dates_request_an_explicit_offset) ... ok
+test_aware_datetime_constant_is_rejected_for_naive_column (test_cleaning_correctness.MissingValueTests.test_aware_datetime_constant_is_rejected_for_naive_column) ... ok
+test_boolean_constants_are_parsed (test_cleaning_correctness.MissingValueTests.test_boolean_constants_are_parsed) ... ok
+test_datetime_constant_preserves_datetime_dtype (test_cleaning_correctness.MissingValueTests.test_datetime_constant_preserves_datetime_dtype) ... ok
+test_drop_operations_preserve_input (test_cleaning_correctness.MissingValueTests.test_drop_operations_preserve_input) ... ok
+test_finite_large_scientific_notation_is_valid_for_float_columns (test_cleaning_correctness.MissingValueTests.test_finite_large_scientific_notation_is_valid_for_float_columns) ... ok
+test_float_categories_reject_inexact_large_integer_constants (test_cleaning_correctness.MissingValueTests.test_float_categories_reject_inexact_large_integer_constants) ... ok
+test_float_constant_remains_numeric (test_cleaning_correctness.MissingValueTests.test_float_constant_remains_numeric) ... ok
+test_fractional_category_fill_keeps_large_integer_labels_exact (test_cleaning_correctness.MissingValueTests.test_fractional_category_fill_keeps_large_integer_labels_exact) ... ok
+test_fractional_interpolation_cannot_round_other_integer_replacements (test_cleaning_correctness.MissingValueTests.test_fractional_interpolation_cannot_round_other_integer_replacements) ... ok
+test_fractional_mean_and_median_promote_nullable_integers (test_cleaning_correctness.MissingValueTests.test_fractional_mean_and_median_promote_nullable_integers) ... ok
+test_incompatible_strategies_raise_actionable_errors (test_cleaning_correctness.MissingValueTests.test_incompatible_strategies_raise_actionable_errors) ... ok
+test_integral_statistics_preserve_nullable_integer_dtype (test_cleaning_correctness.MissingValueTests.test_integral_statistics_preserve_nullable_integer_dtype) ... ok
+test_interpolation_promotes_only_when_fractional_values_are_needed (test_cleaning_correctness.MissingValueTests.test_interpolation_promotes_only_when_fractional_values_are_needed) ... ok
+test_invalid_typed_constants_report_column_and_leave_input_unchanged (test_cleaning_correctness.MissingValueTests.test_invalid_typed_constants_report_column_and_leave_input_unchanged) ... ok
+test_large_integer_constant_is_exact (test_cleaning_correctness.MissingValueTests.test_large_integer_constant_is_exact) ... ok
+test_large_integer_statistics_and_interpolation_remain_exact (test_cleaning_correctness.MissingValueTests.test_large_integer_statistics_and_interpolation_remain_exact) ... ok
+test_naive_datetime_constant_uses_column_timezone (test_cleaning_correctness.MissingValueTests.test_naive_datetime_constant_uses_column_timezone) ... ok
+test_narrow_float_constants_promote_instead_of_rounding (test_cleaning_correctness.MissingValueTests.test_narrow_float_constants_promote_instead_of_rounding) ... ok
+test_narrow_float_interpolation_does_not_round_new_values (test_cleaning_correctness.MissingValueTests.test_narrow_float_interpolation_does_not_round_new_values) ... ok
+test_narrow_integer_constant_widens_without_overflow (test_cleaning_correctness.MissingValueTests.test_narrow_integer_constant_widens_without_overflow) ... ok
+test_new_category_constant_can_be_added (test_cleaning_correctness.MissingValueTests.test_new_category_constant_can_be_added) ... ok
+test_nonfinite_numeric_constants_are_rejected (test_cleaning_correctness.MissingValueTests.test_nonfinite_numeric_constants_are_rejected) ... ok
+test_numeric_category_constant_uses_category_type (test_cleaning_correctness.MissingValueTests.test_numeric_category_constant_uses_category_type) ... ok
+test_signed_category_accepts_uint64_constant_without_rounding (test_cleaning_correctness.MissingValueTests.test_signed_category_accepts_uint64_constant_without_rounding) ... ok
+test_strategy_options_match_column_types (test_cleaning_correctness.MissingValueTests.test_strategy_options_match_column_types) ... ok
+test_string_constant_remains_text (test_cleaning_correctness.MissingValueTests.test_string_constant_remains_text) ... ok
+test_text_numeric_constants_are_parsed (test_cleaning_correctness.MissingValueTests.test_text_numeric_constants_are_parsed) ... ok
+test_unsafe_float_promotion_rejects_instead_of_rounding_existing_integers (test_cleaning_correctness.MissingValueTests.test_unsafe_float_promotion_rejects_instead_of_rounding_existing_integers) ... ok
+test_constant_and_all_missing_columns_have_no_outliers (test_cleaning_correctness.OutlierTests.test_constant_and_all_missing_columns_have_no_outliers) ... ok
+test_fractional_bounds_without_outliers_do_not_promote (test_cleaning_correctness.OutlierTests.test_fractional_bounds_without_outliers_do_not_promote) ... ok
+test_fractional_caps_promote_nullable_integers (test_cleaning_correctness.OutlierTests.test_fractional_caps_promote_nullable_integers) ... ok
+test_ignore_returns_unchanged_independent_frame (test_cleaning_correctness.OutlierTests.test_ignore_returns_unchanged_independent_frame) ... ok
+test_integral_caps_preserve_nullable_integer_dtype (test_cleaning_correctness.OutlierTests.test_integral_caps_preserve_nullable_integer_dtype) ... ok
+test_invalid_arguments_are_rejected_atomically (test_cleaning_correctness.OutlierTests.test_invalid_arguments_are_rejected_atomically) ... ok
+test_large_integer_iqr_caps_use_exact_quartiles (test_cleaning_correctness.OutlierTests.test_large_integer_iqr_caps_use_exact_quartiles) ... ok
+test_nonnumeric_boolean_and_complex_outlier_columns_are_rejected (test_cleaning_correctness.OutlierTests.test_nonnumeric_boolean_and_complex_outlier_columns_are_rejected) ... ok
+test_remove_keeps_rows_with_missing_values (test_cleaning_correctness.OutlierTests.test_remove_keeps_rows_with_missing_values) ... ok
+test_replace_nan_preserves_large_native_integers (test_cleaning_correctness.OutlierTests.test_replace_nan_preserves_large_native_integers) ... ok
+test_replace_nan_preserves_nullable_integer_dtype (test_cleaning_correctness.OutlierTests.test_replace_nan_preserves_nullable_integer_dtype) ... ok
+test_zscore_handles_nullable_masks_and_retains_missing_rows (test_cleaning_correctness.OutlierTests.test_zscore_handles_nullable_masks_and_retains_missing_rows) ... ok
+test_invalid_constant_leaves_entire_missing_value_batch_unchanged (test_cleaning_pages.CleaningPageTests.test_invalid_constant_leaves_entire_missing_value_batch_unchanged) ... 2026-10-30 20:59:37.917 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+Timeout (0:00:45)!
+Thread 0x000038f8 (most recent call first):
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\socket.py", line 295 in accept
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\socket.py", line 627 in _fallback_socketpair
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\asyncio\proactor_events.py", line 787 in _make_self_pipe
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\asyncio\proactor_events.py", line 640 in __init__
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\asyncio\windows_events.py", line 316 in __init__
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\asyncio\events.py", line 720 in new_event_loop
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\asyncio\events.py", line 823 in new_event_loop
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\testing\v1\local_script_runner.py", line 62 in __init__
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\testing\v1\app_test.py", line 529 in _run
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\testing\v1\element_tree.py", line 3870 in run
+  File "C:\Users\Gaming\Documents\Data-Works\.test-tmp\phase6-declared-env\Lib\site-packages\streamlit\testing\v1\app_test.py", line 643 in run
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_cleaning_pages.py", line 25 in make_app
+  File "C:\Users\Gaming\Documents\Data-Works\tests\test_cleaning_pages.py", line 84 in test_invalid_constant_leaves_entire_missing_value_batch_unchanged
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\case.py", line 589 in _callTestMethod
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\case.py", line 634 in run
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\case.py", line 690 in __call__
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\suite.py", line 122 in run
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\suite.py", line 84 in __call__
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\suite.py", line 122 in run
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\suite.py", line 84 in __call__
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\suite.py", line 122 in run
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\suite.py", line 84 in __call__
+  File "C:\Users\Gaming\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\runner.py", line 240 in run
+  File "<stdin>", line 10 in <module>

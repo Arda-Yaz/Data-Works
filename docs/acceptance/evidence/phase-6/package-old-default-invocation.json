@@ -1,0 +1,10 @@
+{
+  "command": [
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-6\\extracted\\scripts\\verify_release.py",
+    "--output-dir",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-6\\package-old-default-blocked"
+  ],
+  "exit_code": 2,
+  "expected_exit_code": 2
+}

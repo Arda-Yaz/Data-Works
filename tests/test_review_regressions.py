@@ -111,13 +111,61 @@ class IngestionTests(unittest.TestCase):
         after = apply_inferred_dtypes(df, infer_column_meta(df))
         assert_frame_equal(df, after)
 
-    def test_bundled_data_preserves_text_and_missingness(self):
-        with (ROOT / "surat_uncleaned.csv").open("rb") as stream:
+    def test_automatic_text_and_identifier_inference_preserves_both_string_missing_modes(self):
+        for missing in (pd.NA, np.nan):
+            for name, values in (("customer_id", ["1", None, "2"]),
+                                 ("customer_id", ["001", None, "002"]),
+                                 ("region", ["NA", None, "EU"])):
+                with self.subTest(missing=repr(missing), name=name, values=values):
+                    dtype = pd.StringDtype(storage="python", na_value=missing)
+                    before = pd.DataFrame({name: pd.Series(values, dtype=dtype)})
+                    original = before.copy(deep=True)
+                    metadata = infer_column_meta(before)
+                    result = apply_inferred_dtypes(before, metadata)
+                    self.assertEqual(metadata[name]["inferred_dtype"], "object")
+                    assert_frame_equal(result, original)
+                    assert_frame_equal(before, original)
+
+    def test_explicit_object_request_still_converts_string_storage(self):
+        for missing in (pd.NA, np.nan):
+            with self.subTest(missing=repr(missing)):
+                dtype = pd.StringDtype(storage="python", na_value=missing)
+                before = pd.DataFrame({"customer_id": pd.Series(["001", None, "002"], dtype=dtype)})
+                metadata = infer_column_meta(before)
+                metadata["customer_id"]["user_dtype"] = "object"
+                result = apply_inferred_dtypes(before, metadata)
+                assert_frame_equal(result, before.astype(object))
+                self.assertEqual(result["customer_id"].dtype, np.dtype("object"))
+
+    def test_numeric_string_modes_still_use_the_reviewed_numeric_inference(self):
+        for missing in (pd.NA, np.nan):
+            with self.subTest(missing=repr(missing)):
+                dtype = pd.StringDtype(storage="python", na_value=missing)
+                before = pd.DataFrame({"value": pd.Series(["1", None, "2"], dtype=dtype)})
+                result = apply_inferred_dtypes(before, infer_column_meta(before))
+                expected = pd.DataFrame({"value": pd.Series([1, pd.NA, 2], dtype="Int64")})
+                assert_frame_equal(result, expected)
+
+    def test_original_synthetic_fixture_preserves_compound_text_and_missingness(self):
+        with (ROOT / "tests/fixtures/ingestion_v1/original-synthetic.csv").open("rb") as stream:
             df = parse_file(stream)
         after = apply_inferred_dtypes(df, infer_column_meta(df))
-        for col in ("property_name", "floor", "price", "square_feet"):
-            pd.testing.assert_series_equal(df[col], after[col])
-        pd.testing.assert_series_equal(df.isna().sum(), after.isna().sum())
+        expected = {
+            "property_name": ["Synthetic unit A", "Synthetic unit B", "Synthetic unit C", None],
+            "floor": ["5 out of 10", "Ground", None, "2 out of 4"],
+            "price": ["12.5 credits", None, "price pending", "NA"],
+            "square_feet": ["900 sq units", "1200 sq units", None, "000900"],
+        }
+        self.assertEqual(len(df), 4)
+        self.assertEqual(list(df.columns), list(expected))
+        for column, values in expected.items():
+            for actual, wanted in zip(df[column], values):
+                if wanted is None:
+                    self.assertTrue(pd.isna(actual))
+                else:
+                    self.assertEqual(actual, wanted)
+        self.assertEqual(df.isna().sum().to_dict(), {column: 1 for column in expected})
+        assert_frame_equal(df, after)
 
 
 class PreprocessingTests(unittest.TestCase):

@@ -52,10 +52,32 @@ class TextTransformationTests(unittest.TestCase):
         self.assertEqual(frame["label"].cat.categories.tolist(), [" A ", "a", " UNUSED "])
 
     def test_mapping_is_exact_simultaneous_and_retains_unmatched(self):
-        frame = pd.DataFrame({"label": ["a", "b", " a", "c", None]})
+        # This case promises preservation of an object-stored None. pandas 3
+        # otherwise infers StringDtype and converts None before our operation.
+        frame = pd.DataFrame({"label": pd.Series(["a", "b", " a", "c", None], dtype=object)})
         result = map_categories(frame, "label", {"a": "b", "b": "c"})
         self.assertEqual(result["label"].tolist(), ["b", "c", " a", "c", None])
         self.assertEqual(frame["label"].tolist(), ["a", "b", " a", "c", None])
+
+    def test_string_storage_and_missing_sentinel_survive_normalization_and_mapping(self):
+        for marker in (pd.NA, np.nan):
+            with self.subTest(missing_sentinel=repr(marker)):
+                dtype = pd.StringDtype(storage="python", na_value=marker)
+                frame = pd.DataFrame({"label": pd.Series([" A ", None, "b"], dtype=dtype)})
+                frame.index = [4, 4, 9]
+                before = frame.copy(deep=True)
+                normalized = normalize_text(frame, ["label"], strip=True, case="lower")
+                mapped = map_categories(normalized, "label", {"a": "b", "b": "a"})
+                for result, expected_values in ((normalized, ["a", "b"]), (mapped, ["b", "a"])):
+                    self.assertEqual(result["label"].dtype, dtype)
+                    self.assertEqual(result["label"].dtype.storage, dtype.storage)
+                    self.assertEqual(result.index.tolist(), [4, 4, 9])
+                    self.assertEqual(result["label"].iloc[[0, 2]].tolist(), expected_values)
+                    if marker is pd.NA:
+                        self.assertIs(result["label"].iloc[1], pd.NA)
+                    else:
+                        self.assertTrue(np.isnan(result["label"].iloc[1]))
+                assert_frame_equal(frame, before)
 
     def test_mapping_preserves_string_storage_and_duplicate_index_labels(self):
         frame = pd.DataFrame({"label": pd.Series(["a", pd.NA, "b"], dtype="string")})

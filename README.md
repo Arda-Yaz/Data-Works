@@ -39,7 +39,15 @@ Data-Works is a Streamlit application for uploading tabular datasets, reviewing 
 
 ## Setup
 
-Use **Python 3.12**. This is the supported runtime checked by the Windows/Linux CI workflow.
+Use **Python 3.12**. The CI workflow is configured for Windows and Linux; recorded
+local verification uses Windows. Linux execution remains unverified in the
+acceptance evidence. See [REPRODUCING.md](REPRODUCING.md) for the verification
+package, recorded environment, and open release gates.
+
+The unchanged declared pins passed a fresh Windows installation and 559 tests on
+2026-10-30. The earlier environment also passed. The local verification package
+and its strict environment/integrity checks are described in that reproduction
+guide; passing them does not establish operator acceptance or production approval.
 
 ```powershell
 python -m venv .venv
@@ -181,6 +189,10 @@ ML runs acquire one process-wide execution slot and use one numerical thread per
 python scripts/run_tests.py
 ```
 
-The runner works across Windows/Linux and isolates Streamlit test files in a disposable temporary directory. GitHub Actions installs dependencies, checks compatibility and source syntax, then runs the suite on both operating systems.
+The runner uses cross-platform Python APIs and isolates Streamlit test files in
+a disposable temporary directory. GitHub Actions is configured to install
+dependencies, check compatibility and source syntax, then run the suite on
+Windows and Linux. A configured job is not evidence that it passed; recorded
+acceptance results qualify the stated Windows environment only.
 
 See [DEPLOYMENT.md](DEPLOYMENT.md) for local startup, private shared deployment, optional native OIDC sign-in, JSON diagnostics, health probes, and hosting limits. Local startup binds to `127.0.0.1`. Shared deployment requires provider/proxy configuration and live callback verification. Licensing and the fixture's upstream provenance must be supplied by the project owner before redistribution.

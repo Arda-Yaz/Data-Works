@@ -177,7 +177,7 @@ class ReplayTests(unittest.TestCase):
         original = pd.DataFrame({
             "value": ["1", "2", None, "100", "2", "3"],
             "label": ["a", "b", "a", "bad", "b", "a"],
-        })
+        }, dtype=object)
         original_metadata = infer_column_meta(original)
         schema = copy.deepcopy(original_metadata)
         schema["value"]["user_dtype"] = "int64"
@@ -195,7 +195,7 @@ class ReplayTests(unittest.TestCase):
         result = replay_operations(original, original_metadata, records)
         expected = pd.DataFrame({
             "value": pd.Series([1.0, 2.0, 2.0, 3.0], index=[0, 1, 2, 5], dtype="Float64"),
-            "label": pd.Series(["a", "b", "a", "a"], index=[0, 1, 2, 5]),
+            "label": pd.Series(["a", "b", "a", "a"], index=[0, 1, 2, 5], dtype=object),
         })
         assert_frame_equal(result["df"], expected)
         self.assertTrue(result["schema_confirmed"])

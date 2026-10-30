@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "sha256": "ddf3766473f917378732826575aa8f19ce2888d02df5be09d646082f32e6311d",
+  "bytes": 591768,
+  "source_files": 229,
+  "deterministic_rebuild_identical": true,
+  "source_snapshot_sha256": "a51c930e8cd7fb715e6d82d00873bbc80f39800806e4e88dd34dff197cc5d758",
+  "excluded_legacy_csv": true,
+  "source_root": "C:\\Users\\Gaming\\Documents\\Data-Works",
+  "release_ready": false
+}

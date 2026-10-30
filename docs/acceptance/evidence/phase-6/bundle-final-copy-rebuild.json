@@ -1,0 +1,6 @@
+{
+  "status": "passed",
+  "byte_identical": true,
+  "sha256": "2093427202d02ca4b2b561481052a7aae3df11ee8e3b0274e793d3cc720c1774",
+  "scope": "checked Git-free source copy rebuilt with clean declared interpreter on same host/zlib"
+}

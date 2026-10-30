@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "rebuilt_from": "checked extracted source copy without Git",
+  "interpreter": "fresh declared Windows Python 3.12 environment",
+  "byte_identical": true,
+  "sha256": "ddf3766473f917378732826575aa8f19ce2888d02df5be09d646082f32e6311d",
+  "bytes": 591768,
+  "scope": "same host and zlib runtime; not independent human or signed authenticity"
+}

@@ -1,0 +1,37 @@
+{
+  "status": "completed",
+  "started_at_utc": "2026-10-30T18:15:06.224508+00:00",
+  "client_date": "2026-10-30",
+  "client_timezone": "Europe/Istanbul",
+  "command": [
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.test-tmp\\phase6-declared-env\\Scripts\\python.exe",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\scripts\\verify_fulfillment_workload_ui.py",
+    "--rows",
+    "100000",
+    "--input",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-6\\benchmark-declared\\workload.csv",
+    "--output-dir",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-6\\ui-workload-declared"
+  ],
+  "cwd": "C:\\Users\\Gaming\\Documents\\Data-Works",
+  "environment_overrides": {
+    "DATAWORKS_REQUIRE_AUTH": "false",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0"
+  },
+  "stdout": "ui-workload-declared-stdout.txt",
+  "stderr": "ui-workload-declared-stderr.txt",
+  "output": "docs\\acceptance\\evidence\\phase-6\\ui-workload-declared",
+  "scope": "One declared-environment headless AppTest profile; no real-browser or ten-sample UI p95 claim.",
+  "sandbox_override": "required for Streamlit 1.66 local asyncio socketpair initialization",
+  "finished_at_utc": "2026-10-30T18:15:47.265381+00:00",
+  "elapsed_seconds": 41.04,
+  "exit_code": 0,
+  "observed_gates": {
+    "correctness_and_identity": true,
+    "whole_process_peak_at_most_1_gib": true
+  }
+}

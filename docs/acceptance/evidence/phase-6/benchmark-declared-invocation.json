@@ -1,0 +1,58 @@
+{
+  "status": "completed",
+  "started_at_utc": "2026-10-30T18:07:16.101487+00:00",
+  "client_date": "2026-10-30",
+  "client_timezone": "Europe/Istanbul",
+  "command": [
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.test-tmp\\phase6-declared-env\\Scripts\\python.exe",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\scripts\\benchmark_fulfillment.py",
+    "--output-dir",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-6\\benchmark-declared",
+    "--rows",
+    "100000",
+    "--runs",
+    "10",
+    "--warmups",
+    "1",
+    "--include-history"
+  ],
+  "cwd": "C:\\Users\\Gaming\\Documents\\Data-Works",
+  "environment_overrides": {
+    "DATAWORKS_REQUIRE_AUTH": "false",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0"
+  },
+  "stdout": "benchmark-declared-stdout.txt",
+  "stderr": "benchmark-declared-stderr.txt",
+  "output": "docs\\acceptance\\evidence\\phase-6\\benchmark-declared",
+  "scope": "Fresh clean declared Python environment; synthetic backend workload only.",
+  "finished_at_utc": "2026-10-30T18:13:46.158464+00:00",
+  "elapsed_seconds": 390.057,
+  "exit_code": 0,
+  "assessment": {
+    "status": "passed",
+    "full_protocol": true,
+    "f14_gate_passed": true,
+    "archive_profile": "with_history",
+    "measured_samples": 10,
+    "warmup_samples": 1,
+    "metrics": {
+      "execution_p95_seconds": 7.352867799999331,
+      "export_p95_seconds": 12.837998799999696,
+      "reopen_p95_seconds": 17.21085949999997,
+      "peak_rss_bytes": 791093248
+    },
+    "gates": {
+      "sample_protocol_complete": true,
+      "all_samples_correct": true,
+      "input_within_20_mib": true,
+      "execution_p95_at_most_30_seconds": true,
+      "export_p95_at_most_30_seconds": true,
+      "reopen_p95_at_most_30_seconds": true,
+      "whole_process_peak_at_most_1_gib": true
+    }
+  }
+}

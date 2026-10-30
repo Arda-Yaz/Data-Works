@@ -1,0 +1,157 @@
+{
+  "status": "passed",
+  "scope": "synthetic correctness and fresh-process persistence; no customer/value/performance claim",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "saved_plan_digest": "8ef37529d140db823496e4e24ceeba8016bdc746bb6340332fc2a3e732772687",
+  "month_a": {
+    "input": "month_a.csv",
+    "run_id": "a79f7217362648d3a47b4f8a6b8a4dff",
+    "source_id": "87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0",
+    "plan_digest": "8ef37529d140db823496e4e24ceeba8016bdc746bb6340332fc2a3e732772687",
+    "report": {
+      "source_rows": 12,
+      "accepted_rows": 4,
+      "rejected_rows": 8,
+      "rejection_reason_assignments": 8,
+      "accepted_distinct_orders": 3,
+      "accepted_quantity": 5,
+      "accepted_line_counts_by_status": {
+        "fulfilled": 2,
+        "pending": 1,
+        "cancelled": 1
+      },
+      "accepted_quantity_by_status": {
+        "fulfilled": 3,
+        "pending": 1,
+        "cancelled": 1
+      }
+    }
+  },
+  "fresh_process_a_reopen": {
+    "input": "month_a.csv",
+    "run_id": "a79f7217362648d3a47b4f8a6b8a4dff",
+    "source_id": "87f4eaeb0d072b290023080641918815ed6d223641b85af356fdb1f89311e0c0",
+    "plan_digest": "8ef37529d140db823496e4e24ceeba8016bdc746bb6340332fc2a3e732772687",
+    "report": {
+      "source_rows": 12,
+      "accepted_rows": 4,
+      "rejected_rows": 8,
+      "rejection_reason_assignments": 8,
+      "accepted_distinct_orders": 3,
+      "accepted_quantity": 5,
+      "accepted_line_counts_by_status": {
+        "fulfilled": 2,
+        "pending": 1,
+        "cancelled": 1
+      },
+      "accepted_quantity_by_status": {
+        "fulfilled": 3,
+        "pending": 1,
+        "cancelled": 1
+      }
+    },
+    "status": "passed",
+    "plan_digest_before": "8ef37529d140db823496e4e24ceeba8016bdc746bb6340332fc2a3e732772687",
+    "streamlit_imported": false
+  },
+  "fresh_process_b_reuse": {
+    "input": "month_b.csv",
+    "run_id": "cacb0ef441974d68a384b3d4f738d678",
+    "source_id": "42383cf80a0d8b4c36495425c65b5afc4a3de3aab887d6868f4b5a13363c0b01",
+    "plan_digest": "8ef37529d140db823496e4e24ceeba8016bdc746bb6340332fc2a3e732772687",
+    "report": {
+      "source_rows": 8,
+      "accepted_rows": 5,
+      "rejected_rows": 3,
+      "rejection_reason_assignments": 3,
+      "accepted_distinct_orders": 4,
+      "accepted_quantity": 11,
+      "accepted_line_counts_by_status": {
+        "fulfilled": 2,
+        "pending": 2,
+        "cancelled": 1
+      },
+      "accepted_quantity_by_status": {
+        "fulfilled": 7,
+        "pending": 2,
+        "cancelled": 2
+      }
+    },
+    "status": "passed",
+    "plan_digest_before": "8ef37529d140db823496e4e24ceeba8016bdc746bb6340332fc2a3e732772687",
+    "streamlit_imported": false
+  },
+  "fresh_process_b_reopen": {
+    "input": "month_b.csv",
+    "run_id": "cacb0ef441974d68a384b3d4f738d678",
+    "source_id": "42383cf80a0d8b4c36495425c65b5afc4a3de3aab887d6868f4b5a13363c0b01",
+    "plan_digest": "8ef37529d140db823496e4e24ceeba8016bdc746bb6340332fc2a3e732772687",
+    "report": {
+      "source_rows": 8,
+      "accepted_rows": 5,
+      "rejected_rows": 3,
+      "rejection_reason_assignments": 3,
+      "accepted_distinct_orders": 4,
+      "accepted_quantity": 11,
+      "accepted_line_counts_by_status": {
+        "fulfilled": 2,
+        "pending": 2,
+        "cancelled": 1
+      },
+      "accepted_quantity_by_status": {
+        "fulfilled": 7,
+        "pending": 2,
+        "cancelled": 2
+      }
+    },
+    "status": "passed",
+    "plan_digest_before": "8ef37529d140db823496e4e24ceeba8016bdc746bb6340332fc2a3e732772687",
+    "streamlit_imported": false
+  },
+  "noncommitting_attempts": [
+    {
+      "input": "month_c_missing_quantity.csv",
+      "outcome": "blocked",
+      "prior_result_preserved": true
+    },
+    {
+      "input": "month_c_extra_column.csv",
+      "outcome": "blocked",
+      "prior_result_preserved": true
+    },
+    {
+      "input": "month_c_conflicting_duplicates.csv",
+      "outcome": "decision_required",
+      "prior_result_preserved": true
+    },
+    {
+      "input": "month_c_unseen_status.csv",
+      "outcome": "decision_required",
+      "prior_result_preserved": true
+    }
+  ],
+  "month_c_invalid_rows": {
+    "input": "month_c_invalid_rows.csv",
+    "run_id": "42ad4352ceb64b25ad963a7f2ad814c3",
+    "source_id": "9e883ce310b549254330802c1c58bdffdf410a0317f883ede3afe630447dfe71",
+    "plan_digest": "8ef37529d140db823496e4e24ceeba8016bdc746bb6340332fc2a3e732772687",
+    "report": {
+      "source_rows": 9,
+      "accepted_rows": 2,
+      "rejected_rows": 7,
+      "rejection_reason_assignments": 9,
+      "accepted_distinct_orders": 2,
+      "accepted_quantity": 3,
+      "accepted_line_counts_by_status": {
+        "fulfilled": 1,
+        "pending": 0,
+        "cancelled": 1
+      },
+      "accepted_quantity_by_status": {
+        "fulfilled": 2,
+        "pending": 0,
+        "cancelled": 1
+      }
+    }
+  }
+}

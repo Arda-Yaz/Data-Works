@@ -87,6 +87,8 @@ def prepare_dataset(df, metadata, previous_df=None, explicit_schema=False):
         ):
             meta["user_dtype"] = None
             meta["inferred_dtype"] = _schema_dtype(series)
+        # Schema choices are logical conversion targets. Preparation preserves
+        # existing storage (including StringDtype's missing-value semantics).
         meta["current_dtype"] = str(series.dtype)
         meta["cardinality"] = int(series.nunique())
         meta["is_categorical"] = (

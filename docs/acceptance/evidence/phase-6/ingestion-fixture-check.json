@@ -1,0 +1,17 @@
+{
+  "command": [
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_review_regressions.py"
+  ],
+  "exit_code": 0,
+  "seconds": 9.078776299999845,
+  "synthetic_fixture_sha256": "c16507975ee7ad2a953fb5cbe99f1b4ae65be81202b6292b6d211b5334b7962a",
+  "unattributed_root_csv_sha256": "cb08655a74ed5035ce94c196330dee8b1e5463237c797e2c4ad65720511e0369",
+  "root_csv_unchanged": true
+}

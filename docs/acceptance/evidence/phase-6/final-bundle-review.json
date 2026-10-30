@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "review_scope": "Independent read-only final ZIP comparison and current-source inventory; final separate-copy execution is recorded by parent",
+  "archive_sha256": "2093427202d02ca4b2b561481052a7aae3df11ee8e3b0274e793d3cc720c1774",
+  "bytes": 591890,
+  "source_files": 229,
+  "zip_members": 230,
+  "source_snapshot_sha256": "5d50a95f04c83ed722418a4e4027b91ebc726ebf975588310dc9e6921f77009e",
+  "changed_source_members_from_previous_candidate": [
+    "docs/acceptance/evidence/phase-3/README.md"
+  ],
+  "added_source_members": [],
+  "removed_source_members": [],
+  "bad_content": [],
+  "current_source_differences": [],
+  "missing_runtime_tests_or_fixtures": [],
+  "forbidden_inventory_paths": [],
+  "origin_state": "exact content snapshot; may include uncommitted changes",
+  "release_ready": false
+}

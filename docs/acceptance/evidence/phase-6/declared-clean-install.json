@@ -1,0 +1,21 @@
+{
+  "at_utc": "2026-10-30T17:55:52.808882+00:00",
+  "command": [
+    "C:\\Users\\Gaming\\AppData\\Local\\Python\\bin\\pip.exe",
+    "--python",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.test-tmp\\phase6-declared-env\\Scripts\\python.exe",
+    "install",
+    "--no-cache-dir",
+    "--disable-pip-version-check",
+    "--no-input",
+    "--retries",
+    "0",
+    "--timeout",
+    "30",
+    "-r",
+    "requirements.txt"
+  ],
+  "exit_code": 0,
+  "seconds": 85.73528549999992,
+  "scope": "fresh isolated environment without system site-packages; original .venv unchanged"
+}

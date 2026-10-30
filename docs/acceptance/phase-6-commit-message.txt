@@ -1,0 +1,18 @@
+feat: add reproducible verification bundles and pandas 3 compatibility
+
+Build deterministic local verification archives with explicit source inventory,
+content manifests, checked extraction, and a strict environment-aware verifier.
+Include setup, walkthrough, observed environments, and explicit release gates.
+
+Preserve pandas nullable and NaN-backed string semantics during inferred text
+conversion and project round trips, including index and column storage. Keep
+legacy string descriptors readable and update AppTest paths/state checks for
+the preserved Streamlit pins.
+
+Replace the regression's unattributed CSV dependency with original synthetic
+data and exclude the unrelated legacy file from verification bundles.
+
+Verify both the existing environment and a fresh installation of declared pins;
+record package reproduction, workload evidence, and remaining external gates.
+All 559 tests pass from the extracted package in both environments. The declared
+environment passes the full 100,000-row protocol and retained-month recovery.

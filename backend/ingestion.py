@@ -357,6 +357,12 @@ def apply_inferred_dtypes(df: pd.DataFrame, column_meta: dict) -> pd.DataFrame:
         col = result[name]
         if target == str(col.dtype):
             continue
+        if (meta.get("user_dtype") is None and target == "object"
+                and isinstance(col.dtype, pd.StringDtype)):
+            # "object" is the inferred logical text choice, not a request to
+            # replace existing string storage or its missing-value sentinel.
+            # An explicit user_dtype="object" still performs that conversion.
+            continue
         try:
             if target in ("int64", "float64"):
                 converted = _numeric_column(col, target, meta.get("numeric_decimal", "."), meta.get("numeric_thousands"))

@@ -1,6 +1,13 @@
 # Running DataWorks
 
-The supported Python version is **3.12**. CI checks it on Windows and Linux. Install the pinned dependencies, then run:
+The supported Python version is **3.12**. CI is configured for Windows and Linux;
+the recorded acceptance runs use Windows, and Linux execution remains unverified.
+The preserved dependency pins installed successfully into a fresh Windows
+environment on 2026-10-30; all 559 regression tests and the fresh-process
+fulfillment proof passed there. The earlier installed environment also passed.
+See [REPRODUCING.md](REPRODUCING.md) for exact observed versions, reproduction
+commands, and remaining release gates. Once the selected environment is installed,
+run:
 
 ```shell
 python -m streamlit run app.py
@@ -16,7 +23,12 @@ python -m compileall -q app.py backend frontend scripts tests
 python scripts/run_tests.py
 ```
 
-The runner selects a disposable repository-local temporary directory before importing Streamlit tests. No test data is sent to an external service. CI includes actual legacy/current Excel parsing, project round trips, cleaning/schema undo, fitted preprocessing, ML evaluation, and Streamlit page checks.
+The runner selects a disposable repository-local temporary directory before
+importing Streamlit tests. No test data is sent to an external service. The suite
+covers actual legacy/current Excel parsing, project round trips, cleaning/schema
+undo, fitted preprocessing, ML evaluation, and Streamlit page checks. The CI job
+is configured to run that suite; its presence does not establish a successful
+Linux run. Installation of the preserved pins was separately verified locally.
 
 ## Private shared deployment
 

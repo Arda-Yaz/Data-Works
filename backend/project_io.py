@@ -85,13 +85,18 @@ def _dtype_to_json(dtype, budget, depth):
     if isinstance(dtype, pd.DatetimeTZDtype):
         return {"kind": "datetime_tz", "unit": dtype.unit, "tz": str(dtype.tz)}
     if isinstance(dtype, pd.StringDtype):
-        return {"kind": "string", "storage": dtype.storage}
+        spec = {"kind": "string", "storage": dtype.storage}
+        # pandas 3 defaults to NaN-backed strings; nullable strings still use
+        # pd.NA. Storage alone no longer identifies their missing-value semantics.
+        if getattr(dtype, "na_value", pd.NA) is not pd.NA:
+            spec["na_value"] = "nan"
+        return spec
     if str(dtype) in _EXTENSIONS:
         return {"kind": "extension", "name": str(dtype)}
     if isinstance(dtype, pd.PeriodDtype):
         return {"kind": "period", "freq": str(dtype)[7:-1]}
     if isinstance(dtype, pd.IntervalDtype):
-        return {"kind": "interval", "subtype": _dtype_to_json(dtype.subtype, budget, depth + 1), "closed": dtype.closed}
+        return {"kind": "interval", "subtype": _dtype_to_json(dtype.subtype, budget, depth + 1), "closed": getattr(dtype, "closed")}
     try:
         dtype = _numpy_dtype(np.dtype(dtype).str)
     except (TypeError, ValueError) as exc:
@@ -107,7 +112,12 @@ def _dtype_from_json(spec, budget, depth):
         return _numpy_dtype(spec["name"])
     if kind == "extension" and set(spec) == {"kind", "name"} and spec["name"] in _EXTENSIONS:
         return pd.api.types.pandas_dtype(spec["name"])
-    if kind == "string" and set(spec) == {"kind", "storage"} and spec["storage"] in ("python", "pyarrow", "pyarrow_numpy"):
+    if kind == "string" and set(spec) in ({"kind", "storage"}, {"kind", "storage", "na_value"}) and spec["storage"] in ("python", "pyarrow", "pyarrow_numpy"):
+        if "na_value" in spec and spec["na_value"] != "nan":
+            raise ValueError("Unsupported string missing-value semantics.")
+        if "na_value" in spec or spec["storage"] == "pyarrow_numpy":
+            storage = "pyarrow" if spec["storage"] == "pyarrow_numpy" else spec["storage"]
+            return pd.StringDtype(storage=storage, na_value=np.nan)
         return pd.StringDtype(storage=spec["storage"])
     if kind == "datetime_tz" and set(spec) == {"kind", "unit", "tz"}:
         if spec["unit"] not in ("s", "ms", "us", "ns") or not isinstance(spec["tz"], str) or len(spec["tz"]) > 200:
@@ -121,7 +131,7 @@ def _dtype_from_json(spec, budget, depth):
         return pd.PeriodDtype(_frequency(spec["freq"]))
     if kind == "interval" and set(spec) == {"kind", "subtype", "closed"} and spec["closed"] in ("left", "right", "both", "neither"):
         subtype = _dtype_from_json(spec["subtype"], budget, depth + 1)
-        return pd.IntervalDtype(subtype, closed=spec["closed"])
+        return pd.IntervalDtype(subtype, spec["closed"])
     raise ValueError("Unsupported or malformed dtype descriptor.")
 
 
@@ -190,6 +200,48 @@ def _missing(value):
     return value is None or value is pd.NA or value is pd.NaT or isinstance(value, (float, np.floating)) and math.isnan(value)
 
 
+def _validate_numpy_value(value, dtype):
+    """Validate decoded cells before NumPy can coerce or truncate them."""
+    kind = dtype.kind
+    if kind == "O":
+        return
+    if kind == "b":
+        if not isinstance(value, (bool, np.bool_)):
+            raise ValueError("Boolean arrays must contain boolean values.")
+    elif kind in "iu":
+        bounds = np.iinfo(dtype)
+        if (isinstance(value, (bool, np.bool_)) or not isinstance(value, Integral)
+                or not bounds.min <= value <= bounds.max):
+            raise ValueError("Integer arrays must contain exact, in-range integers.")
+    elif kind in "fc":
+        allowed = Real if kind == "f" else (Real, complex, np.complexfloating)
+        if isinstance(value, (bool, np.bool_)) or not isinstance(value, allowed):
+            raise ValueError("Numeric arrays must contain numeric scalar values.")
+        with np.errstate(over="ignore", under="ignore", invalid="ignore"):
+            stored = np.asarray(value, dtype=dtype).item()
+        original = value.item() if isinstance(value, np.generic) else value
+
+        def equal(left, right):
+            return left == right or math.isnan(left) and math.isnan(right)
+
+        matches = (equal(stored, original) if kind == "f" else
+                   equal(stored.real, original.real) and equal(stored.imag, original.imag))
+        if not matches:
+            raise ValueError("The declared array dtype would round the stored value.")
+    elif kind in "US":
+        expected = str if kind == "U" else bytes
+        capacity = dtype.itemsize // 4 if kind == "U" else dtype.itemsize
+        if not isinstance(value, expected) or len(value) > capacity:
+            raise ValueError("The declared string array dtype would coerce or truncate a value.")
+    elif kind in "Mm":
+        expected = np.datetime64 if kind == "M" else np.timedelta64
+        if not isinstance(value, expected):
+            raise ValueError("Time arrays must contain typed time scalars.")
+        stored = np.asarray(value, dtype=dtype)[()]
+        if not (np.isnat(value) and np.isnat(stored)) and stored != value:
+            raise ValueError("The declared time array dtype would change a stored value.")
+
+
 def _encode_index(index, budget, depth):
     budget.node(depth)
     if len(index) > MAX_ROWS:
@@ -200,7 +252,7 @@ def _encode_index(index, budget, depth):
         return {"kind": "multi", "levels": [_encode_index(level, budget, depth + 1) for level in index.levels],
                 "codes": [code.tolist() for code in index.codes], "names": [_encode(name, budget, depth + 1) for name in index.names]}
     return {"kind": "index", "name": _encode(index.name, budget, depth + 1),
-            "data": _encode_data(pd.Series(index.array), budget, depth + 1),
+            "data": _encode_data(pd.Series(index.array, dtype=index.dtype), budget, depth + 1),
             "length": len(index), "freq": getattr(index, "freqstr", None)}
 
 
@@ -234,7 +286,7 @@ def _decode_index(data, budget, depth):
             raise ValueError("Invalid index length.")
         series = _decode_data(data["data"], length, budget, depth + 1)
         name = _decode(data["name"], budget, depth + 1)
-        index = pd.Index(series.array, name=name)
+        index = pd.Index(series.array, dtype=series.dtype, name=name)
         if data["freq"] is not None:
             frequency = _frequency(data["freq"])
             if isinstance(index, pd.DatetimeIndex):
@@ -375,7 +427,11 @@ def _decode(value, budget, depth):
         dtype = _numpy_dtype(value["dtype"])
         if kind == "numpy_scalar":
             budget.allocation(dtype.itemsize)
-            return np.array(_decode(value["value"], budget, depth + 1), dtype=dtype)[()]
+            decoded = _decode(value["value"], budget, depth + 1)
+            if dtype.kind == "O":
+                raise ValueError("Object values cannot be declared as NumPy scalars.")
+            _validate_numpy_value(decoded, dtype)
+            return np.array(decoded, dtype=dtype)[()]
         shape, values = value["shape"], value["values"]
         if not isinstance(shape, list) or len(shape) > 32 or any(_integer(size) < 0 for size in shape):
             raise ValueError("Invalid array dimensions.")
@@ -390,6 +446,8 @@ def _decode(value, budget, depth):
             for position, item in enumerate(decoded):
                 array[position] = item
         else:
+            for item in decoded:
+                _validate_numpy_value(item, dtype)
             array[:] = decoded
         return array.reshape(shape)
     if kind == "complex" and keys == {"real", "imag"}:

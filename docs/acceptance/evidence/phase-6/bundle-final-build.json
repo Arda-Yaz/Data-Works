@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "bytes": 591890,
+  "sha256": "2093427202d02ca4b2b561481052a7aae3df11ee8e3b0274e793d3cc720c1774",
+  "source_files": 229,
+  "source_snapshot_sha256": "5d50a95f04c83ed722418a4e4027b91ebc726ebf975588310dc9e6921f77009e",
+  "deterministic_rebuild_identical": true,
+  "release_ready": false
+}

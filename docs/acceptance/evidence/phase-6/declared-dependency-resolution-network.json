@@ -1,0 +1,23 @@
+{
+  "at_utc": "2026-10-30T17:53:57.903605+00:00",
+  "command": [
+    "C:\\Users\\Gaming\\AppData\\Local\\Python\\bin\\pip.exe",
+    "--python",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.venv\\Scripts\\python.exe",
+    "install",
+    "--dry-run",
+    "--ignore-installed",
+    "--no-cache-dir",
+    "--disable-pip-version-check",
+    "--no-input",
+    "--retries",
+    "0",
+    "--timeout",
+    "15",
+    "-r",
+    "requirements.txt"
+  ],
+  "exit_code": 0,
+  "seconds": 5.732056400000147,
+  "scope": "resolution outside network sandbox; no installation performed"
+}

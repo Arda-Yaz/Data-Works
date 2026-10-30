@@ -1,0 +1,32 @@
+{
+  "status": "completed",
+  "started_at_utc": "2026-10-30T18:16:32.037714+00:00",
+  "client_date": "2026-10-30",
+  "client_timezone": "Europe/Istanbul",
+  "command": [
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.test-tmp\\phase6-declared-env\\Scripts\\python.exe",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-4\\large-month-reuse.py",
+    "--benchmark-dir",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-6\\benchmark-declared",
+    "--output",
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\docs\\acceptance\\evidence\\phase-6\\large-month-declared.json"
+  ],
+  "cwd": "C:\\Users\\Gaming\\Documents\\Data-Works",
+  "environment_overrides": {
+    "DATAWORKS_REQUIRE_AUTH": "false",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "PYTHONHASHSEED": "0"
+  },
+  "stdout": "large-month-declared-stdout.txt",
+  "stderr": "large-month-declared-stderr.txt",
+  "output": "docs\\acceptance\\evidence\\phase-6\\large-month-declared.json",
+  "script_sha256": "3d6d8f361ac695eab6a2e940a6389c6d694d33aa07afbdd73be67da209258df9",
+  "scope": "One clean-declared-environment 100k prior A -> new B failure/retry and history-pruning diagnostic; not F14 p95 or UI.",
+  "historical_script_date_label": "The unchanged Phase 4 script writes a fixed client_date=2026-10-27; this invocation client_date and actual UTC timestamps identify the present run.",
+  "finished_at_utc": "2026-10-30T18:17:11.724418+00:00",
+  "elapsed_seconds": 39.686,
+  "exit_code": 0
+}

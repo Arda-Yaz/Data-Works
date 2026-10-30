@@ -1,0 +1,1539 @@
+{
+  "protocol_version": 1,
+  "started_at_utc": "2026-10-30T18:07:16.341834+00:00",
+  "scope": "synthetic single-user backend workload; no UI, customer, or business-value claim",
+  "status": "passed",
+  "configuration": {
+    "rows": 100000,
+    "runs": 10,
+    "warmups": 1,
+    "include_history": true
+  },
+  "workload": {
+    "input_bytes": 4230060,
+    "input_sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e",
+    "columns": [
+      "order_id",
+      "line_id",
+      "order_date",
+      "sku",
+      "quantity",
+      "fulfillment_status"
+    ],
+    "encoding": "utf-8-sig",
+    "delimiter": ",",
+    "expected_report": {
+      "source_rows": 100000,
+      "accepted_rows": 50000,
+      "rejected_rows": 50000,
+      "rejection_reason_assignments": 70000,
+      "accepted_distinct_orders": 40000,
+      "accepted_quantity": 120000,
+      "accepted_line_counts_by_status": {
+        "fulfilled": 20000,
+        "pending": 20000,
+        "cancelled": 10000
+      },
+      "accepted_quantity_by_status": {
+        "fulfilled": 60000,
+        "pending": 30000,
+        "cancelled": 30000
+      }
+    }
+  },
+  "measurement": {
+    "execution": "run_project complete candidate/commit transition; ingestion and setup recorded separately",
+    "export": "export_project plus typed archive serialization/compression; archive write recorded separately",
+    "reopen": "fresh process backend imports plus archive read, loads_project and validate_project",
+    "rss": "OS whole-process high-water mark including imports and oracle checks, maximum across execution and reopen processes",
+    "percentile": "nearest-rank p95 of measured samples; warm-up excluded from timing percentile",
+    "timeout_seconds_per_process": 180
+  },
+  "reference_host": {
+    "platform": "Windows-11-10.0.26300-SP0",
+    "architecture": "AMD64",
+    "processor": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+    "logical_cpus": 12,
+    "physical_ram_bytes": 16282554368,
+    "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "python_executable": "C:\\Users\\Gaming\\Documents\\Data-Works\\.test-tmp\\phase6-declared-env\\Scripts\\python.exe"
+  },
+  "packages": {
+    "streamlit": "1.66.1",
+    "pandas": "3.1.0",
+    "numpy": "2.5.4",
+    "plotly": "7.1.0",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1",
+    "joblib": "1.6.0",
+    "threadpoolctl": "3.7.0",
+    "Authlib": "1.9.1",
+    "openpyxl": "3.1.5",
+    "xlrd": "2.0.2",
+    "watchdog": "6.0.0"
+  },
+  "declared_environment": {
+    "declared_pins": {
+      "streamlit": "1.66.1",
+      "pandas": "3.1.0",
+      "numpy": "2.5.4",
+      "plotly": "7.1.0",
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1",
+      "joblib": "1.6.0",
+      "threadpoolctl": "3.7.0",
+      "Authlib": "1.9.1",
+      "openpyxl": "3.1.5",
+      "xlrd": "2.0.2",
+      "watchdog": "6.0.0"
+    },
+    "actual_packages": {
+      "streamlit": "1.66.1",
+      "pandas": "3.1.0",
+      "numpy": "2.5.4",
+      "plotly": "7.1.0",
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1",
+      "joblib": "1.6.0",
+      "threadpoolctl": "3.7.0",
+      "Authlib": "1.9.1",
+      "openpyxl": "3.1.5",
+      "xlrd": "2.0.2",
+      "watchdog": "6.0.0"
+    },
+    "matches_declared_pins": true,
+    "scope": "Performance measurements use actual installed packages; matching declared dependencies is a separate release gate."
+  },
+  "implementation_sha256": {
+    "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+    "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+    "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+    "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+    "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+    "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+    "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+  },
+  "samples": [
+    {
+      "index": 0,
+      "kind": "warmup",
+      "status": "passed",
+      "archive": "sample-00.dataworks",
+      "run": {
+        "status": "passed",
+        "kind": "run",
+        "stage": "complete",
+        "import_seconds": 0.8299533999997948,
+        "input_read_seconds": 0.01624939999965136,
+        "input_bytes": 4230060,
+        "input_sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e",
+        "ingestion_seconds": 0.18426290000024892,
+        "setup_seconds": 0.22979829999985668,
+        "execution_seconds": 6.302730800000063,
+        "oracle_seconds": 0.05473669999992126,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "304cc93e1a3904d4dec8da2a7ee539e6158ef2c733d488d36b1421ae287681c5",
+        "run_id": "29cf157a757a4edc8331ad1aabe58734",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "runtime_history_snapshots": 2,
+        "export_seconds": 12.078324000000066,
+        "exported_history_snapshots": 2,
+        "archive_write_seconds": 0.0010415000006105402,
+        "archive_bytes": 1284715,
+        "archive_sha256": "d2f34c9e8efc3aa3df1ebe829ff70459a2a4687cb149ee798607ff797be798fd",
+        "process_operation_seconds": 19.69968169999993,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 789712896,
+        "returncode": 0
+      },
+      "reopen": {
+        "status": "passed",
+        "kind": "reopen",
+        "stage": "complete",
+        "import_seconds": 0.8032762000002549,
+        "reopen_seconds": 14.211915099999715,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "304cc93e1a3904d4dec8da2a7ee539e6158ef2c733d488d36b1421ae287681c5",
+        "run_id": "29cf157a757a4edc8331ad1aabe58734",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "reopened_history_snapshots": 2,
+        "process_operation_seconds": 14.266220599999542,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 662462464,
+        "returncode": 0
+      }
+    },
+    {
+      "index": 1,
+      "kind": "measured",
+      "status": "passed",
+      "archive": "sample-01.dataworks",
+      "run": {
+        "status": "passed",
+        "kind": "run",
+        "stage": "complete",
+        "import_seconds": 0.7827904000005219,
+        "input_read_seconds": 0.0011031000003640656,
+        "input_bytes": 4230060,
+        "input_sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e",
+        "ingestion_seconds": 0.20809640000061336,
+        "setup_seconds": 0.29131260000031034,
+        "execution_seconds": 6.735190299999886,
+        "oracle_seconds": 0.05240649999996094,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "2e14adc70c6774191b3c941f4ba523d789efb211cc53187e5d271d3121f487d1",
+        "run_id": "3abc81bfcc2945be8ae377ff4119ddf9",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "runtime_history_snapshots": 2,
+        "export_seconds": 12.205045099999552,
+        "exported_history_snapshots": 2,
+        "archive_write_seconds": 0.0009417999999641324,
+        "archive_bytes": 1284720,
+        "archive_sha256": "df57cfd16e5cf624c5f1184a0d7c2787bb76bfd6d1950c91e6848fb27292b950",
+        "process_operation_seconds": 20.279472400000486,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 790638592,
+        "returncode": 0
+      },
+      "reopen": {
+        "status": "passed",
+        "kind": "reopen",
+        "stage": "complete",
+        "import_seconds": 0.7991086000001815,
+        "reopen_seconds": 14.382773299999826,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "2e14adc70c6774191b3c941f4ba523d789efb211cc53187e5d271d3121f487d1",
+        "run_id": "3abc81bfcc2945be8ae377ff4119ddf9",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "reopened_history_snapshots": 2,
+        "process_operation_seconds": 14.472843499999726,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 661667840,
+        "returncode": 0
+      }
+    },
+    {
+      "index": 2,
+      "kind": "measured",
+      "status": "passed",
+      "archive": "sample-02.dataworks",
+      "run": {
+        "status": "passed",
+        "kind": "run",
+        "stage": "complete",
+        "import_seconds": 0.8457911999994394,
+        "input_read_seconds": 0.0013664999996763072,
+        "input_bytes": 4230060,
+        "input_sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e",
+        "ingestion_seconds": 0.24422379999941768,
+        "setup_seconds": 0.2718112000002293,
+        "execution_seconds": 6.470487399999911,
+        "oracle_seconds": 0.05125339999995049,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "bece2919ab33027ea20265503a206eaa07146bca3bd78914adc28e2ca999f130",
+        "run_id": "671c09d51e2841029a87ba9ce2b57a3b",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "runtime_history_snapshots": 2,
+        "export_seconds": 12.116200299999946,
+        "exported_history_snapshots": 2,
+        "archive_write_seconds": 0.011121900000034657,
+        "archive_bytes": 1284723,
+        "archive_sha256": "ca8280f4e8f38d513a7c8c1cfade1c078d514316d27647c1f12e14e0e1ece25e",
+        "process_operation_seconds": 20.01485479999974,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 790343680,
+        "returncode": 0
+      },
+      "reopen": {
+        "status": "passed",
+        "kind": "reopen",
+        "stage": "complete",
+        "import_seconds": 0.8227816999997231,
+        "reopen_seconds": 14.33321799999976,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "bece2919ab33027ea20265503a206eaa07146bca3bd78914adc28e2ca999f130",
+        "run_id": "671c09d51e2841029a87ba9ce2b57a3b",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "reopened_history_snapshots": 2,
+        "process_operation_seconds": 14.385964900000545,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 662040576,
+        "returncode": 0
+      }
+    },
+    {
+      "index": 3,
+      "kind": "measured",
+      "status": "passed",
+      "archive": "sample-03.dataworks",
+      "run": {
+        "status": "passed",
+        "kind": "run",
+        "stage": "complete",
+        "import_seconds": 0.7726233000003049,
+        "input_read_seconds": 0.0012249000001247623,
+        "input_bytes": 4230060,
+        "input_sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e",
+        "ingestion_seconds": 0.2156302000003052,
+        "setup_seconds": 0.28145369999947434,
+        "execution_seconds": 6.277130899999975,
+        "oracle_seconds": 0.05102879999958532,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "e84bb46a9743c17a6173cdc2d79d2f7695d72aa3e2fb08e97f0f606e5c77884a",
+        "run_id": "d78467dc22814fea825414cf49af0db0",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "runtime_history_snapshots": 2,
+        "export_seconds": 12.053574900000058,
+        "exported_history_snapshots": 2,
+        "archive_write_seconds": 0.0009332999998150626,
+        "archive_bytes": 1284716,
+        "archive_sha256": "63cc894a151bf76ff34e60d575330facc87a1e791576f032d9817faeaa9ea687",
+        "process_operation_seconds": 19.65673120000065,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 789553152,
+        "returncode": 0
+      },
+      "reopen": {
+        "status": "passed",
+        "kind": "reopen",
+        "stage": "complete",
+        "import_seconds": 0.8107363999997688,
+        "reopen_seconds": 14.150822499999776,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "e84bb46a9743c17a6173cdc2d79d2f7695d72aa3e2fb08e97f0f606e5c77884a",
+        "run_id": "d78467dc22814fea825414cf49af0db0",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "reopened_history_snapshots": 2,
+        "process_operation_seconds": 14.207260199999837,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 662274048,
+        "returncode": 0
+      }
+    },
+    {
+      "index": 4,
+      "kind": "measured",
+      "status": "passed",
+      "archive": "sample-04.dataworks",
+      "run": {
+        "status": "passed",
+        "kind": "run",
+        "stage": "complete",
+        "import_seconds": 0.7711389999994935,
+        "input_read_seconds": 0.0010910000000876607,
+        "input_bytes": 4230060,
+        "input_sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e",
+        "ingestion_seconds": 0.2078842999999324,
+        "setup_seconds": 0.2773569999999381,
+        "execution_seconds": 6.366294200000084,
+        "oracle_seconds": 0.05107060000045749,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "ae136a7f40bfa50bdb1f7163462435e49e2246c5fd91e32c3d2b0c34f8216dbf",
+        "run_id": "4fc1824bbae54f9782a02c3ede37f4e2",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "runtime_history_snapshots": 2,
+        "export_seconds": 12.3982132000001,
+        "exported_history_snapshots": 2,
+        "archive_write_seconds": 0.0008604000004197587,
+        "archive_bytes": 1284728,
+        "archive_sha256": "9e35a866cb8c6989009a2e6604f87df4e163adda04cfdf529e6771b5ba21937a",
+        "process_operation_seconds": 20.0767907999998,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 790626304,
+        "returncode": 0
+      },
+      "reopen": {
+        "status": "passed",
+        "kind": "reopen",
+        "stage": "complete",
+        "import_seconds": 0.9047224000005372,
+        "reopen_seconds": 15.557766099999753,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "ae136a7f40bfa50bdb1f7163462435e49e2246c5fd91e32c3d2b0c34f8216dbf",
+        "run_id": "4fc1824bbae54f9782a02c3ede37f4e2",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "reopened_history_snapshots": 2,
+        "process_operation_seconds": 15.622115799999847,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 642568192,
+        "returncode": 0
+      }
+    },
+    {
+      "index": 5,
+      "kind": "measured",
+      "status": "passed",
+      "archive": "sample-05.dataworks",
+      "run": {
+        "status": "passed",
+        "kind": "run",
+        "stage": "complete",
+        "import_seconds": 1.0919935000001715,
+        "input_read_seconds": 0.003560500000276079,
+        "input_bytes": 4230060,
+        "input_sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e",
+        "ingestion_seconds": 0.27354770000056305,
+        "setup_seconds": 0.24957939999967493,
+        "execution_seconds": 6.820574100000158,
+        "oracle_seconds": 0.0528902999994898,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "abdd031d729d96b4678116684497694965cf9bcf68756778a094a09fb07d9bf6",
+        "run_id": "d0c5443a92f24aff8b2bfb935b1f7c62",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "runtime_history_snapshots": 2,
+        "export_seconds": 12.837998799999696,
+        "exported_history_snapshots": 2,
+        "archive_write_seconds": 0.0010600999994494487,
+        "archive_bytes": 1284720,
+        "archive_sha256": "2a3946ed51fd2fa47ec7e00d1feef7db00d9dee018be57860984c2d8dc880aa8",
+        "process_operation_seconds": 21.33403929999986,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 789905408,
+        "returncode": 0
+      },
+      "reopen": {
+        "status": "passed",
+        "kind": "reopen",
+        "stage": "complete",
+        "import_seconds": 2.4288757000003898,
+        "reopen_seconds": 17.21085949999997,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "abdd031d729d96b4678116684497694965cf9bcf68756778a094a09fb07d9bf6",
+        "run_id": "d0c5443a92f24aff8b2bfb935b1f7c62",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "reopened_history_snapshots": 2,
+        "process_operation_seconds": 17.283478000000287,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 661372928,
+        "returncode": 0
+      }
+    },
+    {
+      "index": 6,
+      "kind": "measured",
+      "status": "passed",
+      "archive": "sample-06.dataworks",
+      "run": {
+        "status": "passed",
+        "kind": "run",
+        "stage": "complete",
+        "import_seconds": 0.831748399999924,
+        "input_read_seconds": 0.008447300000625546,
+        "input_bytes": 4230060,
+        "input_sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e",
+        "ingestion_seconds": 0.2740469000000303,
+        "setup_seconds": 0.3334231999997428,
+        "execution_seconds": 7.352867799999331,
+        "oracle_seconds": 0.05274829999962094,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "543db91780e34216f4d40d70ac41db34564d6443404f9cc467385327dfff49bc",
+        "run_id": "b3e18e042a4347508bcc669082e138de",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "runtime_history_snapshots": 2,
+        "export_seconds": 12.452750999999807,
+        "exported_history_snapshots": 2,
+        "archive_write_seconds": 0.011255099999289087,
+        "archive_bytes": 1284715,
+        "archive_sha256": "3833d8351230f9110977079c4fe8709cf65df390b7d66dd996d53527358f1275",
+        "process_operation_seconds": 21.319916499999636,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 791093248,
+        "returncode": 0
+      },
+      "reopen": {
+        "status": "passed",
+        "kind": "reopen",
+        "stage": "complete",
+        "import_seconds": 0.8506867000005514,
+        "reopen_seconds": 13.600363100000322,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "543db91780e34216f4d40d70ac41db34564d6443404f9cc467385327dfff49bc",
+        "run_id": "b3e18e042a4347508bcc669082e138de",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "reopened_history_snapshots": 2,
+        "process_operation_seconds": 13.650144000000182,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 662749184,
+        "returncode": 0
+      }
+    },
+    {
+      "index": 7,
+      "kind": "measured",
+      "status": "passed",
+      "archive": "sample-07.dataworks",
+      "run": {
+        "status": "passed",
+        "kind": "run",
+        "stage": "complete",
+        "import_seconds": 0.7108104000008098,
+        "input_read_seconds": 0.0010963999993691687,
+        "input_bytes": 4230060,
+        "input_sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e",
+        "ingestion_seconds": 0.1913262999996732,
+        "setup_seconds": 0.2577615000000151,
+        "execution_seconds": 6.208394000000226,
+        "oracle_seconds": 0.049342600000272796,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "5af808711400471ed8fb5031e8f533ec31a6177a741f6f1915b97de586c0069e",
+        "run_id": "f7e02a82eb8040cda1f652437484ed24",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "runtime_history_snapshots": 2,
+        "export_seconds": 11.7441560999996,
+        "exported_history_snapshots": 2,
+        "archive_write_seconds": 0.0011942999999519088,
+        "archive_bytes": 1284716,
+        "archive_sha256": "ba4be53b32a3e1e2cb44b7a0b324c9b29ff2a61d273a3195b50da3d5513dbf9b",
+        "process_operation_seconds": 19.169172700000672,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 790749184,
+        "returncode": 0
+      },
+      "reopen": {
+        "status": "passed",
+        "kind": "reopen",
+        "stage": "complete",
+        "import_seconds": 0.7220030999997107,
+        "reopen_seconds": 13.489986399999907,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "5af808711400471ed8fb5031e8f533ec31a6177a741f6f1915b97de586c0069e",
+        "run_id": "f7e02a82eb8040cda1f652437484ed24",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "reopened_history_snapshots": 2,
+        "process_operation_seconds": 13.540847299999768,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 662761472,
+        "returncode": 0
+      }
+    },
+    {
+      "index": 8,
+      "kind": "measured",
+      "status": "passed",
+      "archive": "sample-08.dataworks",
+      "run": {
+        "status": "passed",
+        "kind": "run",
+        "stage": "complete",
+        "import_seconds": 0.6953884999993534,
+        "input_read_seconds": 0.0011067999994338606,
+        "input_bytes": 4230060,
+        "input_sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e",
+        "ingestion_seconds": 0.20677000000068801,
+        "setup_seconds": 0.2701928999995289,
+        "execution_seconds": 6.22725089999949,
+        "oracle_seconds": 0.05323670000052516,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "f0921a04522806e431a228a76c37b2ea765d9bfc809974bc6101a5a96cafdaa5",
+        "run_id": "799e5d49a77d4d39a19c5bfdc07b663a",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "runtime_history_snapshots": 2,
+        "export_seconds": 11.717490699999871,
+        "exported_history_snapshots": 2,
+        "archive_write_seconds": 0.0008658000006107613,
+        "archive_bytes": 1284724,
+        "archive_sha256": "d32c05f714fd64dc5ce126b06f230a0d55c25ce229987e11017c60e926aebe72",
+        "process_operation_seconds": 19.174895599999218,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 789798912,
+        "returncode": 0
+      },
+      "reopen": {
+        "status": "passed",
+        "kind": "reopen",
+        "stage": "complete",
+        "import_seconds": 0.778614199999538,
+        "reopen_seconds": 13.856415999999626,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "f0921a04522806e431a228a76c37b2ea765d9bfc809974bc6101a5a96cafdaa5",
+        "run_id": "799e5d49a77d4d39a19c5bfdc07b663a",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "reopened_history_snapshots": 2,
+        "process_operation_seconds": 13.906802900000002,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 661377024,
+        "returncode": 0
+      }
+    },
+    {
+      "index": 9,
+      "kind": "measured",
+      "status": "passed",
+      "archive": "sample-09.dataworks",
+      "run": {
+        "status": "passed",
+        "kind": "run",
+        "stage": "complete",
+        "import_seconds": 0.6989271000002191,
+        "input_read_seconds": 0.0011663000004773494,
+        "input_bytes": 4230060,
+        "input_sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e",
+        "ingestion_seconds": 0.20658519999960845,
+        "setup_seconds": 0.2790527999995902,
+        "execution_seconds": 6.161498700000266,
+        "oracle_seconds": 0.0493984000004275,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "a66958a5a8f78e56b5bd5e6990d7609efcddacb6f83550bdbfa3b7b299095e4e",
+        "run_id": "768e4e53ff32450aaa1e27dc8aee5244",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "runtime_history_snapshots": 2,
+        "export_seconds": 11.667088500000318,
+        "exported_history_snapshots": 2,
+        "archive_write_seconds": 0.011110000000371656,
+        "archive_bytes": 1284730,
+        "archive_sha256": "e8189b41b3b7f87141b51a775929a35e630161a197befebecbe36c2e39b6bf02",
+        "process_operation_seconds": 19.07772610000029,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 789565440,
+        "returncode": 0
+      },
+      "reopen": {
+        "status": "passed",
+        "kind": "reopen",
+        "stage": "complete",
+        "import_seconds": 0.717162300000382,
+        "reopen_seconds": 14.178440200000296,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "a66958a5a8f78e56b5bd5e6990d7609efcddacb6f83550bdbfa3b7b299095e4e",
+        "run_id": "768e4e53ff32450aaa1e27dc8aee5244",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "reopened_history_snapshots": 2,
+        "process_operation_seconds": 14.228326499999639,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 662261760,
+        "returncode": 0
+      }
+    },
+    {
+      "index": 10,
+      "kind": "measured",
+      "status": "passed",
+      "archive": "sample-10.dataworks",
+      "run": {
+        "status": "passed",
+        "kind": "run",
+        "stage": "complete",
+        "import_seconds": 0.7028824999997596,
+        "input_read_seconds": 0.0010876000005737296,
+        "input_bytes": 4230060,
+        "input_sha256": "0044ea22bebda2be5c3242b249c3f32a184be3049fcfa80964b47991ee15f86e",
+        "ingestion_seconds": 0.18912000000000262,
+        "setup_seconds": 0.26772710000022926,
+        "execution_seconds": 6.077956799999811,
+        "oracle_seconds": 0.04833119999966584,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "c30785dd0be089cf1578e830e278f53413195d96cf34efd2a557609153605e0e",
+        "run_id": "3ccac09928d343a99709f4f94b88463f",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "runtime_history_snapshots": 2,
+        "export_seconds": 11.712356500000169,
+        "exported_history_snapshots": 2,
+        "archive_write_seconds": 0.010909999999967113,
+        "archive_bytes": 1284720,
+        "archive_sha256": "63dcec64df44315f7395bc0a4ec25a220a73c51f6579c25b3018e360761bd61a",
+        "process_operation_seconds": 19.013083099999676,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 790388736,
+        "returncode": 0
+      },
+      "reopen": {
+        "status": "passed",
+        "kind": "reopen",
+        "stage": "complete",
+        "import_seconds": 0.7345072999996773,
+        "reopen_seconds": 13.393072400000165,
+        "source_id": "f354abe90db9ad4513915e950f730781e5ee9b026c82f1da69b598e23ccb5aeb",
+        "plan_digest": "c30785dd0be089cf1578e830e278f53413195d96cf34efd2a557609153605e0e",
+        "run_id": "3ccac09928d343a99709f4f94b88463f",
+        "actual_report": {
+          "source_rows": 100000,
+          "accepted_rows": 50000,
+          "rejected_rows": 50000,
+          "rejection_reason_assignments": 70000,
+          "accepted_distinct_orders": 40000,
+          "accepted_quantity": 120000,
+          "accepted_line_counts_by_status": {
+            "fulfilled": 20000,
+            "pending": 20000,
+            "cancelled": 10000
+          },
+          "accepted_quantity_by_status": {
+            "fulfilled": 60000,
+            "pending": 30000,
+            "cancelled": 30000
+          }
+        },
+        "reopened_history_snapshots": 2,
+        "process_operation_seconds": 13.447257699999682,
+        "packages": {
+          "streamlit": "1.66.1",
+          "pandas": "3.1.0",
+          "numpy": "2.5.4",
+          "plotly": "7.1.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "joblib": "1.6.0",
+          "threadpoolctl": "3.7.0",
+          "Authlib": "1.9.1",
+          "openpyxl": "3.1.5",
+          "xlrd": "2.0.2",
+          "watchdog": "6.0.0"
+        },
+        "implementation_sha256": {
+          "backend/fulfillment.py": "44455c3c1860a3200b09e24f9fd62292cbb5ad8c0ce6f44069da39d1df733a37",
+          "backend/fulfillment_state.py": "420e4c9b282b284cdb659de7f4bf76e4d6378e7fbeb56eb378f47f6433ccb5c8",
+          "backend/project_io.py": "0115822aa5b117447e423382ac26c8897b6be0854f2477ed2a63f85f0bedc2b4",
+          "backend/fulfillment_wire.py": "3cc891ec024a1e6a63dba2e2948e05adc27810d139fd49f3f571433797b0f0c3",
+          "backend/resources.py": "9e9cfcb85a6b56828e016085d30912346f6b26975e455ca1f395e818bcc60f6a",
+          "scripts/benchmark_fulfillment.py": "7a8d457d0d7db51e8e652eaf4624c279fbf508deb3ead3183a8deb60e5a78290",
+          "requirements.txt": "bdb68448375567616b30a28244b07c482c136ec4da1019ed2bbe1faca8a8c130"
+        },
+        "peak_rss_bytes": 661524480,
+        "returncode": 0
+      }
+    }
+  ],
+  "assessment": {
+    "status": "passed",
+    "full_protocol": true,
+    "f14_gate_passed": true,
+    "archive_profile": "with_history",
+    "measured_samples": 10,
+    "warmup_samples": 1,
+    "metrics": {
+      "execution_p95_seconds": 7.352867799999331,
+      "export_p95_seconds": 12.837998799999696,
+      "reopen_p95_seconds": 17.21085949999997,
+      "peak_rss_bytes": 791093248
+    },
+    "gates": {
+      "sample_protocol_complete": true,
+      "all_samples_correct": true,
+      "input_within_20_mib": true,
+      "execution_p95_at_most_30_seconds": true,
+      "export_p95_at_most_30_seconds": true,
+      "reopen_p95_at_most_30_seconds": true,
+      "whole_process_peak_at_most_1_gib": true
+    }
+  },
+  "finished_at_utc": "2026-10-30T18:13:46.124397+00:00"
+}

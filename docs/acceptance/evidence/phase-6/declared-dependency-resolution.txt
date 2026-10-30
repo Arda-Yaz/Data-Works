@@ -1,0 +1,8 @@
+ERROR: Could not find a version that satisfies the requirement streamlit==1.66.1 (from versions: none)
+ERROR: No matching distribution found for streamlit==1.66.1
+WARNING: Failed to remove contents in a temporary directory 'C:\Users\Gaming\AppData\Local\Packages\sandbox.{82612eff-13ad-4de8-8aa7-ffb5cd4a4294}\AC\Temp\pip-build-tracker-kqje2a1r'.
+You can safely remove it manually.
+WARNING: Failed to remove contents in a temporary directory 'C:\Users\Gaming\AppData\Local\Packages\sandbox.{82612eff-13ad-4de8-8aa7-ffb5cd4a4294}\AC\Temp\pip-ephem-wheel-cache-ozmu5tno'.
+You can safely remove it manually.
+WARNING: Failed to remove contents in a temporary directory 'C:\Users\Gaming\AppData\Local\Packages\sandbox.{82612eff-13ad-4de8-8aa7-ffb5cd4a4294}\AC\Temp\pip-install-i0hpundx'.
+You can safely remove it manually.

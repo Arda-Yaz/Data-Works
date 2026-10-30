@@ -1,0 +1,9 @@
+{
+  "command": [
+    "C:\\Users\\Gaming\\Documents\\Data-Works\\.test-tmp\\phase6-declared-env\\Scripts\\python.exe",
+    "-c",
+    "import tempfile,unittest\nfrom pathlib import Path\nscratch=Path('.test-tmp'); scratch.mkdir(exist_ok=True)\nwith tempfile.TemporaryDirectory(prefix='page-text-',dir=scratch) as temporary:\n tempfile.tempdir=str(Path(temporary).resolve())\n suite=unittest.TestSuite()\n for pattern in ('test_fulfillment_pages.py','test_project_pages.py','test_state_consistency_pages.py','test_text_transform.py'):\n  suite.addTests(unittest.defaultTestLoader.discover('tests',pattern=pattern))\n result=unittest.TextTestRunner(verbosity=1).run(suite)\n raise SystemExit(0 if result.wasSuccessful() else 1)\n"
+  ],
+  "exit_code": 0,
+  "seconds": 10.832288799999333
+}

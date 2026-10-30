@@ -1,0 +1,6 @@
+*.zip
+*.csv
+*.dataworks
+extracted/
+extracted-final/
+environment-install/

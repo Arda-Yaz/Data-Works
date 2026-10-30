@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "review_scope": "Read-only exact ZIP inventory/content, current-source completeness, reproduction/release gate documents; no heavy tests during performance run",
+  "archive_sha256": "ddf3766473f917378732826575aa8f19ce2888d02df5be09d646082f32e6311d",
+  "bytes": 591768,
+  "source_files": 229,
+  "zip_members": 230,
+  "source_snapshot_sha256": "a51c930e8cd7fb715e6d82d00873bbc80f39800806e4e88dd34dff197cc5d758",
+  "bad_content": [],
+  "missing_runtime_tests_or_fixtures": [],
+  "current_source_differences": [],
+  "forbidden_inventory_paths": [],
+  "origin_state": "exact content snapshot; may include uncommitted changes",
+  "release_ready": false,
+  "claims_review": "Reproduction instructions accurately distinguish clean declared installation, historical observed environment, separate-copy evidence, and open independent-human/operator/Linux/licensing gates. Hashes explicitly not authentication. F14 must be attributed after pending final measurement."
+}

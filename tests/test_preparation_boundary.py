@@ -13,7 +13,7 @@ from backend.dataset_preparation import prepare_dataset
 
 class PreparationBoundaryTests(unittest.TestCase):
     def test_preparation_owns_frame_and_nested_metadata_and_preserves_index(self):
-        frame = pd.DataFrame({"code": ["001", "002", "001"]}, index=[4, 4, 7])
+        frame = pd.DataFrame({"code": ["001", "002", "001"]}, index=[4, 4, 7], dtype=object)
         metadata = {"code": {"role": "id", "allowed_values": ["001", "002"]}}
         original = frame.copy(deep=True)
         original_metadata = copy.deepcopy(metadata)
@@ -31,6 +31,21 @@ class PreparationBoundaryTests(unittest.TestCase):
         assert_frame_equal(frame, original)
         self.assertEqual(metadata, original_metadata)
 
+    def test_string_storage_and_missing_semantics_survive_preparation(self):
+        for missing in (pd.NA, float("nan")):
+            with self.subTest(missing=repr(missing)):
+                storage = pd.StringDtype(storage="python", na_value=missing)
+                frame = pd.DataFrame({"code": pd.Series(["001", None, "002"], dtype=storage)})
+                frame.index = [4, 4, 7]
+                before = frame.copy(deep=True)
+                candidate, metadata = prepare_dataset(frame, {})
+                assert_frame_equal(candidate, before)
+                self.assertEqual(metadata["code"]["current_dtype"], str(storage))
+                self.assertEqual(metadata["code"]["original_dtype"], str(storage))
+                self.assertEqual(metadata["code"]["inferred_dtype"], "object")
+                self.assertEqual(candidate.index.tolist(), [4, 4, 7])
+                candidate.iloc[0, 0] = "999"
+                assert_frame_equal(frame, before)
     def test_dtype_change_clears_conversion_request_unless_schema_is_explicit(self):
         before = pd.DataFrame({"value": pd.Series([1, 2], dtype="Int64")})
         after = before.astype({"value": "Float64"})
@@ -67,7 +82,7 @@ class PreparationBoundaryTests(unittest.TestCase):
             from backend.ingestion import infer_column_meta
             from backend.operations import replay_operations
 
-            original = pd.DataFrame({'x': ['1', None, '3']}, index=[4, 4, 7])
+            original = pd.DataFrame({'x': ['1', None, '3']}, index=[4, 4, 7], dtype=object)
             metadata = infer_column_meta(original)
             schema = {key: dict(value) for key, value in metadata.items()}
             schema['x']['user_dtype'] = 'int64'

@@ -203,7 +203,7 @@ if st.button("Replace working data", key="test_replace"):
         self.assertIsNone(app.session_state["df"])
         self.assertEqual(app.session_state["viz_charts"], [])
         self.assertEqual(app.session_state["ui_theme"], "dark")
-        self.assertNotIn("ml_target", app.session_state.filtered_state)
+        self.assertNotIn("ml_target", app.session_state)
 
 
 if __name__ == "__main__":

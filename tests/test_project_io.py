@@ -44,6 +44,38 @@ class ProjectCodecTests(unittest.TestCase):
         assert_frame_equal(result, frame)
         self.assertEqual(int(result.iloc[0, 0]), 9007199254740993)
 
+    def test_string_missing_semantics_and_storage_survive_frame_and_index_round_trip(self):
+        for storage in ("python", "pyarrow"):
+            for missing in (pd.NA, np.nan):
+                dtype = pd.StringDtype(storage=storage, na_value=missing)
+                with self.subTest(storage=storage, missing=str(missing)):
+                    frame = pd.DataFrame({"token": pd.Series(["0001", None, "NA"], dtype=dtype)})
+                    frame.index = pd.Index(["first", None, "last"], dtype=dtype, name="source")
+                    frame.columns = pd.Index(["token"], dtype=dtype)
+                    restored = loads_project(dumps_project({"df": frame}))["df"]
+                    assert_frame_equal(restored, frame)
+                    self.assertEqual(restored["token"].dtype.storage, storage)
+                    self.assertEqual(restored["token"].dtype.na_value is pd.NA, missing is pd.NA)
+                    if missing is pd.NA:
+                        self.assertIs(restored.iloc[1, 0], pd.NA)
+                    else:
+                        self.assertTrue(np.isnan(restored.iloc[1, 0]))
+
+    def test_object_string_indexes_do_not_reinfer_a_new_string_dtype(self):
+        frame = pd.DataFrame({"code": pd.Series(["001", None], dtype=object)})
+        frame.index = pd.Index(["one", None], dtype=object)
+        frame.columns = pd.Index(["code"], dtype=object)
+        assert_frame_equal(decode_value(encode_value(frame)), frame)
+
+    def test_legacy_string_descriptor_retains_nullable_semantics_and_invalid_mode_rejects(self):
+        series = pd.Series(["001", None], dtype=pd.StringDtype(storage="python"))
+        encoded = encode_value(series)
+        self.assertEqual(encoded["data"]["dtype"], {"kind": "string", "storage": "python"})
+        self.assertIs(decode_value(encoded).iloc[1], pd.NA)
+        encoded["data"]["dtype"]["na_value"] = "guess"
+        with self.assertRaises(ValueError):
+            decode_value(encoded)
+
     def test_large_integer_categorical_levels_are_not_converted_to_floats(self):
         value = 2**53 + 1
         frame = pd.DataFrame({"category": pd.Categorical.from_codes([0, -1], categories=pd.Index([value], dtype="int64"))})
@@ -162,6 +194,40 @@ class ProjectCodecTests(unittest.TestCase):
         encoded["data"][0]["values"] = [16777217]
         with self.assertRaisesRegex(ValueError, "round"):
             decode_value(encoded)
+
+    def test_numpy_arrays_reject_lossy_or_wrong_type_payloads(self):
+        cases = [("int64", 1.5), ("uint8", -1), ("bool", "false"),
+                 ("float32", 16777217), ("complex64", complex(16777217, 1)),
+                 ("U1", "ABC"), ("S1", b"ABC"),
+                 ("datetime64[D]", np.datetime64("2026-10-30T12", "h"))]
+        for dtype, value in cases:
+            with self.subTest(dtype=dtype), self.assertRaises(ValueError):
+                decode_value({"$dataworks": "array", "dtype": np.dtype(dtype).str,
+                              "shape": [1], "values": [encode_value(value)]})
+
+    def test_numpy_scalar_tag_rejects_array_values_and_lossy_casts(self):
+        for dtype, value in (("int64", [1, 2]), ("float64", [[1.0]]),
+                             ("object", [1, 2]), ("int64", 1.5), ("float32", 16777217)):
+            with self.subTest(dtype=dtype, value=value), self.assertRaises(ValueError):
+                decode_value({"$dataworks": "numpy_scalar", "dtype": np.dtype(dtype).str,
+                              "value": encode_value(value)})
+
+    def test_valid_numpy_arrays_keep_dtype_values_and_nonfinite_markers(self):
+        arrays = [np.array([True, False]), np.array([-128, 127], dtype="int8"),
+                  np.array([1.5, np.nan, np.inf, -np.inf], dtype="float16"),
+                  np.array([1+2j, complex(np.nan, 1), complex(1, np.nan)], dtype="complex64"),
+                  np.array(["001", "NA"], dtype="U3"), np.array([b"abc", b""], dtype="S3"),
+                  np.array([1, "NaT"], dtype="timedelta64[ns]"),
+                  np.array(np.uint64(2**64 - 1))]
+        objects = np.empty(2, dtype=object)
+        objects[0], objects[1] = {"kept": [1, 2]}, ["nested", None]
+        arrays.append(objects)
+        for source in arrays:
+            with self.subTest(dtype=source.dtype):
+                result = decode_value(encode_value(source))
+                self.assertEqual(result.dtype, source.dtype)
+                self.assertEqual(result.shape, source.shape)
+                np.testing.assert_array_equal(result, source)
 
 
 if __name__ == "__main__":

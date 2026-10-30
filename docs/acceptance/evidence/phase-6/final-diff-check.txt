@@ -1,0 +1,14 @@
+warning: in the working copy of 'DEPLOYMENT.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/dataset_preparation.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/ingestion.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/project_io.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/acceptance/evidence/phase-3/README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_fulfillment_pages.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_operation_recipes.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_preparation_boundary.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_project_io.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_project_pages.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_review_regressions.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_state_consistency_pages.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/test_text_transform.py', LF will be replaced by CRLF the next time Git touches it
