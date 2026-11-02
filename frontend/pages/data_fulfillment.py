@@ -49,31 +49,36 @@ def _next_action(workspace):
 
 
 def _show_workspace_status(workspace):
-    st.subheader("Workspace status")
     source = workspace["source"]
     plan = workspace["draft_plan"]
     latest = workspace["last_attempt"]
     committed = workspace["committed"]
     columns = st.columns(4)
     columns[0].caption("Current source")
-    columns[0].text(f"{len(source['rows']):,} lines · {source['source_id'][:12]}" if source else "No source loaded")
+    columns[0].text(f"{len(source['rows']):,} lines loaded" if source else "No source loaded")
     columns[1].caption("Current plan")
-    columns[1].text(f"Revision {plan['revision']} · {plan['plan_id'][:12]}")
+    columns[1].text(f"Revision {plan['revision']}")
     columns[2].caption("Latest attempt for these inputs")
     columns[2].text(latest["status"].replace("_", " ") if latest else "Not run")
     columns[3].caption("Successful result")
     if committed:
         label = "Matches current inputs" if StateManager.fulfillment_result_is_current() else "Earlier source or plan"
-        columns[3].text(f"{label} · {committed['attempt']['run_id'][:12]}")
+        columns[3].text(label)
     else:
         columns[3].text("No successful result")
     st.info(_next_action(workspace))
     show_project_download_status()
-    st.caption(
-        f"Undo retains {len(workspace['history'])} of at most {MAX_HISTORY} checkpoints within "
-        f"{resources.MAX_HISTORY_BYTES / 1024**2:g} MiB. Oldest checkpoints are released first; "
-        "a large change may leave no undo. Retain a project download before replacing work you need."
-    )
+    with st.expander("Source, run, and recovery details"):
+        if source:
+            st.text(f"Current source: {source['source_id'][:12]}")
+        st.text(f"Current plan: {plan['plan_id'][:12]} · Revision {plan['revision']}")
+        if committed:
+            st.text(f"Successful run: {committed['attempt']['run_id'][:12]}")
+        st.caption(
+            f"Undo retains {len(workspace['history'])} of at most {MAX_HISTORY} checkpoints within "
+            f"{resources.MAX_HISTORY_BYTES / 1024**2:g} MiB. Oldest checkpoints are released first; "
+            "a large change may leave no undo. Retain a project download before replacing work you need."
+        )
     notice = st.session_state.get("fulfillment_change_notice")
     if notice and notice["revision"] == st.session_state.project_revision:
         if notice["pruned"]:
@@ -266,76 +271,81 @@ def _show_result(workspace):
         st.warning("This result belongs to an earlier source or plan. Run the current plan to update it.")
     if workspace["last_attempt"] and workspace["last_attempt"]["run_id"] != attempt["run_id"]:
         st.caption("The latest attempt and this successful result are different runs.")
-    st.caption(
-        f"Source {attempt['source_id'][:12]} · Plan revision {attempt['plan_revision']} · Run {attempt['run_id'][:12]}"
-    )
-    st.caption("Report totals and fulfillment download buttons belong to this successful run, including when the latest attempt did not complete.")
+    st.caption("Report totals and downloads belong to this successful run. A preview filter never changes them.")
     totals = st.columns(4)
     for column, label, value in zip(totals, ("Source lines", "Accepted lines", "Quarantined lines", "Accepted orders"),
                                     (report["source_rows"], report["accepted_rows"], report["rejected_rows"], report["accepted_distinct_orders"])):
         column.metric(label, str(value))
     st.caption(f"Accepted quantity: {report['accepted_quantity']:,}. Reason assignments: {report['rejection_reason_assignments']:,}; a line may have more than one reason.")
-    statuses = []
-    for status, count in report["accepted_line_counts_by_status"].items():
-        statuses.append({"Status": status, "Accepted lines": str(count),
-                         "Accepted quantity": str(report["accepted_quantity_by_status"][status])})
-    st.dataframe(pd.DataFrame(statuses), hide_index=True, width="stretch")
+    accepted_tab, quarantine_tab, summary_tab = st.tabs(["Accepted lines", "Quarantine", "Status summary"])
+    with accepted_tab:
+        st.caption(f"Showing at most {_PREVIEW_ROWS} of {len(attempt['accepted']):,} accepted lines. The table toolbar exports only this preview. Use Download accepted CSV below for every accepted line in this result.")
+        st.dataframe(_accepted_frame(attempt["accepted"][:_PREVIEW_ROWS]), hide_index=True, width="stretch")
+    with quarantine_tab:
+        counts = Counter(reason for record in attempt["rejected"] for reason in record["reasons"])
+        reason = st.selectbox(
+            "Inspect quarantine reason", ["All reasons", *sorted(counts)],
+            format_func=lambda value: value if value == "All reasons" else f"{_REASON_LABELS.get(value, value)} ({counts[value]:,} lines)",
+            key=f"fulfillment_rejection_reason_{attempt['run_id']}",
+        )
+        matching = len(attempt["rejected"]) if reason == "All reasons" else counts[reason]
+        preview = list(islice((record for record in attempt["rejected"]
+                               if reason == "All reasons" or reason in record["reasons"]), _PREVIEW_ROWS))
+        st.caption(f"Showing {len(preview):,} of {matching:,} matching quarantined lines ({len(attempt['rejected']):,} total). This filter changes only the preview. The table toolbar exports this filtered preview; use Download quarantine CSV below for the full successful run. Original values, source-row references, and all reasons are retained.")
+        st.dataframe(_rejected_frame(preview), hide_index=True, width="stretch")
+    with summary_tab:
+        statuses = []
+        for status, count in report["accepted_line_counts_by_status"].items():
+            statuses.append({"Status": status, "Accepted lines": str(count),
+                             "Accepted quantity": str(report["accepted_quantity_by_status"][status])})
+        st.dataframe(pd.DataFrame(statuses), hide_index=True, width="stretch")
+        st.caption(f"Source {attempt['source_id'][:12]} · Plan revision {attempt['plan_revision']} · Run {attempt['run_id'][:12]}")
 
-    st.write("Accepted lines")
-    st.caption(f"Showing at most {_PREVIEW_ROWS} of {len(attempt['accepted']):,} accepted lines. The table toolbar exports only this preview. Use Download accepted CSV below for every accepted line in this result.")
-    st.dataframe(_accepted_frame(attempt["accepted"][:_PREVIEW_ROWS]), hide_index=True, width="stretch")
-    st.write("Quarantined lines with original values")
-    counts = Counter(reason for record in attempt["rejected"] for reason in record["reasons"])
-    reason = st.selectbox(
-        "Inspect quarantine reason", ["All reasons", *sorted(counts)],
-        format_func=lambda value: value if value == "All reasons" else f"{_REASON_LABELS.get(value, value)} ({counts[value]:,} lines)",
-        key=f"fulfillment_rejection_reason_{attempt['run_id']}",
-    )
-    matching = len(attempt["rejected"]) if reason == "All reasons" else counts[reason]
-    preview = list(islice((record for record in attempt["rejected"]
-                           if reason == "All reasons" or reason in record["reasons"]), _PREVIEW_ROWS))
-    st.caption(f"Showing {len(preview):,} of {matching:,} matching quarantined lines ({len(attempt['rejected']):,} total). This filter changes only the preview. The table toolbar exports this filtered preview; use Download quarantine CSV below for the full successful run. Report totals, source-row references, and all reasons are retained.")
-    st.dataframe(_rejected_frame(preview), hide_index=True, width="stretch")
-
-    mode = st.radio(
-        "Fulfillment CSV text handling", ["spreadsheet_safe", "raw"],
-        format_func=lambda value: "Spreadsheet-safe text" if value == "spreadsheet_safe" else "Raw values",
-        horizontal=True, key="fulfillment_export_mode",
-    )
-    st.caption("Spreadsheet-safe CSV prefixes formula-like text with an apostrophe. Raw CSV preserves the source text; the project always retains original values and types.")
+    with st.expander("CSV download options"):
+        mode = st.radio(
+            "Fulfillment CSV text handling", ["spreadsheet_safe", "raw"],
+            format_func=lambda value: "Spreadsheet-safe text" if value == "spreadsheet_safe" else "Raw values",
+            horizontal=True, key="fulfillment_export_mode",
+        )
+        st.caption("Spreadsheet-safe CSV prefixes formula-like text with an apostrophe. Raw CSV preserves the source text; the project always retains original values and types.")
     # State transitions replace owned results. The deferred exporters read this
     # committed run and build new frames, so another full copy per rerun is wasteful.
     accepted = attempt["accepted"]
     rejected = attempt["rejected"]
     suffix = attempt["run_id"][:12]
-    st.download_button(
-        "Download accepted CSV", lambda: export_csv(_accepted_frame(accepted), spreadsheet_safe=mode == "spreadsheet_safe"),
-        file_name=f"fulfillment-{suffix}-accepted.csv", mime="text/csv", key="fulfillment_accepted_download", on_click="ignore",
-    )
-    st.download_button(
-        "Download quarantine CSV", lambda: export_csv(_rejected_frame(rejected), spreadsheet_safe=mode == "spreadsheet_safe"),
-        file_name=f"fulfillment-{suffix}-quarantine.csv", mime="text/csv", key="fulfillment_rejected_download", on_click="ignore",
-    )
+    download_columns = st.columns(3)
+    with download_columns[0]:
+        st.download_button(
+            "Download accepted CSV", lambda: export_csv(_accepted_frame(accepted), spreadsheet_safe=mode == "spreadsheet_safe"),
+            file_name=f"fulfillment-{suffix}-accepted.csv", mime="text/csv", key="fulfillment_accepted_download", on_click="ignore",
+        )
+    with download_columns[1]:
+        st.download_button(
+            "Download quarantine CSV", lambda: export_csv(_rejected_frame(rejected), spreadsheet_safe=mode == "spreadsheet_safe"),
+            file_name=f"fulfillment-{suffix}-quarantine.csv", mime="text/csv", key="fulfillment_rejected_download", on_click="ignore",
+        )
     report_document = {key: attempt[key] for key in (
         "run_id", "source_id", "plan_id", "plan_revision", "plan_digest", "engine_version", "report",
     )}
-    st.download_button(
-        "Download fulfillment report", json.dumps(report_document, ensure_ascii=False, indent=2).encode("utf-8"),
-        file_name=f"fulfillment-{suffix}-report.json", mime="application/json", key="fulfillment_report_download", on_click="ignore",
-    )
-    st.info("Use Project & Exports to download a .dataworks archive containing source evidence, the saved plan, run results, and optional undo history. Retain that file to reopen this work in a new session.")
+    with download_columns[2]:
+        st.download_button(
+            "Download fulfillment report", json.dumps(report_document, ensure_ascii=False, indent=2).encode("utf-8"),
+            file_name=f"fulfillment-{suffix}-report.json", mime="application/json", key="fulfillment_report_download", on_click="ignore",
+        )
+    st.caption("Save a project in Project & Exports to retain the source, plan, results, and optional undo history together.")
 
 
 def data_fulfillment():
     st.title("Order Fulfillment")
-    st.caption("Prepare a monthly order-line file for fulfillment reporting. Identifiers remain text, invalid records are quarantined, and conflicting duplicates require a decision.")
+    st.caption("Load this month's CSV, run your plan, and review the accepted and quarantined lines.")
     _show_workspace_status(st.session_state.fulfillment)
     st.subheader("Monthly source file")
     uploaded = st.file_uploader("Choose an order-line CSV", type=["csv"], key="fulfillment_source_file")
-    options = st.columns(2)
-    encoding = options[0].text_input("Source text encoding", value="utf-8-sig", key="fulfillment_encoding")
-    delimiter = options[1].selectbox("Source delimiter", [",", ";", "\t", "|"],
-                                     format_func=lambda item: "Tab" if item == "\t" else item, key="fulfillment_delimiter")
+    with st.expander("File options"):
+        options = st.columns(2)
+        encoding = options[0].text_input("Source text encoding", value="utf-8-sig", key="fulfillment_encoding")
+        delimiter = options[1].selectbox("Source delimiter", [",", ";", "\t", "|"],
+                                         format_func=lambda item: "Tab" if item == "\t" else item, key="fulfillment_delimiter")
     if st.button("Load fulfillment source", disabled=uploaded is None, key="fulfillment_load"):
         try:
             with st.spinner("Reading and validating the source…"):
@@ -354,31 +364,32 @@ def data_fulfillment():
     workspace = st.session_state.fulfillment
     source = workspace["source"]
     if source is not None:
-        st.caption(f"Current source: {len(source['rows']):,} lines · Identity {source['source_id'][:12]}. Preview shows at most {_PREVIEW_ROWS} source lines and does not change execution scope.")
         with st.expander("Preview original source lines"):
+            st.caption(f"Showing at most {_PREVIEW_ROWS} of {len(source['rows']):,} source lines. Previewing does not change execution scope.")
             st.caption("The table toolbar exports only this source preview. The project archive retains the full original source.")
             st.dataframe(pd.DataFrame(source["rows"][:_PREVIEW_ROWS], columns=source["columns"], dtype=object), hide_index=True, width="stretch")
     else:
         st.info("Load a CSV with order_id, line_id, order_date, sku, quantity, and fulfillment_status.")
 
-    st.subheader("Reusable plan")
     plan = workspace["draft_plan"]
     digest = plan_digest(plan)
-    st.caption(f"Plan revision {plan['revision']} · Identity {plan['plan_id'][:12]} · Digest {digest[:12]}")
-    st.download_button("Download fulfillment plan", dumps_plan(plan), file_name="fulfillment-plan.json",
-                       mime="application/json", key="fulfillment_plan_download", on_click="ignore")
-    plan_file = st.file_uploader("Choose a saved fulfillment plan", type=["json"], key="fulfillment_plan_file")
-    if st.button("Open fulfillment plan", disabled=plan_file is None, key="fulfillment_plan_open"):
-        try:
-            previous_history_count = len(workspace["history"])
-            changed = StateManager.set_fulfillment_plan(loads_plan(plan_file.getvalue()))
-        except Exception as exc:
-            log_failure("fulfillment_plan_open_failed", exc)
-            st.error(f"Plan was not opened; the previous plan is unchanged. {exc}")
-        else:
-            _note_change("Saved plan opened. Run it for the current source." if changed else "This saved plan is already open.",
-                         previous_history_count, checkpoint=changed)
-            st.rerun()
+    with st.expander("Saved plan and processing rules"):
+        st.caption(f"Plan revision {plan['revision']} · Identity {plan['plan_id'][:12]} · Digest {digest[:12]}")
+        st.caption("Dates must be YYYY-MM-DD or YYYY/MM/DD. Quantities must be positive whole numbers; quantities are never filled. Exact duplicate lines keep the first source record; cancelled lines remain accepted.")
+        st.download_button("Download fulfillment plan", dumps_plan(plan), file_name="fulfillment-plan.json",
+                           mime="application/json", key="fulfillment_plan_download", on_click="ignore")
+        plan_file = st.file_uploader("Choose a saved fulfillment plan", type=["json"], key="fulfillment_plan_file")
+        if st.button("Open fulfillment plan", disabled=plan_file is None, key="fulfillment_plan_open"):
+            try:
+                previous_history_count = len(workspace["history"])
+                changed = StateManager.set_fulfillment_plan(loads_plan(plan_file.getvalue()))
+            except Exception as exc:
+                log_failure("fulfillment_plan_open_failed", exc)
+                st.error(f"Plan was not opened; the previous plan is unchanged. {exc}")
+            else:
+                _note_change("Saved plan opened. Run it for the current source." if changed else "This saved plan is already open.",
+                             previous_history_count, checkpoint=changed)
+                st.rerun()
     with st.expander("Review status mapping"):
         mapping_rows = list(islice(plan["steps"][1]["status_mapping"].items(), _PREVIEW_ROWS))
         st.dataframe(pd.DataFrame(mapping_rows, columns=["Source status (trimmed and lowercase)", "Fulfillment meaning"]),
@@ -402,7 +413,6 @@ def data_fulfillment():
             except Exception as exc:
                 log_failure("fulfillment_plan_edit_failed", exc)
                 st.error(f"Mapping was not applied; the previous plan is unchanged. {exc}")
-    st.caption("Dates must be YYYY-MM-DD or YYYY/MM/DD. Quantities must be positive whole numbers; quantities are never filled. Exact duplicate lines keep the first source record; cancelled lines remain accepted.")
     st.subheader("Run and review")
     buttons = st.columns(2)
     if buttons[0].button("Run fulfillment plan", disabled=source is None, type="primary", key="fulfillment_run"):

@@ -17,28 +17,29 @@ def _filename(name):
 
 
 def _save_project_section(filename):
-    st.subheader("Save this project")
-    st.caption(
-        "Includes source/working data, schema, transformation parameters, saved charts, completed experiment reports, "
-        "and fulfillment source, plan, results, and quarantine evidence when present. "
-        "Live fitted models are exported separately from Machine Learning."
-    )
-    with_history = st.checkbox(
-        "Include undo snapshots (larger file)",
-        value=st.session_state.get("_project_history_preference", True), key="project_include_history",
-    )
+    st.caption("Download a .dataworks archive to reopen this project with its data, settings, and recorded results.")
+    with st.expander("Archive contents & undo options"):
+        st.caption(
+            "Includes source/working data, schema, transformation parameters, saved charts, completed experiment reports, "
+            "and fulfillment source, plan, results, and quarantine evidence when present. "
+            "Live fitted models are exported separately from Machine Learning."
+        )
+        with_history = st.checkbox(
+            "Include undo snapshots (larger file)",
+            value=st.session_state.get("_project_history_preference", True), key="project_include_history",
+        )
+        dataset_history = len(st.session_state.get("history", []))
+        fulfillment_history = len(st.session_state.fulfillment["history"])
+        st.caption(
+            f"Retained undo snapshots: dataset {dataset_history}; fulfillment {fulfillment_history}. "
+            "Undo history is bounded by count and estimated memory; older snapshots can be released."
+        )
+        if with_history:
+            st.caption("This archive includes the retained snapshots only. Previously released undo history cannot be recovered from it.")
     # Streamlit removes widget state when navigating away. Keep this choice so
     # archive validity and the returning checkbox use the same save options.
     st.session_state["_project_history_preference"] = with_history
-    dataset_history = len(st.session_state.get("history", []))
-    fulfillment_history = len(st.session_state.fulfillment["history"])
-    st.caption(
-        f"Retained undo snapshots: dataset {dataset_history}; fulfillment {fulfillment_history}. "
-        "Undo history is bounded by count and estimated memory; older snapshots can be released."
-    )
-    if with_history:
-        st.caption("This archive includes the retained snapshots only. Previously released undo history cannot be recovered from it.")
-    else:
+    if not with_history:
         st.warning(
             "Undo snapshots are omitted from this download. Reopening it starts with no undo history; "
             "the current data, fulfillment source, plan, and recorded results remain included."
@@ -48,7 +49,7 @@ def _save_project_section(filename):
     if prepared and prepared["token"] != token:
         st.session_state.pop("prepared_project_download", None)
         prepared = None
-    if st.button("Prepare Project Download", key="project_prepare"):
+    if st.button("Prepare project archive", key="project_prepare", type="secondary" if prepared else "primary"):
         try:
             with st.spinner("Preparing the project archive…"):
                 archive = dumps_project(StateManager.export_project(include_history=with_history))
@@ -59,16 +60,14 @@ def _save_project_section(filename):
             st.error(f"Could not prepare the project. {exc}")
     if prepared:
         st.download_button(
-            "Download DataWorks Project", prepared["data"], file_name=f"{filename}.dataworks",
-            mime="application/zip", key="project_download", on_click="ignore",
+            "Download .dataworks archive", prepared["data"], file_name=f"{filename}.dataworks",
+            mime="application/zip", key="project_download", on_click="ignore", type="primary",
         )
         st.caption(f"Prepared {len(prepared['data']):,} bytes. Retain the download to reopen this work; new changes require a fresh download.")
     show_project_download_status()
 
 
-def data_project():
-    st.title("Project & Exports")
-    st.subheader("Open a project")
+def _open_project_section():
     st.caption("Opening a project replaces this session's dataset, history, charts, experiment reports, and fulfillment workspace.")
     uploaded = st.file_uploader("Choose a DataWorks project", type=["dataworks"], key="project_file")
     if st.button("Open Project", key="project_open", disabled=uploaded is None):
@@ -88,38 +87,20 @@ def data_project():
             st.toast("Project opened.")
             st.rerun()
 
-    fulfillment = st.session_state.fulfillment
-    if not StateManager.has_dataset() and fulfillment["source"] is None and fulfillment["committed"] is None:
-        st.info("Upload a dataset, load an Order Fulfillment source, or open a project to prepare downloads.")
-        return
-    name = st.text_input("Project name", value=st.session_state.project_name, max_chars=200, key="project_name_input")
-    try:
-        StateManager.set_project_name(name)
-    except ValueError as exc:
-        st.error(str(exc))
-        return
-    filename = _filename(name)
-    df = st.session_state.df
-    if df is None:
-        st.caption("Fulfillment project. Review the source, saved plan, accepted lines, and quarantined lines on Order Fulfillment.")
-        _save_project_section(filename)
-        return
-    st.caption(f"Working dataset: {len(df)} rows, {len(df.columns)} columns · State {st.session_state.data_version[:8]}")
-    with st.expander("Session resource usage"):
-        st.json(StateManager.resource_summary())
-        st.caption("Undo snapshots and experiments are bounded by count and estimated memory; oldest entries are released when their budget is reached.")
 
-    st.subheader("Download cleaned data")
-    csv_mode = st.radio(
-        "CSV text handling", ["spreadsheet_safe", "raw"],
-        format_func=lambda value: "Spreadsheet-safe text" if value == "spreadsheet_safe" else "Raw values",
-        horizontal=True, key="export_csv_mode",
-    )
-    include_index = st.checkbox("Include row index in CSV", value=False, key="export_csv_index")
-    st.caption(
-        "Spreadsheet-safe CSV prefixes formula-like text with an apostrophe. Raw CSV preserves that text; "
-        "spreadsheet programs may interpret it as formulas. Project files preserve data types and schema."
-    )
+def _export_data_section(df, filename):
+    st.caption("Export the current working table as CSV. Use a .dataworks archive to reopen the whole project.")
+    with st.expander("CSV options"):
+        csv_mode = st.radio(
+            "CSV text handling", ["spreadsheet_safe", "raw"],
+            format_func=lambda value: "Spreadsheet-safe text" if value == "spreadsheet_safe" else "Raw values",
+            horizontal=True, key="export_csv_mode",
+        )
+        include_index = st.checkbox("Include row index in CSV", value=False, key="export_csv_index")
+        st.caption(
+            "Spreadsheet-safe CSV prefixes formula-like text with an apostrophe. Raw CSV preserves that text; "
+            "spreadsheet programs may interpret it as formulas. Project files preserve data types and schema."
+        )
     exported = df.copy(deep=True)
     st.download_button(
         "Download cleaned CSV",
@@ -127,9 +108,8 @@ def data_project():
         file_name=f"{filename}-cleaned.csv", mime="text/csv", key="export_cleaned_csv", on_click="ignore",
     )
 
-    _save_project_section(filename)
 
-    st.subheader("Transformation history")
+def _transformation_history_section(filename):
     operations = st.session_state.operation_log
     if operations:
         rows = []
@@ -143,10 +123,10 @@ def data_project():
                 "Columns before": effect.get("columns_before"), "Columns after": effect.get("columns_after"),
             })
         st.dataframe(pd.DataFrame(rows), width="stretch")
-        with st.expander("Exact operation parameters"):
-            for operation in operations:
-                st.write(operation["name"])
-                st.json(encode_value({"kind": operation["kind"], "parameters": operation["parameters"]}))
+        st.markdown("**Exact operation parameters**")
+        for operation in operations:
+            st.write(operation["name"])
+            st.json(encode_value({"kind": operation["kind"], "parameters": operation["parameters"]}))
     else:
         st.info("No transformations have been applied to the original upload.")
     replayable = all(operation.get("replayable", False) for operation in operations)
@@ -176,3 +156,52 @@ def data_project():
                 st.success("The recorded parameters reproduce the working data and schema exactly.")
             else:
                 st.error("The recorded parameters do not reproduce the current state. Save the project to preserve its data; this recipe is not a complete reconstruction.")
+
+
+def data_project():
+    st.title("Project & Exports")
+    st.caption("Save your work, export a table, or reopen an archive. This session is not autosaved.")
+    save_tab, export_tab, open_tab = st.tabs(["Save project", "Export data", "Open project"])
+    fulfillment = st.session_state.fulfillment
+    has_project = StateManager.has_dataset() or fulfillment["source"] is not None or fulfillment["committed"] is not None
+    filename = _filename(st.session_state.project_name)
+    valid_name = True
+
+    with save_tab:
+        if not has_project:
+            st.info("Upload a dataset, load an Order Fulfillment source, or open a project to prepare downloads.")
+        else:
+            name = st.text_input("Project name", value=st.session_state.project_name, max_chars=200, key="project_name_input")
+            try:
+                StateManager.set_project_name(name)
+            except ValueError as exc:
+                valid_name = False
+                st.error(str(exc))
+            if valid_name:
+                filename = _filename(name)
+                df = st.session_state.df
+                if df is None:
+                    st.caption("Fulfillment project. Review the source, saved plan, accepted lines, and quarantined lines on Order Fulfillment.")
+                else:
+                    st.caption(f"Working dataset: {len(df)} rows, {len(df.columns)} columns · State {st.session_state.data_version[:8]}")
+                _save_project_section(filename)
+                with st.expander("Session resource usage"):
+                    st.json(StateManager.resource_summary())
+                    st.caption("Undo snapshots and experiments are bounded by count and estimated memory; oldest entries are released when their budget is reached.")
+
+    with export_tab:
+        df = st.session_state.df
+        if df is None:
+            if has_project:
+                st.info("Download accepted CSV, quarantined records, and the processing report from Order Fulfillment.")
+            else:
+                st.info("Load a dataset or open a project to export data.")
+        elif not valid_name:
+            st.info("Enter a valid project name under Save project to prepare exports.")
+        else:
+            _export_data_section(df, filename)
+            with st.expander("Transformation history & recipe"):
+                _transformation_history_section(filename)
+
+    with open_tab:
+        _open_project_section()

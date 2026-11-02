@@ -16,6 +16,7 @@ from backend.cleaning import (
     build_missing_candidate,
     build_outlier_candidate,
     find_mismatches_by_allowed_values,
+    get_outlier_columns,
     remove_duplicates,
     validate_allowed_values,
 )
@@ -256,8 +257,23 @@ def apply_recipe_operation(df, metadata, operation):
         candidate, _ = remove_duplicates(df, subset=parameters["subset"], keep=parameters["keep"])
         return candidate, None, None, False
     if kind == "outliers":
-        candidate = build_outlier_candidate(df, parameters["actions"])
-        learns = any(choice[1] != "ignore" for choice in parameters["actions"].values())
+        actions = parameters["actions"]
+        _references(df, actions)
+        numeric = set(get_outlier_columns(df, metadata, include_protected=True))
+        nonnumeric = [column for column in actions if column not in numeric]
+        if nonnumeric:
+            raise ValueError(f"Outlier handling requires real numeric columns: {nonnumeric}.")
+        eligible = set(get_outlier_columns(
+            df, metadata, include_protected=parameters["include_protected"],
+        ))
+        protected = [column for column in actions if column not in eligible]
+        if protected:
+            raise ValueError(
+                f"Outlier recipe references protected columns: {protected}. "
+                "Review their roles and numeric categories before setting include_protected=True."
+            )
+        candidate = build_outlier_candidate(df, actions)
+        learns = any(choice[1] != "ignore" for choice in actions.values())
         return candidate, None, None, learns
     if kind == "text_normalize":
         columns = parameters["columns"]

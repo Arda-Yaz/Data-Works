@@ -42,12 +42,16 @@ def row_inspector(df, *, key_prefix="inspect"):
             return
         options = df.columns.tolist()
         columns_key = f"{key_prefix}_columns"
+        default_columns = options
         if columns_key in st.session_state:
-            st.session_state[columns_key] = [
+            selected = [
                 column for column in st.session_state[columns_key] if column in df.columns
             ]
+            if selected != st.session_state[columns_key]:
+                st.session_state[columns_key] = selected
+            default_columns = None
         columns = st.multiselect(
-            "Columns to inspect and search", options, default=options,
+            "Columns to inspect and search", options, default=default_columns,
             format_func=repr, key=columns_key,
         )
         query = st.text_input("Find literal text (case-insensitive)", key=f"{key_prefix}_query")

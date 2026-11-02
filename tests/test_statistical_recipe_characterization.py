@@ -31,7 +31,9 @@ class StatisticalRecipeCharacterizationTests(unittest.TestCase):
 
     def test_generic_iqr_replay_refits_bounds_on_each_input(self):
         example = EXAMPLES["iqr_cap"]
-        recipe = [{"kind": "outliers", "parameters": {"actions": {"value": ["iqr", "cap"]}}}]
+        recipe = [{"kind": "outliers", "parameters": {
+            "actions": {"value": ["iqr", "cap"]}, "include_protected": True,
+        }}]
         a = replay_operations(pd.DataFrame({"value": example["month_a"]}), {}, recipe)
         b = replay_operations(pd.DataFrame({"value": example["month_b"]}), {}, recipe)
         self.assertEqual(a["df"]["value"].tolist(), [1, 2, 3, 4, 7])

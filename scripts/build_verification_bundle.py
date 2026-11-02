@@ -24,6 +24,7 @@ ADDITIONS = {
     "tests/fixtures/ingestion_v1/README.md", "tests/fixtures/ingestion_v1/original-synthetic.csv",
     "docs/acceptance/phase-6-protocol.md", "environment/verified-windows-py312.json",
     "environment/declared-clean-windows-py312.json",
+    "frontend/navigation.py", "frontend/styles.py", "tests/test_navigation.py",
 }
 
 

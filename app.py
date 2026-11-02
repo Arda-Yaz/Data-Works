@@ -3,6 +3,8 @@ import streamlit as st
 from backend.state import StateManager
 from backend.access import require_access
 from backend.diagnostics import configure_logging, log_failure
+from frontend.navigation import show_navigation
+from frontend.styles import apply_styles
 
 st.set_page_config(page_title="DataWorks", layout="wide")
 configure_logging()
@@ -15,21 +17,8 @@ _PAGES_NEED_DATA = {"Data Cleaning", "EDA", "Visualization", "Machine Learning"}
 
 
 def home_page():
-    st.sidebar.title("DataWorks")
-
-    all_pages = ["Upload", "Order Fulfillment", "Data Cleaning", "EDA", "Visualization", "Machine Learning", "Project & Exports"]
-    page = st.sidebar.selectbox("Navigate", all_pages)
-
-    # Undo button + operation history in sidebar
-    history = st.session_state.get("history", [])
-    if history:
-        st.sidebar.markdown("---")
-        st.sidebar.subheader("Dataset history")
-        for entry in reversed(history[-5:]):
-            st.sidebar.text(f"• {entry['name']}")
-        if st.sidebar.button("↩ Undo dataset change"):
-            if StateManager.undo():
-                st.rerun()
+    apply_styles()
+    page = show_navigation()
 
     # Guard: pages that need a loaded dataset
     if page in _PAGES_NEED_DATA and not StateManager.has_dataset():

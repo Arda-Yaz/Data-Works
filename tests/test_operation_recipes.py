@@ -97,6 +97,68 @@ class RecipeApplicationTests(unittest.TestCase):
         assert_frame_equal(self.frame, before)
         self.assertEqual(self.metadata, metadata)
 
+    def test_outlier_recipe_rejects_protected_columns_before_calculating_a_candidate(self):
+        frame = pd.DataFrame({"value": [1, 2, 3, 4, 100]})
+        before = frame.copy(deep=True)
+        for settings in (
+            {"role": "id"}, {"role": "datetime"}, {"role": "ignore"},
+            {"role": "feature", "is_categorical": True},
+        ):
+            for action in ("cap", "remove", "replace_nan", "ignore"):
+                metadata = {"value": settings.copy()}
+                original_metadata = copy.deepcopy(metadata)
+                record = operation("outliers", {
+                    "actions": {"value": ["iqr", action]}, "include_protected": False,
+                })
+                with self.subTest(settings=settings, action=action), patch(
+                    "backend.operations.build_outlier_candidate",
+                ) as calculate:
+                    with self.assertRaisesRegex(ValueError, "protected columns.*value"):
+                        apply_recipe_operation(frame, metadata, record)
+                    calculate.assert_not_called()
+                assert_frame_equal(frame, before)
+                self.assertEqual(metadata, original_metadata)
+
+    def test_outlier_recipe_explicit_opt_in_allows_protected_numeric_columns(self):
+        frame = pd.DataFrame({"order_id": [1, 2, 3, 4, 100]})
+        metadata = {"order_id": {"role": "id", "is_categorical": True}}
+        before, original_metadata = frame.copy(deep=True), copy.deepcopy(metadata)
+        candidate, explicit, confirmed, learns = apply_recipe_operation(
+            frame, metadata, operation("outliers", {
+                "actions": {"order_id": ["iqr", "cap"]}, "include_protected": True,
+            }),
+        )
+        self.assertEqual(candidate["order_id"].tolist(), [1, 2, 3, 4, 7])
+        self.assertIsNone(explicit)
+        self.assertIsNone(confirmed)
+        self.assertTrue(learns)
+        assert_frame_equal(frame, before)
+        self.assertEqual(metadata, original_metadata)
+
+    def test_outlier_recipe_default_policy_still_allows_numeric_features(self):
+        frame = pd.DataFrame({"measurement": [1, 2, 3, 4, 100]})
+        candidate, _, _, learns = apply_recipe_operation(
+            frame, {"measurement": {"role": "feature", "is_categorical": False}},
+            operation("outliers", {"actions": {"measurement": ["iqr", "cap"]}}),
+        )
+        self.assertEqual(candidate["measurement"].tolist(), [1, 2, 3, 4, 7])
+        self.assertTrue(learns)
+
+    def test_outlier_opt_in_does_not_allow_nonnumeric_columns(self):
+        frame = pd.DataFrame({"measurement": [1, 2, 3, 4, 100], "label": ["a"] * 5})
+        before = frame.copy(deep=True)
+        for include_protected in (False, True):
+            with self.subTest(include_protected=include_protected), patch(
+                "backend.operations.build_outlier_candidate",
+            ) as calculate:
+                with self.assertRaisesRegex(ValueError, "real numeric columns.*label"):
+                    apply_recipe_operation(frame, {}, operation("outliers", {
+                        "actions": {"measurement": ["iqr", "cap"], "label": ["iqr", "cap"]},
+                        "include_protected": include_protected,
+                    }))
+                calculate.assert_not_called()
+        assert_frame_equal(frame, before)
+
     def test_mismatch_removal_uses_positions_for_duplicate_labels(self):
         frame = pd.DataFrame({"label": ["allowed", "bad", "allowed"]}, index=["same", "same", "other"])
         metadata = infer_column_meta(frame)
@@ -173,6 +235,17 @@ class RecipeApplicationTests(unittest.TestCase):
 
 
 class ReplayTests(unittest.TestCase):
+    def test_outlier_replay_enforces_prepared_metadata_protection(self):
+        frame = pd.DataFrame({"order_id": [1, 2, 3, 4, 100]})
+        metadata = {"order_id": {"role": "id"}}
+        record = operation("outliers", {"actions": {"order_id": ["iqr", "cap"]}})
+        with self.assertRaisesRegex(ValueError, "operation 1.*protected columns.*order_id"):
+            replay_operations(frame, metadata, [record])
+        record["parameters"]["include_protected"] = True
+        result = replay_operations(frame, metadata, [record])
+        self.assertEqual(result["df"]["order_id"].tolist(), [1, 2, 3, 4, 7])
+        self.assertEqual(result["column_meta"]["order_id"]["role"], "id")
+
     def test_complete_chain_reproduces_values_schema_and_provenance(self):
         original = pd.DataFrame({
             "value": ["1", "2", None, "100", "2", "3"],

@@ -2,6 +2,18 @@
 
 Data-Works is a Streamlit application for uploading tabular datasets, reviewing schema, cleaning data, exploring distributions, building charts, and running quick machine learning experiments.
 
+## Workspace layout
+
+The sidebar separates **Data preparation** from **Order Fulfillment**. Data
+preparation follows **Load & review → Clean data → Explore data**; chart building
+and model training are available under **Charts & models**. Switching workspaces
+preserves their separate data and returns to the last data-preparation step.
+
+Use **Save, export & reopen** for project archives, CSV export, and opening saved
+projects. File options, technical identities, and advanced settings are collapsed
+by default. Accepted fulfillment rows, quarantine, and status totals have separate
+result tabs; their download buttons still export the complete successful run.
+
 ## Features
 
 - Upload CSV, TSV, TXT, Excel, JSON, and JSON Lines files with explicit reading options.

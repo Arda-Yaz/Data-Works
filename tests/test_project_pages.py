@@ -209,7 +209,7 @@ else:
 
     def test_project_route_is_accessible_without_an_upload(self):
         app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=30).run(timeout=30)
-        app.sidebar.selectbox[0].set_value("Project & Exports").run()
+        app.sidebar.button(key="nav_project").click().run()
         self.assert_clean(app)
         self.assertEqual(app.title[0].value, "Project & Exports")
         self.assertTrue(app.button(key="project_open").disabled)
